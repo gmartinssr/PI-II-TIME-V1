@@ -17,5 +17,5 @@
 
 **Semestre/Ano**: 2° semestre 2026
 
-**Professor Orientador**: Fernando Soares
+**Professor Orientador**: Fernando Silveira
 
