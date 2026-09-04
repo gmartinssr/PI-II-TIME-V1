@@ -1,4 +1,5 @@
-<!--CODIGO GERADO POR VITOR ZAGO GUEDES BATISTA -- RA: 26008322*/-->
+<!--CÓDIGO GERADO POR VITOR ZAGO GUEDES BATISTA -- RA: 26008322*/-->
+<!--Alterações feitas por Guilherme Baez Machado -- RA: 26008322-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,12 +20,12 @@
         <h2>Workflow</h2>
 
         <ul>
-            <li>Dashboard</li>
-            <li class="ativo">Demandas</li>
-            <li>Nova Demanda</li>
-            <li>Projetos</li>
-            <li>Perfil</li>
-            <li>Sair</li>
+        <li><a href="#">Dashboard</a></li>
+        <li class="ativo"><a href="#">Demandas</a></li>
+        <li><a href="#">Nova Demanda</a></li>
+        <li><a href="#">Projetos</a></li>
+        <li><a href="#">Perfil</a></li>
+        <li><a href="#">Sair</a></li>
         </ul>
 
     </aside>
@@ -105,110 +106,112 @@
         </section>
 
         <!-- TABELA -->
+         <!-- Usuários e Demandas apenas Placeholders - Para finais de visualização -->
         <section class="lista-demandas">
+            <div>
+                <table>
+                    
+                    <thead>
 
-            <table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Projeto</th>
+                            <th>Responsável</th>
+                            <th>Data Criação</th>
+                            <th>Prazo</th>
+                            <th>Ações</th>
+                        </tr>
 
-                <thead>
+                    </thead>
 
-                    <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Tipo</th>
-                        <th>Prioridade</th>
-                        <th>Status</th>
-                        <th>Projeto</th>
-                        <th>Responsável</th>
-                        <th>Data Criação</th>
-                        <th>Prazo</th>
-                        <th>Ações</th>
-                    </tr>
+                    <tbody>
 
-                </thead>
+                        <tr>
+                            <td>#001</td>
+                            <td>Corrigir erro de Login</td>
+                            <td>Defeito</td>
+                            <td><span class="badge critica">Crítica</span></td>
+                            <td><span class="badge andamento">Em andamento</span></td>
+                            <td>Sistema Acadêmico</td>
+                            <td>João Silva</td>
+                            <td>28/08/2026</td>
+                            <td>05/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                                <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
+                            </td>
+                        </tr>
 
-                <tbody>
+                        <tr>
+                            <td>#002</td>
+                            <td>Criar Dashboard</td>
+                            <td>Tarefa</td>
+                            <td><span class="badge alta">Alta</span></td>
+                            <td><span class="badge aberta">Aberta</span></td>
+                            <td>Portal Web</td>
+                            <td>Maria Souza</td>
+                            <td>29/08/2026</td>
+                            <td>08/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                                <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td>#001</td>
-                        <td>Corrigir erro de Login</td>
-                        <td>Defeito</td>
-                        <td><span class="badge critica">Crítica</span></td>
-                        <td><span class="badge andamento">Em andamento</span></td>
-                        <td>Sistema Acadêmico</td>
-                        <td>João Silva</td>
-                        <td>28/08/2026</td>
-                        <td>05/09/2026</td>
-                        <td class="acoes">
-                            <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
-                            <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>#003</td>
+                            <td>Documentar API</td>
+                            <td>Documentação</td>
+                            <td><span class="badge media">Média</span></td>
+                            <td><span class="badge revisao">Em revisão</span></td>
+                            <td>API Demandas</td>
+                            <td>Vitor Zago</td>
+                            <td>30/08/2026</td>
+                            <td>10/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                                <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td>#002</td>
-                        <td>Criar Dashboard</td>
-                        <td>Tarefa</td>
-                        <td><span class="badge alta">Alta</span></td>
-                        <td><span class="badge aberta">Aberta</span></td>
-                        <td>Portal Web</td>
-                        <td>Maria Souza</td>
-                        <td>29/08/2026</td>
-                        <td>08/09/2026</td>
-                        <td class="acoes">
-                            <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
-                            <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>#004</td>
+                            <td>Adicionar filtro por prioridade</td>
+                            <td>Melhoria</td>
+                            <td><span class="badge baixa">Baixa</span></td>
+                            <td><span class="badge concluida">Concluída</span></td>
+                            <td>Sistema Demandas</td>
+                            <td>Ana Costa</td>
+                            <td>25/08/2026</td>
+                            <td>01/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td>#003</td>
-                        <td>Documentar API</td>
-                        <td>Documentação</td>
-                        <td><span class="badge media">Média</span></td>
-                        <td><span class="badge revisao">Em revisão</span></td>
-                        <td>API Demandas</td>
-                        <td>Vitor Zago</td>
-                        <td>30/08/2026</td>
-                        <td>10/09/2026</td>
-                        <td class="acoes">
-                            <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
-                            <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>#005</td>
+                            <td>Atualizar banco de dados</td>
+                            <td>Tarefa</td>
+                            <td><span class="badge alta">Alta</span></td>
+                            <td><span class="badge cancelada">Cancelada</span></td>
+                            <td>Banco Oracle</td>
+                            <td>Carlos Lima</td>
+                            <td>22/08/2026</td>
+                            <td>30/08/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td>#004</td>
-                        <td>Adicionar filtro por prioridade</td>
-                        <td>Melhoria</td>
-                        <td><span class="badge baixa">Baixa</span></td>
-                        <td><span class="badge concluida">Concluída</span></td>
-                        <td>Sistema Demandas</td>
-                        <td>Ana Costa</td>
-                        <td>25/08/2026</td>
-                        <td>01/09/2026</td>
-                        <td class="acoes">
-                            <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
-                        </td>
-                    </tr>
+                    </tbody>
 
-                    <tr>
-                        <td>#005</td>
-                        <td>Atualizar banco de dados</td>
-                        <td>Tarefa</td>
-                        <td><span class="badge alta">Alta</span></td>
-                        <td><span class="badge cancelada">Cancelada</span></td>
-                        <td>Banco Oracle</td>
-                        <td>Carlos Lima</td>
-                        <td>22/08/2026</td>
-                        <td>30/08/2026</td>
-                        <td class="acoes">
-                            <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
-                        </td>
-                    </tr>
-
-                </tbody>
-
-            </table>
+                </table>
+            </div>
 
         </section>
 
