@@ -1,0 +1,412 @@
+/*Código Feito Por Guilherme Baez Machado -- RA: 26002725*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #E7E8ED;
+    color: #1F2937;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.sidebar {
+    width: 220px;
+    min-height: 100vh;
+    padding: 28px 20px;
+
+    background-color: #123E6B;
+    background-image: url("fundo-tela6.jpeg");
+    background-size: cover;
+    background-position: center;
+
+    color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    padding: 0 14px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 8px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 14px;
+    color: #FFFFFF;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    transform: translateX(3px);
+}
+
+.sidebar a.ativo {
+    background-color: rgba(10, 65, 115, 0.85);
+}
+
+main {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 32px;
+}
+
+.topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.topo h1 {
+    color: #174E87;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.topo p {
+    color: #64748B;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+.botao-nova {
+    background-color: #2E8B57;
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.botao-nova:hover {
+    background-color: #247347;
+    transform: translateY(-2px);
+}
+
+.cards-dashboard {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.cards-dashboard .card {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.90);
+    padding: 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+
+    min-height: 130px;
+}
+
+.cards-dashboard .card h3 {
+    color: #64748B;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.cards-dashboard .card p {
+    color: #174E87;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.distribuicao {
+    margin-bottom: 28px;
+}
+
+.distribuicao .row {
+    display: flex;
+    gap: 24px;
+}
+
+.distribuicao .col-md-6 {
+    flex: 1;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.90);
+    padding: 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+
+    height: 100%;
+}
+
+.card h2 {
+    color: #174E87;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+
+.prioridade,
+.tipo {
+    margin-bottom: 18px;
+}
+
+.linha-prioridade,
+.linha-tipo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+}
+
+.linha-prioridade p,
+.linha-tipo p {
+    margin: 0;
+}
+
+.numero {
+    color: #174E87;
+    font-weight: 600;
+}
+
+.barra {
+    width: 100%;
+    height: 8px;
+    background-color: #E5E7EB;
+    border-radius: 10px;
+}
+
+.barra-preenchida {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.critica {
+    width: 40%;
+    background-color: #EF4444;
+}
+
+.alta {
+    width: 70%;
+    background-color: #F97316;
+}
+
+.media {
+    width: 100%;
+    background-color: #EAB308;
+}
+
+.baixa {
+    width: 30%;
+    background-color: #22C55E;
+}
+
+.tarefa {
+    width: 100%;
+    background-color: #3B82F6;
+}
+
+.defeito {
+    width: 60%;
+    background-color: #EF4444;
+}
+
+.melhoria {
+    width: 50%;
+    background-color: #22C55E;
+}
+
+.documentacao {
+    width: 30%;
+    background-color: #8B5CF6;
+}
+
+.alertas {
+    margin-bottom: 28px;
+}
+
+.alertas .row {
+    display: flex;
+    gap: 24px;
+}
+
+.alertas .col-md-6 {
+    flex: 1;
+}
+
+.demanda-alerta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.demanda-alerta p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.demanda-alerta p:last-child { /*Ultimo elemento dentro da div --> pega somente o ultimo <p> da div demanda-alerta*/
+
+    /* EXEMPLO
+    <div>
+        <p>Primeiro</p>  ← :first-child
+        <p>Segundo</p>
+        <p>Terceiro</p>  ← :last-child
+    </div>
+    */
+
+    color: #64748B;
+    font-weight: 600;
+}
+
+/*A partir daqui começa o códgio de responsividade, ainda não entendi direito, mas tentei fazer pesquisando*/
+/*Basicamente, cada @media seria um tipo de disposivo, com um tamanho maximo*/
+/*de acordo com esse tamanho maximo, a gente altera certas propriedades visuais do site*/
+@media (max-width: 1000px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .cards-dashboard {
+        gap: 12px;
+    }
+
+    .cards-dashboard .card {
+        min-width: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 12px;
+        padding: 0;
+    }
+
+    .sidebar ul {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+    }
+
+    .sidebar li {
+        margin-bottom: 0;
+    }
+
+    .sidebar a {
+        padding: 9px 12px;
+        font-size: 14px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .topo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .botao-nova {
+        width: 100%;
+        text-align: center;
+    }
+
+    .cards-dashboard {
+        flex-direction: column;
+    }
+
+    .cards-dashboard .card {
+        width: 100%;
+    }
+
+    .distribuicao .row,
+    .alertas .row {
+        flex-direction: column;
+    }
+
+    .distribuicao .col-md-6,
+    .alertas .col-md-6 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+
+    main {
+        padding: 15px;
+    }
+
+    .topo h1 {
+        font-size: 26px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .card h2 {
+        font-size: 18px;
+    }
+
+    .cards-dashboard .card p {
+        font-size: 26px;
+    }
+
+    .demanda-alerta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
