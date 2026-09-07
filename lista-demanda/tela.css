@@ -261,32 +261,31 @@ tbody tr:hover {
     font-weight: 600;
     white-space: nowrap;
 }
-
 /* Status */
-
 .aberta {
-    background-color: #DBEAFE;
-    color: #1D4ED8;
+    background-color: #2563EB;
+    color: white;
 }
 
 .andamento {
-    background-color: #FEF3C7;
-    color: #B45309;
+    background-color: #F59E0B;
+    color: white;
 }
 
 .revisao {
-    background-color: #EDE9FE;
-    color: #7C3AED;
+    background-color: #9333EA;
+    color: white;
 }
 
 .concluida {
-    background-color: #DCFCE7;
-    color: #15803D;
+    background-color: #16A34A;
+    color: white;
 }
 
+
 .cancelada {
-    background-color: #FEE2E2;
-    color: #B91C1C;
+    background-color: #DC2626;
+    color: white;
 }
 
 /* Prioridade */
