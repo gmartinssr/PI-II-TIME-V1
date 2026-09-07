@@ -21,23 +21,26 @@ body {
     width: 220px;
     min-height: 100vh;
     padding: 28px 20px;
+
     background-color: #123E6B;
     background-image: url("fundo-tela6.jpeg");
     background-size: cover;
     background-position: center;
+
     color: #FFFFFF;
     flex-shrink: 0;
 }
 
 .sidebar h2 {
-    text-align: center;
     font-size: 26px;
     font-weight: 600;
     margin-bottom: 40px;
+    padding: 0 14px;
 }
 
 .sidebar ul {
     list-style: none;
+    padding: 0;
 }
 
 .sidebar li {
@@ -59,7 +62,7 @@ body {
     transform: translateX(3px);
 }
 
-.sidebar .ativo a {
+.sidebar a.ativo {
     background-color: rgba(10, 65, 115, 0.85);
 }
 
