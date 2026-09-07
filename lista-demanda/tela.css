@@ -257,7 +257,6 @@ tbody tr:hover {
     display: inline-block;
     padding: 5px 10px;
     border-radius: 20px;
-    color: #FFFFFF;
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
@@ -266,41 +265,50 @@ tbody tr:hover {
 /* Status */
 
 .aberta {
-    background-color: #2563EB;
+    background-color: #DBEAFE;
+    color: #1D4ED8;
 }
 
 .andamento {
-    background-color: #F59E0B;
+    background-color: #FEF3C7;
+    color: #B45309;
 }
 
 .revisao {
-    background-color: #9333EA;
+    background-color: #EDE9FE;
+    color: #7C3AED;
 }
 
 .concluida {
-    background-color: #16A34A;
+    background-color: #DCFCE7;
+    color: #15803D;
 }
 
 .cancelada {
-    background-color: #DC2626;
+    background-color: #FEE2E2;
+    color: #B91C1C;
 }
 
 /* Prioridade */
 
 .critica {
-    background-color: #B91C1C;
+    background-color: #FEE2E2;
+    color: #B91C1C;
 }
 
 .alta {
-    background-color: #EA580C;
+    background-color: #FFEDD5;
+    color: #C2410C;
 }
 
 .media {
-    background-color: #D97706;
+    background-color: #FEF3C7;
+    color: #A16207;
 }
 
 .baixa {
-    background-color: #15803D;
+    background-color: #DCFCE7;
+    color: #15803D;
 }
 
 .acoes {
