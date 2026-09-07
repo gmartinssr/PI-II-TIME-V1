@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workflow — Nova demanda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="page">
+
+  <header class="app-header">
+    <div class="brand">
+      <h1>Workflow</h1>
+      <span class="divider">/</span>
+      <span class="context">Demandas</span>
+    </div>
+    <span class="record-id">DEM-0142</span>
+  </header>
+
+  <form>
+    <div class="flow">
+
+      <!-- Seção 1 -->
+      <div class="section active">
+        <div class="flow-spine">
+          <div class="spine-node">1</div>
+          <div class="spine-line"></div>
+        </div>
+        <div class="section-body">
+          <div class="section-head">
+            <h2>Dados básicos</h2>
+            <p>O que precisa ser feito, em poucas palavras.</p>
+          </div>
+          <div class="panel">
+            <div class="field full">
+              <label for="titulo">Título da demanda</label>
+              <input type="text" id="titulo" name="titulo" placeholder="Ex.: Ajustar layout da tela de login" maxlength="80">
+            </div>
+            <div class="field full">
+              <label for="descricao">Descrição</label>
+              <textarea id="descricao" name="descricao" placeholder="Descreva o contexto, o objetivo e qualquer detalhe importante para quem for executar."></textarea>
+              <span class="char-count">0 / 1000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 2 -->
+      <div class="section">
+        <div class="flow-spine">
+          <div class="spine-node">2</div>
+          <div class="spine-line"></div>
+        </div>
+        <div class="section-body">
+          <div class="section-head">
+            <h2>Classificação</h2>
+            <p>Ajuda a organizar e priorizar no quadro de demandas.</p>
+          </div>
+          <div class="panel">
+            <div class="field-row">
+              <div class="field">
+                <label for="categoria">Categoria</label>
+                <select id="categoria" name="categoria">
+                  <option value="">Selecione</option>
+                  <option value="bug">Correção de bug</option>
+                  <option value="melhoria">Melhoria</option>
+                  <option value="novo">Nova funcionalidade</option>
+                  <option value="suporte">Suporte</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="projeto">Projeto relacionado</label>
+                <select id="projeto" name="projeto">
+                  <option value="">Selecione</option>
+                  <option value="workflow">Workflow</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Prioridade</label>
+              <div class="pill-group" role="radiogroup" aria-label="Prioridade">
+                <input type="radio" id="p-baixa" name="prioridade" value="baixa" checked>
+                <label class="pill" data-level="baixa" for="p-baixa"><span class="dot"></span>Baixa</label>
+
+                <input type="radio" id="p-media" name="prioridade" value="media">
+                <label class="pill" data-level="media" for="p-media"><span class="dot"></span>Média</label>
+
+                <input type="radio" id="p-alta" name="prioridade" value="alta">
+                <label class="pill" data-level="alta" for="p-alta"><span class="dot"></span>Alta</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 3 -->
+      <div class="section">
+        <div class="flow-spine">
+          <div class="spine-node">3</div>
+          <div class="spine-line"></div>
+        </div>
+        <div class="section-body">
+          <div class="section-head">
+            <h2>Atribuição e prazo</h2>
+            <p>Quem cuida disso e até quando.</p>
+          </div>
+          <div class="panel">
+            <div class="field-row">
+              <div class="field">
+                <label for="responsavel">Responsável</label>
+                <select id="responsavel" name="responsavel">
+                  <option value="">Selecione</option>
+                  <option value="joao">João</option>
+                  <option value="maria">Maria</option>
+                  <option value="equipe">Equipe Workflow</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="solicitante">Solicitante</label>
+                <input type="text" id="solicitante" name="solicitante" placeholder="Nome de quem abriu a demanda">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="abertura">Data de abertura</label>
+                <input type="date" id="abertura" name="abertura">
+              </div>
+              <div class="field">
+                <label for="prazo">Prazo</label>
+                <input type="date" id="prazo" name="prazo">
+              </div>
+            </div>
+            <div class="field full">
+              <label>Status atual</label>
+              <div class="status-row">
+                <span class="status-badge">Em aberto</span>
+                <span>alterado automaticamente conforme o andamento</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 4 -->
+      <div class="section">
+        <div class="flow-spine">
+          <div class="spine-node">4</div>
+        </div>
+        <div class="section-body">
+          <div class="section-head">
+            <h2>Anexos</h2>
+            <p>Opcional — prints, planilhas ou documentos de apoio.</p>
+          </div>
+          <div class="panel">
+            <div class="dropzone">
+              Arraste um arquivo aqui ou <strong>escolha no computador</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-danger-text">Excluir demanda</button>
+        <div class="actions-right">
+          <button type="button" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar demanda</button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+
+<script>
+  const textarea = document.getElementById('descricao');
+  const counter = document.querySelector('.char-count');
+  textarea.addEventListener('input', () => {
+    counter.textContent = `${textarea.value.length} / 1000`;
+  });
+</script>
+
+</body>
+</html>
