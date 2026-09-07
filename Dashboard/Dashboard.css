@@ -280,8 +280,133 @@ main {
     font-size: 14px;
 }
 
-.demanda-alerta p:last-child {
+.demanda-alerta p:last-child { /*Ultimo elemento dentro da div --> pega somente o ultimo <p> da div demanda-alerta*/
+
+    /* EXEMPLO
+    <div>
+        <p>Primeiro</p>  ← :first-child
+        <p>Segundo</p>
+        <p>Terceiro</p>  ← :last-child
+    </div>
+    */
+
     color: #64748B;
     font-weight: 600;
 }
 
+/*A partir daqui começa o códgio de responsividade, ainda não entendi direito, mas tentei fazer pesquisando*/
+/*Basicamente, cada @media seria um tipo de disposivo, com um tamanho maximo*/
+/*de acordo com esse tamanho maximo, a gente altera certas propriedades visuais do site*/
+@media (max-width: 1000px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .cards-dashboard {
+        gap: 12px;
+    }
+
+    .cards-dashboard .card {
+        min-width: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 12px;
+        padding: 0;
+    }
+
+    .sidebar ul {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+    }
+
+    .sidebar li {
+        margin-bottom: 0;
+    }
+
+    .sidebar a {
+        padding: 9px 12px;
+        font-size: 14px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .topo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .botao-nova {
+        width: 100%;
+        text-align: center;
+    }
+
+    .cards-dashboard {
+        flex-direction: column;
+    }
+
+    .cards-dashboard .card {
+        width: 100%;
+    }
+
+    .distribuicao .row,
+    .alertas .row {
+        flex-direction: column;
+    }
+
+    .distribuicao .col-md-6,
+    .alertas .col-md-6 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+
+    main {
+        padding: 15px;
+    }
+
+    .topo h1 {
+        font-size: 26px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .card h2 {
+        font-size: 18px;
+    }
+
+    .cards-dashboard .card p {
+        font-size: 26px;
+    }
+
+    .demanda-alerta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
