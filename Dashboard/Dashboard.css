@@ -214,42 +214,42 @@ main {
 
 .critica {
     width: 40%;
-    background-color: #B91C1C;
+    background-color: #EF4444;
 }
 
 .alta {
     width: 70%;
-    background-color: #EA580C;
+    background-color: #F97316;
 }
 
 .media {
     width: 100%;
-    background-color: #D97706;
+    background-color: #EAB308;
 }
 
 .baixa {
     width: 30%;
-    background-color: #15803D;
+    background-color: #22C55E;
 }
 
 .tarefa {
     width: 100%;
-    background-color: #2563EB;
+    background-color: #3B82F6;
 }
 
 .defeito {
     width: 60%;
-    background-color: #DC2626;
+    background-color: #EF4444;
 }
 
 .melhoria {
     width: 50%;
-    background-color: #16A34A;
+    background-color: #22C55E;
 }
 
 .documentacao {
     width: 30%;
-    background-color: #9333EA;
+    background-color: #8B5CF6;
 }
 
 .alertas {
