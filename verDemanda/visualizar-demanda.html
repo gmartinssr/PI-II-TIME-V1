@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workflow — Ver demanda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styleVisualizar.css">
+</head>
+<body>
+
+<div class="page">
+
+  <header class="app-header">
+    <div class="brand">
+      <h1>Workflow</h1>
+      <span class="divider">/</span>
+      <span class="context">Demandas</span>
+    </div>
+    <a href="listagem-demandas.html" class="back-link">&larr; Voltar para a lista</a>
+  </header>
+
+  <div class="title-bar">
+    <div class="title-bar-main">
+      <span class="record-id">DEM-0142</span>
+      <h2>Ajustar layout da tela de login</h2>
+    </div>
+    <div class="title-bar-actions">
+      <span class="status-badge status-andamento">Em andamento</span>
+      <a href="cadastro-demanda.html?id=DEM-0142" class="btn-primary">Editar demanda</a>
+    </div>
+  </div>
+
+  <div class="detail-grid">
+
+    <!-- Coluna principal -->
+    <div class="detail-main">
+
+      <div class="block">
+        <h3>Descrição</h3>
+        <p class="description-text">
+          O formulário de login está desalinhado em telas menores que 768px. O botão "Entrar"
+          fica colado na borda inferior e o campo de senha perde o espaçamento com o campo de
+          e-mail. Ajustar o espaçamento e testar em pelo menos três resoluções diferentes antes
+          de subir para produção.
+        </p>
+      </div>
+
+      <div class="block">
+        <h3>Anexos</h3>
+        <ul class="attachment-list">
+          <li class="attachment-item">
+            <span class="attachment-icon">📎</span>
+            <span class="attachment-name">print-tela-login-mobile.png</span>
+            <span class="attachment-size">238 KB</span>
+          </li>
+          <li class="attachment-item">
+            <span class="attachment-icon">📎</span>
+            <span class="attachment-name">checklist-resolucoes.pdf</span>
+            <span class="attachment-size">96 KB</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Coluna lateral: metadados -->
+    <aside class="detail-sidebar">
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span class="status-badge status-andamento">Em andamento</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Prioridade</span>
+        <span class="priority-tag priority-alta"><span class="dot"></span>Alta</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Categoria</span>
+        <span class="info-value">Correção de bug</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Projeto relacionado</span>
+        <span class="info-value">Workflow</span>
+      </div>
+
+      <div class="info-divider"></div>
+
+      <div class="info-row">
+        <span class="info-label">Responsável</span>
+        <span class="info-value">Maria</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Solicitante</span>
+        <span class="info-value">João</span>
+      </div>
+
+      <div class="info-divider"></div>
+
+      <div class="info-row">
+        <span class="info-label">Data de abertura</span>
+        <span class="info-value">01/09/2026</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Prazo</span>
+        <span class="info-value">16/09/2026</span>
+      </div>
+    </aside>
+
+  </div>
+
+</div>
+
+</body>
+</html>
