@@ -83,19 +83,31 @@ header span {
 }
 
 .btn-entrar {
+    display: block;
     width: 100%;
     padding: 10px;
+    box-sizing: border-box;
+
     background: rgba(255, 255, 255, 0.15);
-    color: white;
+    color: #FFFFFF;
+    text-decoration: none;
+    text-align: center;
+
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 8px;
+
     font-size: 16px;
     font-weight: bold;
+
     margin-top: 10px;
-    transition: 0.2s
+    cursor: pointer;
+
+    transition: 0.2s;
 }
 
 .btn-entrar:hover {
     background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.05);
+    color: #FFFFFF;
+    text-decoration: none;
+    transform: scale(1.02);
 }

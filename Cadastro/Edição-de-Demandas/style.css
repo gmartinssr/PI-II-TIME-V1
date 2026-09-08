@@ -356,22 +356,41 @@
   .btn-primary:hover { background: var(--accent-ink); }
 
   .btn-secondary {
-    background: #fff;
-    border-color: var(--line);
-    color: var(--ink);
+      display: inline-block;
+      padding: 10px 18px;
+      box-sizing: border-box;
+
+      text-decoration: none;
+      text-align: center;
+
+      cursor: pointer;
   }
   .btn-secondary:hover { border-color: #B9B6AC; }
 
   .btn-danger-text {
-    background: var(--danger);
-    color: #fff;
-    border: 1px solid var(--danger);
-    padding: 10px 18px;
-    border-radius: var(--radius);
+      display: inline-block;
+      padding: 10px 16px;
+
+      color: white;
+      background: #c0392b;
+
+      border: 1px solid transparent;
+      border-radius: 6px;
+
+      font-size: 14px;
+      font-weight: 600;
+
+      text-decoration: none;
+      cursor: pointer;
+
+      transition: 0.2s;
   }
-  .btn-danger-text:hover { 
-    background: #963722;
-    border-color: #963722; 
+
+  .btn-danger-text:hover {
+      color: #ffffff;
+      background: #641a12;
+      border-color: #641a12;
+      text-decoration: none;
   }
 
   @media (max-width: 640px) {
