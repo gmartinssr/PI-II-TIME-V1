@@ -1,0 +1,243 @@
+<!--CÓDIGO GERADO POR VITOR ZAGO GUEDES BATISTA -- RA: 26008322*/-->
+<!--Alterações feitas por Guilherme Baez Machado -- RA: 26008322-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Demandas</title>
+
+    <link rel="stylesheet" href="tela.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+        
+
+       <h2>Workflow</h2>
+
+    <ul>
+        <li>
+            <a href="dashboard.html">Dashboard</a>
+        </li>
+
+        <li class="ativo">
+            <a href="listagem-demandas.html">Demandas</a>
+        </li>
+
+        <li>
+            <a href="cadastro-demanda.html">Nova Demanda</a>
+        </li>
+
+        <li>
+            <a href="#">Sair</a>
+        </li>
+    </ul>
+
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+
+        <!-- CABEÇALHO -->
+        <section class="topo">
+
+            <div>
+                <h1>Listagem de Demandas</h1>
+            </div>
+
+            <a href="cadastro-demanda.html" class="botao-nova">
+                + Nova Demanda
+            </a>
+
+        </section>
+
+        <!-- CARDS -->
+        <section class="cards">
+
+            <div class="card">
+                <h3>Total</h3>
+                <p>0</p>
+            </div>
+
+            <div class="card">
+                <h3>Em andamento</h3>
+                <p>0</p>
+            </div>
+
+            <div class="card">
+                <h3>Concluídas</h3>
+                <p>0</p>
+            </div>
+
+            <div class="card">
+                <h3>Críticas</h3>
+                <p>0</p>
+            </div>
+
+        </section>
+
+        <!-- FILTROS -->
+        <section class="filtros">
+
+            <input type="text" placeholder="Buscar por título...">
+
+            <select>
+                <option>Status</option>
+                <option>Aberta</option>
+                <option>Em andamento</option>
+                <option>Em revisão</option>
+                <option>Concluída</option>
+                <option>Cancelada</option>
+            </select>
+
+            <select>
+                <option>Prioridade</option>
+                <option>Crítica</option>
+                <option>Alta</option>
+                <option>Média</option>
+                <option>Baixa</option>
+            </select>
+
+            <select>
+                <option>Tipo</option>
+                <option>Tarefa</option>
+                <option>Defeito</option>
+                <option>Melhoria</option>
+                <option>Documentação</option>
+            </select>
+
+            <button class="botao-filtrar">Filtrar</button>
+
+        </section>
+
+        <!-- TABELA -->
+         <!-- Usuários e Demandas apenas Placeholders - Para finais de visualização -->
+        <section class="lista-demandas">
+            <div>
+                <table>
+                    
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Projeto</th>
+                            <th>Responsável</th>
+                            <th>Data Criação</th>
+                            <th>Prazo</th>
+                            <th>Ações</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>#001</td>
+                            <td>Corrigir erro de Login</td>
+                            <td>Defeito</td>
+                            <td><span class="badge critica">Crítica</span></td>
+                            <td><span class="badge andamento">Em andamento</span></td>
+                            <td>Sistema Acadêmico</td>
+                            <td>João Silva</td>
+                            <td>28/08/2026</td>
+                            <td>05/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                                <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#002</td>
+                            <td>Criar Dashboard</td>
+                            <td>Tarefa</td>
+                            <td><span class="badge alta">Alta</span></td>
+                            <td><span class="badge aberta">Aberta</span></td>
+                            <td>Portal Web</td>
+                            <td>Maria Souza</td>
+                            <td>29/08/2026</td>
+                            <td>08/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                                <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#003</td>
+                            <td>Documentar API</td>
+                            <td>Documentação</td>
+                            <td><span class="badge media">Média</span></td>
+                            <td><span class="badge revisao">Em revisão</span></td>
+                            <td>API Demandas</td>
+                            <td>Vitor Zago</td>
+                            <td>30/08/2026</td>
+                            <td>10/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                                <a href="cadastro-demanda.html" class="btn-editar">Editar</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#004</td>
+                            <td>Adicionar filtro por prioridade</td>
+                            <td>Melhoria</td>
+                            <td><span class="badge baixa">Baixa</span></td>
+                            <td><span class="badge concluida">Concluída</span></td>
+                            <td>Sistema Demandas</td>
+                            <td>Ana Costa</td>
+                            <td>25/08/2026</td>
+                            <td>01/09/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#005</td>
+                            <td>Atualizar banco de dados</td>
+                            <td>Tarefa</td>
+                            <td><span class="badge alta">Alta</span></td>
+                            <td><span class="badge cancelada">Cancelada</span></td>
+                            <td>Banco Oracle</td>
+                            <td>Carlos Lima</td>
+                            <td>22/08/2026</td>
+                            <td>30/08/2026</td>
+                            <td class="acoes">
+                                <a href="detalhes-demanda.html" class="btn-detalhes">Ver</a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </section>
+
+        <!-- PAGINAÇÃO -->
+        <section class="paginacao">
+
+            <a href="#">Anterior</a>
+            <a href="#" class="pagina-ativa">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">Próxima</a>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
