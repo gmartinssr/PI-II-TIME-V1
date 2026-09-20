@@ -18,10 +18,10 @@
       <span class="divider">/</span>
       <span class="context">Demandas</span>
     </div>
-    <span class="record-id">DEM-0142</span>
+    <span class="record-id">Nova Demanda</span>
   </header>
 
-  <form>
+  <form novalidate> 
     <div class="flow">
 
       <!-- Seção 1 -->
@@ -38,11 +38,27 @@
           <div class="panel">
             <div class="field full">
               <label for="titulo">Título da demanda</label>
-              <input type="text" id="titulo" name="titulo" placeholder="Ex.: Ajustar layout da tela de login" maxlength="80">
+
+              <input 
+                type="text"
+                id="titulo"
+                name="titulo"
+                placeholder="Ex.: Ajustar layout da tela de login"
+                maxlength="80"
+              >
+
             </div>
             <div class="field full">
               <label for="descricao">Descrição</label>
-              <textarea id="descricao" name="descricao" placeholder="Descreva o contexto, o objetivo e qualquer detalhe importante para quem for executar."></textarea>
+
+              <textarea 
+                id="descricao"
+                name="descricao"
+                placeholder="Descreva o contexto, o objetivo e qualquer detalhe importante para quem for executar."
+                maxlength="1000"
+                required
+              ></textarea>
+
               <span class="char-count">0 / 1000</span>
             </div>
           </div>
@@ -64,17 +80,17 @@
             <div class="field-row">
               <div class="field">
                 <label for="categoria">Categoria</label>
-                <select id="categoria" name="categoria">
+                <select id="categoria" name="categoria" required>
                   <option value="">Selecione</option>
-                  <option value="bug">Correção de bug</option>
+                  <option value="tarefa">Tarefa</option>
+                  <option value="defeito">Defeito</option>
                   <option value="melhoria">Melhoria</option>
-                  <option value="novo">Nova funcionalidade</option>
-                  <option value="suporte">Suporte</option>
+                  <option value="documentação">Documentação</option>
                 </select>
               </div>
               <div class="field">
                 <label for="projeto">Projeto relacionado</label>
-                <select id="projeto" name="projeto">
+                <select id="projeto" name="projeto" required>
                   <option value="">Selecione</option>
                   <option value="workflow">Workflow</option>
                   <option value="outro">Outro</option>
@@ -136,7 +152,15 @@
               </div>
               <div class="field">
                 <label for="solicitante">Solicitante</label>
-                <input type="text" id="solicitante" name="solicitante" placeholder="Nome de quem abriu a demanda">
+
+                <input 
+                  type="text"
+                  id="solicitante"
+                  name="solicitante"
+                  placeholder="Nome de quem abriu a demanda"
+                  maxlength="100"
+                >
+
               </div>
             </div>
             <div class="field-row">
@@ -146,13 +170,13 @@
               </div>
               <div class="field">
                 <label for="prazo">Prazo</label>
-                <input type="date" id="prazo" name="prazo">
+                <input type="date" id="prazo" name="prazo" required>
               </div>
             </div>
             <div class="field full">
               <label>Status atual</label>
               <div class="status-row">
-                <span class="status-badge">Em aberto</span>
+                <span class="status-badge">Aberta</span>
                 <span>alterado automaticamente conforme o andamento</span>
               </div>
             </div>
@@ -172,7 +196,11 @@
           </div>
           <div class="panel">
             <div class="dropzone">
-              Arraste um arquivo aqui ou <strong>escolha no computador</strong>
+              <label for="anexo">
+                Arraste um arquivo aqui ou <strong>escolha no computador</strong>
+              </label>
+
+              <input type="file" id="anexo" name="anexo">
             </div>
           </div>
         </div>
@@ -192,13 +220,7 @@
 
 </div>
 
-<script>
-  const textarea = document.getElementById('descricao');
-  const counter = document.querySelector('.char-count');
-  textarea.addEventListener('input', () => {
-    counter.textContent = `${textarea.value.length} / 1000`;
-  });
-</script>
+<script src="scriptCadastroDemandas.js"></script>
 
 </body>
 </html>

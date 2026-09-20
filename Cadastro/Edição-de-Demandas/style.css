@@ -160,6 +160,16 @@
     color: var(--ink);
   }
 
+  .campo-erro {
+      border-color: var(--danger);
+  }
+
+  .mensagem-erro {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
   /* ---------- Fields ---------- */
   .field-row {
     display: grid;
