@@ -111,3 +111,13 @@ header span {
     text-decoration: none;
     transform: scale(1.02);
 }
+
+.campo-erro {
+    border-color: #B3432B !important;
+}
+
+.mensagem-erro {
+    color: #ff8f7a;
+    font-size: 12px;
+    margin-top: 4px;
+}
