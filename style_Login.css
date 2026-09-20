@@ -99,3 +99,13 @@ header span {
     background: rgba(255, 255, 255, 0.25);
     transform: scale(1.05);
 }
+
+.campo-erro {
+    border-color: #B3432B !important;
+}
+
+.mensagem-erro {
+    color: #ff8f7a;
+    font-size: 12px;
+    margin-top: 4px;
+}
