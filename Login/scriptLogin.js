@@ -72,5 +72,5 @@ form.addEventListener("submit", function(event) {
     console.log("Login válido!");
 
     // Redireciona para o Dashboard
-    window.location.href = "indexDashboard.html";
+    window.location.href = "../Dashboard/indexDashboard.html";
 });
