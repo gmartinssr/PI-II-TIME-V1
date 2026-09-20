@@ -34,47 +34,70 @@
             </aside>
 
             <main>
-                <section class = "topo">
+                <section class="topo">
                     <div>
-                        <h1>Dashboard</h1>
-                        <p>Visão geral das demandas</p>
+                        <p class="subtitulo-topo">CENTRAL DE CONTROLE</p>
+                        <h1>Visão geral das demandas</h1>
+                        <p class="descricao-topo">
+                            Acompanhe o andamento e as prioridades do projeto.
+                        </p>
                     </div>
-
-                    <a href = "../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html" class = "botao-nova">
-                        + Nova Demanda
-                    </a>
+                        <a href="../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html" class="botao-nova">
+                            <span class="icone-botao">+</span>
+                            <span>Nova Demanda</span>
+                        </a>
                 </section>
 
-                <section class="cards-dashboard">
+                <section class="resumo-dashboard">
 
-                    <div class="card">
-                        <h3>Total</h3>
-                        <p>24</p>
+                    <div class="total-demandas">
+                        <p class="titulo-resumo">DEMANDAS NO SISTEMA</p>
+                        <p class="numero-total" id="total">24</p>
+                        <p class="texto-resumo">Total de demandas registradas</p>
                     </div>
 
-                    <div class="card">
-                        <h3>Abertas</h3>
-                        <p>6</p>
-                    </div>
+                    <div class="status-demandas">
 
-                    <div class="card">
-                        <h3>Em andamento</h3>
-                        <p>9</p>
-                    </div>
+                        <div class="status-item">
+                            <span class="ponto aberto"></span>
+                            <div>
+                                <p id="abertas">6</p>
+                                <span>Abertas</span>
+                            </div>
+                        </div>
 
-                    <div class="card">
-                        <h3>Em revisão</h3>
-                        <p>3</p>
-                    </div>
+                        <div class="status-item">
+                            <span class="ponto andamento"></span>
+                            <div>
+                                <p id="andamento">9</p>
+                                <span>Em andamento</span>
+                            </div>
+                        </div>
 
-                    <div class="card">
-                        <h3>Concluídas</h3>
-                        <p>4</p>
-                    </div>
+                        <div class="status-item">
+                            <span class="ponto revisao"></span>
+                            <div>
+                                <p id="revisao">3</p>
+                                <span>Em revisão</span>
+                            </div>
+                        </div>
 
-                    <div class="card">
-                        <h3>Canceladas</h3>
-                        <p>2</p>
+                        <div class="status-item">
+                            <span class="ponto concluida"></span>
+                            <div>
+                                <p id="concluidas">4</p>
+                                <span>Concluídas</span>
+                            </div>
+                        </div>
+
+                        <div class="status-item">
+                            <span class="ponto cancelada"></span>
+                            <div>
+                                <p id="canceladas">2</p>
+                                <span>Canceladas</span>
+                            </div>
+                        </div>
+
                     </div>
 
                 </section>
@@ -88,7 +111,7 @@
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Crítica</p>
-                                        <p>4</p>
+                                        <p class="numero">4</p>
                                     </div>
 
                                     <div class="barra">
@@ -99,7 +122,7 @@
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Alta</p>
-                                        <p>7</p>
+                                        <p class="numero">7</p>
                                     </div>
 
                                     <div class="barra">
@@ -110,7 +133,7 @@
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Média</p>
-                                        <p>10</p>
+                                        <p class="numero">10</p>
                                     </div>
 
                                     <div class="barra">
@@ -121,7 +144,7 @@
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Baixa</p>
-                                        <p>3</p>
+                                        <p class="numero">3</p>
                                     </div>
 
                                     <div class="barra">
@@ -137,7 +160,7 @@
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Tarefa</p>
-                                        <p>10</p>
+                                        <p class="numero">10</p>
                                     </div>
 
                                     <div class="barra">
@@ -148,7 +171,7 @@
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Defeito</p>
-                                        <p>6</p>
+                                        <p class="numero">6</p>
                                     </div>
 
                                     <div class="barra">
@@ -159,7 +182,7 @@
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Melhoria</p>
-                                        <p>5</p>
+                                        <p class="numero">5</p>
                                     </div>
 
                                     <div class="barra">
@@ -170,7 +193,7 @@
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Documentação</p>
-                                        <p>3</p>
+                                        <p class="numero">3</p>
                                     </div>
 
                                     <div class="barra">
@@ -232,5 +255,6 @@
             </main>
 
         </div>
+        <script src="scriptDashboard.js"></script>
 </body>
 </html>

@@ -8,7 +8,9 @@
 
 body {
     font-family: "Segoe UI", Arial, sans-serif;
+
     background-color: #E7E8ED;
+
     color: #1F2937;
 }
 
@@ -77,8 +79,10 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
+    margin-bottom: 10px;
 }
+
+
 
 .topo h1 {
     color: #174E87;
@@ -92,8 +96,12 @@ main {
     margin-top: 5px;
 }
 
+.subtitulo-topo {
+    margin-top: 12px !important;
+}
+
 .botao-nova {
-    background-color: #2E8B57;
+    background: linear-gradient(135deg, #2E8B57, #4ecc89);
     color: #FFFFFF;
     text-decoration: none;
     padding: 11px 18px;
@@ -104,41 +112,137 @@ main {
 }
 
 .botao-nova:hover {
-    background-color: #247347;
+    background: linear-gradient(135deg, #247347, #4ecc89);
     transform: translateY(-2px);
 }
 
-.cards-dashboard {
+.resumo-dashboard {
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 40px;
+
     margin-bottom: 28px;
-    flex-wrap: wrap;
+    padding: 30px;
+
+    background: linear-gradient(
+        135deg,
+        #10294A,
+        #123E6B
+    );
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.15);
+
+    color: #FFFFFF;
+
+    transition: 0.25s ease;
 }
 
-.cards-dashboard .card {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.90);
-    padding: 20px;
+.resumo-dashboard:hover {
+    transform: translateY(-2px);
 
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
-
-    min-height: 130px;
+    box-shadow:
+        0 14px 35px rgba(15, 23, 42, 0.20),
+        0 3px 8px rgba(15, 23, 42, 0.08);
 }
 
-.cards-dashboard .card h3 {
-    color: #64748B;
-    font-size: 16px;
+.total-demandas {
+    min-width: 220px;
+    padding-right: 30px;
+
+    border-right: 1px solid rgba(255, 255, 255, 0.20);
+}
+
+.titulo-resumo {
+    margin-bottom: 5px;
+
+    color: #93C5FD;
+    font-size: 13px;
     font-weight: 600;
-    margin-bottom: 10px;
+    letter-spacing: 1px;
 }
 
-.cards-dashboard .card p {
-    color: #174E87;
-    font-size: 30px;
+.numero-total {
+    margin: 0;
+
+    font-size: 64px;
+    line-height: 1;
     font-weight: 700;
+}
+
+.texto-resumo {
+    margin-top: 8px;
+
+    color: #CBD5E1;
+    font-size: 13px;
+}
+
+.status-demandas {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+    gap: 25px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    min-width: 120px;
+    min-height: 100px;
+
+    padding: 15px 20px;
+}
+
+.status-item + .status-item {
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.status-item p {
+    margin: 8px 0 3px;
+
+    color: #FFFFFF;
+    font-size: 34px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.status-item span {
+    color: #CBD5E1;
+    font-size: 14px;
+}
+
+.ponto {
+    width: 9px;
+    height: 9px;
+
+    margin-bottom: 3px;
+
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ponto.aberto {
+    background-color: #6366F1;
+}
+
+.ponto.andamento {
+    background-color: #0EA5E9;
+}
+
+.ponto.revisao {
+    background-color: #FBBF24;
+}
+
+.ponto.concluida {
+    background-color: #22C55E;
+}
+
+.ponto.cancelada {
+    background-color: #EF4444;
 }
 
 .distribuicao {
@@ -155,22 +259,47 @@ main {
 }
 
 .card {
-    background: rgba(255, 255, 255, 0.90);
-    padding: 20px;
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.96),
+        rgba(246, 248, 252, 0.92)
+    );
 
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
+    padding: 22px;
 
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08),
+        0 2px 6px rgba(15, 23, 42, 0.04);
 
     height: 100%;
+
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 14px 35px rgba(15, 23, 42, 0.12),
+        0 3px 8px rgba(15, 23, 42, 0.05);
 }
 
 .card h2 {
     color: #174E87;
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #E2E8F0;
 }
 
 
@@ -188,6 +317,7 @@ main {
     margin-bottom: 7px;
 
     font-size: 14px;
+    font-weight: 500;
 }
 
 .linha-prioridade p,
@@ -197,59 +327,79 @@ main {
 
 .numero {
     color: #174E87;
-    font-weight: 600;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    background-color: #EFF4FA;
+
+    padding: 3px 9px;
+
+    border-radius: 20px;
 }
 
 .barra {
     width: 100%;
-    height: 8px;
-    background-color: #E5E7EB;
-    border-radius: 10px;
+    height: 10px;
+
+    background-color: #E8EDF3;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.10);
 }
 
 .barra-preenchida {
     height: 100%;
-    border-radius: 10px;
+
+    border-radius: 20px;
+
+    transition: width 0.4s ease;
+
+    box-shadow:
+        0 1px 4px rgba(15, 23, 42, 0.18);
 }
 
 .critica {
     width: 40%;
-    background-color: #EF4444;
+    background: #EF4444;
 }
 
 .alta {
     width: 70%;
-    background-color: #F97316;
+    background: #F97316;
 }
 
 .media {
     width: 100%;
-    background-color: #EAB308;
+    background: #EAB308;
 }
 
 .baixa {
     width: 30%;
-    background-color: #22C55E;
+    background: #22C55E;
 }
 
 .tarefa {
     width: 100%;
-    background-color: #3B82F6;
+    background: #3B82F6;
 }
 
 .defeito {
     width: 60%;
-    background-color: #EF4444;
+    background: #EF4444;
 }
 
 .melhoria {
     width: 50%;
-    background-color: #22C55E;
+    background: #22C55E;
 }
 
 .documentacao {
     width: 30%;
-    background-color: #8B5CF6;
+    background: #8B5CF6;
 }
 
 .alertas {
@@ -270,9 +420,23 @@ main {
     justify-content: space-between;
     align-items: center;
 
-    padding: 12px 0;
+    padding: 13px 14px;
 
-    border-bottom: 1px solid #E5E7EB;
+    margin-bottom: 8px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+
+    background-color: rgba(248, 250, 252, 0.75);
+
+    transition: 0.2s ease;
+}
+
+.demanda-alerta:hover {
+    background-color: #FFFFFF;
+    transform: translateX(4px);
+
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 .demanda-alerta p {
@@ -280,18 +444,34 @@ main {
     font-size: 14px;
 }
 
-.demanda-alerta p:last-child { /*Ultimo elemento dentro da div --> pega somente o ultimo <p> da div demanda-alerta*/
-
-    /* EXEMPLO
-    <div>
-        <p>Primeiro</p>  ← :first-child
-        <p>Segundo</p>
-        <p>Terceiro</p>  ← :last-child
-    </div>
-    */
-
-    color: #64748B;
+.demanda-alerta p:first-child { /*Primeiro elemento dentro da div*/
+    color: #1F2937;
     font-weight: 600;
+}
+
+/* Seleciona o ultimo <p> das demandas do primeiro painel,
+   que corresponde as demandas criticas em aberto */
+.alertas .col-md-6:first-child .demanda-alerta p:last-child {
+    color: #EF4444;
+    font-size: 12px;
+    font-weight: 700;
+
+    background-color: #FEE2E2;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+/*Estiliza somente as datas das demandas proximas do prazo*/
+.alertas .col-md-6:last-child .demanda-alerta p:last-child {
+    color: #174E87;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    background-color: #DBEAFE;
+
+    padding: 5px 10px;
+    border-radius: 20px;
 }
 
 /*A partir daqui começa o códgio de responsividade, ainda não entendi direito, mas tentei fazer pesquisando*/
@@ -307,12 +487,12 @@ main {
         padding: 20px;
     }
 
-    .cards-dashboard {
+    .status-demandas {
         gap: 12px;
     }
 
-    .cards-dashboard .card {
-        min-width: 160px;
+    .status-item {
+        padding: 15px;
     }
 }
 
@@ -363,12 +543,23 @@ main {
         text-align: center;
     }
 
-    .cards-dashboard {
+    .resumo-dashboard {
         flex-direction: column;
     }
 
-    .cards-dashboard .card {
+    .total-demandas {
         width: 100%;
+        min-width: 0;
+        padding-right: 30px;
+    }
+
+    .status-demandas {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .status-item {
+        min-width: calc(50% - 6px);
     }
 
     .distribuicao .row,
@@ -392,16 +583,29 @@ main {
         font-size: 26px;
     }
 
+    .resumo-dashboard {
+        padding: 20px;
+    }
+
+    .numero-total {
+        font-size: 52px;
+    }
+
+    .status-demandas {
+        flex-direction: column;
+    }
+
+    .status-item {
+        width: 100%;
+        min-width: 0;
+    }
+
     .card {
         padding: 16px;
     }
 
     .card h2 {
-        font-size: 18px;
-    }
-
-    .cards-dashboard .card p {
-        font-size: 26px;
+        font-size: 14px;
     }
 
     .demanda-alerta {
