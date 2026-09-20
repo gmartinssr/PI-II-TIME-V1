@@ -79,6 +79,14 @@ main {
     margin-bottom: 28px;
 }
 
+.sem-resultados {
+    display: none;
+    padding: 30px;
+    text-align: center;
+    color: #64748B;
+    font-size: 14px;
+}
+
 .topo h1 {
     color: #174E87;
     font-size: 32px;
@@ -88,7 +96,7 @@ main {
 /* Botão Nova Demanda */
 
 .botao-nova {
-    background-color: #2E8B57;
+    background: linear-gradient(135deg, #2E8B57, #4ecc89);
     color: #FFFFFF;
     text-decoration: none;
     padding: 11px 18px;
@@ -99,8 +107,27 @@ main {
 }
 
 .botao-nova:hover {
-    background-color: #247347;
+    background: linear-gradient(135deg, #247347, #4ecc89);
     transform: translateY(-2px);
+}
+
+.botao-limpar {
+    height: 40px;
+    padding: 0 18px;
+    background-color: #64748B;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.botao-limpar:hover {
+    background-color: #475569;
+    transform: translateY(-1px);
 }
 
 .cards {
@@ -111,19 +138,33 @@ main {
 }
 
 .card {
-    background: rgba(255, 255, 255, 0.90);
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.96),
+        rgba(246, 248, 252, 0.92)
+    );
+
     flex: 1;
     min-width: 180px;
+
     padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
-    transition: 0.2s;
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08),
+        0 2px 6px rgba(15, 23, 42, 0.04);
+
+    transition: 0.25s ease;
 }
 
 .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 20px rgba(15, 23, 42, 0.12);
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 14px 35px rgba(15, 23, 42, 0.12),
+        0 3px 8px rgba(15, 23, 42, 0.05);
 }
 
 .card h3 {
@@ -144,11 +185,18 @@ main {
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.90);
+
+    background: rgba(255, 255, 255, 0.75);
+
     padding: 20px;
     margin-bottom: 28px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
 }
 
 .filtros input,
@@ -202,9 +250,17 @@ main {
 
 .lista-demandas {
     width: 100%;
+    min-height: 360px;
+
     background-color: #FFFFFF;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08),
+        0 2px 6px rgba(15, 23, 42, 0.04);
+
     overflow: hidden;
 }
 
@@ -242,11 +298,8 @@ td {
 }
 
 tbody tr {
+    background-color: #FFFFFF;
     transition: 0.15s;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #F8FAFC;
 }
 
 tbody tr:hover {
@@ -465,7 +518,8 @@ tbody tr:hover {
 
     .filtros input,
     .filtros select,
-    .botao-filtrar {
+    .botao-filtrar,
+    .botao-limpar {
         width: 100%;
     }
 }

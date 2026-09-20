@@ -86,38 +86,39 @@
             <input type="text" placeholder="Buscar por título...">
 
             <select>
-                <option>Status</option>
-                <option>Aberta</option>
-                <option>Em andamento</option>
-                <option>Em revisão</option>
-                <option>Concluída</option>
-                <option>Cancelada</option>
+                <option value="">Status</option>
+                <option value="Aberta">Aberta</option>
+                <option value="Em andamento">Em andamento</option>
+                <option value="Em revisão">Em revisão</option>
+                <option value="Concluída">Concluída</option>
+                <option value="Cancelada">Cancelada</option>
             </select>
 
             <select>
-                <option>Prioridade</option>
-                <option>Crítica</option>
-                <option>Alta</option>
-                <option>Média</option>
-                <option>Baixa</option>
+                <option value="">Prioridade</option>
+                <option value="Crítica">Crítica</option>
+                <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
             </select>
 
             <select>
-                <option>Tipo</option>
-                <option>Tarefa</option>
-                <option>Defeito</option>
-                <option>Melhoria</option>
-                <option>Documentação</option>
+                <option value="">Tipo</option>
+                <option value="Tarefa">Tarefa</option>
+                <option value="Defeito">Defeito</option>
+                <option value="Melhoria">Melhoria</option>
+                <option value="Documentação">Documentação</option>
             </select>
 
             <button class="botao-filtrar">Filtrar</button>
-
+            <button class="botao-limpar" type="button">Limpar</button>
+            
         </section>
 
         <!-- TABELA -->
          <!-- Usuários e Demandas apenas Placeholders - Para finais de visualização -->
         <section class="lista-demandas">
-            <div>
+            <div class="tabela-container">
                 <table>
                     
                     <thead>
@@ -222,6 +223,9 @@
                     </tbody>
 
                 </table>
+                <p id="sem-resultados" class="sem-resultados">
+                    Nenhuma demanda encontrada.
+                </p>
             </div>
 
         </section>
@@ -240,6 +244,6 @@
     </main>
 
 </div>
-
+<script src="scriptListagem.js"></script>
 </body>
 </html>
