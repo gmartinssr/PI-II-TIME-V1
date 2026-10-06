@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kanban</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styleKanban.css">
+</head>
+
+    <body>
+
+        <div class="kanban-container">
+            <a href="#" class="botao-voltar">← Voltar para Projetos</a>
+
+            <section class="kanban-topo">
+                <p class="subtitulo-topo">PROJETO</p>
+
+                <select class="seletor-projeto">
+                    <option>Sistema Workflow</option>
+                    <option>Projeto PataViva</option>
+                    <option>Aplicativo Mobile</option>
+                </select>
+
+                <p class="descricao-topo">
+                    Acompanhe o andamento das demandas deste projeto.
+                </p>
+            </section>
+
+            <section class="kanban-board">
+                <div class="kanban-coluna">
+                    <div class="kanban-coluna-topo">
+                        <h2>A Fazer</h2>
+                        <span>0</span>
+                    </div>
+
+                    <div class="kanban-cards">
+                    <!--Código-->
+                    </div>
+                </div>
+
+
+
+                <div class="kanban-coluna">
+                    <div class="kanban-coluna-topo">
+                        <h2>Em Andamento</h2>
+                        <span>0</span>
+                    </div>  
+
+                    <div class="kanban-cards">
+                        <!--Código-->
+                    </div>
+                </div>
+
+
+                <div class="kanban-coluna">
+                    <div class="kanban-coluna-topo">
+                        <h2>Em Revisão</h2>
+                        <span>0</span>
+                    </div>
+
+                    <div class="kanban-cards">
+                        <!--Código-->
+                    </div>
+                </div>
+
+
+
+                <div class="kanban-coluna">
+                    <div class="kanban-coluna-topo">
+                        <h2>Concluídas</h2>
+                        <span>0</span>
+                    </div>
+
+                    <div class="kanban-cards">
+                        <!--Código-->
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        
+        <script src="scriptKanban.js"></script>
+    </body>
+</html>
