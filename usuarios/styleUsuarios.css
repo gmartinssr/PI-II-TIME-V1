@@ -1,0 +1,464 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #E7E8ED;
+    color: #1F2937;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+
+/* =========================
+   MENU LATERAL
+========================= */
+
+.sidebar {
+    width: 220px;
+    min-height: 100vh;
+    padding: 28px 20px;
+
+    background-color: #123E6B;
+    background-image: url("fundo-tela6.jpeg");
+    background-size: cover;
+    background-position: center;
+
+    color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    padding: 0 14px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 8px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 14px;
+
+    color: #FFFFFF;
+    text-decoration: none;
+    border-radius: 8px;
+
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    transform: translateX(3px);
+}
+
+.sidebar a.ativo {
+    background-color: rgba(10, 65, 115, 0.85);
+}
+
+
+/* =========================
+   CONTEÚDO PRINCIPAL
+========================= */
+
+main {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 32px;
+}
+
+.topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.topo h1 {
+    color: #174E87;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+
+/* =========================
+   CONTEÚDO DOS CARDS
+========================= */
+
+.conteudo {
+    display: grid;
+
+    /* Card do perfil maior + card das demandas */
+    grid-template-columns: 1fr 1fr;
+
+    gap: 24px;
+
+    align-items: stretch;
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.96),
+        rgba(246, 248, 252, 0.92)
+    );
+
+    padding: 24px;
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08),
+        0 2px 6px rgba(15, 23, 42, 0.04);
+
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    box-shadow:
+        0 14px 35px rgba(15, 23, 42, 0.12),
+        0 3px 8px rgba(15, 23, 42, 0.05);
+}
+
+.card h2 {
+    color: #174E87;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #E2E8F0;
+}
+
+
+/* =========================
+   INFORMAÇÕES DO USUÁRIO
+========================= */
+
+#nome,
+#email,
+#usuario,
+#cargo {
+    margin-bottom: 18px;
+
+    font-size: 15px;
+    color: #475569;
+
+    padding: 12px 14px;
+
+    background-color: #F8FAFC;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+}
+
+#nome strong,
+#email strong,
+#usuario strong,
+#cargo strong {
+    color: #174E87;
+}
+
+
+/* =========================
+   DEMANDAS
+========================= */
+
+#criadas,
+#concluidas,
+#andamento {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 14px;
+    padding: 14px 16px;
+
+    background-color: #F8FAFC;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+
+    font-size: 15px;
+    color: #475569;
+}
+
+#criadas strong,
+#concluidas strong,
+#andamento strong {
+    color: #174E87;
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+.botao-senha,
+.botao-usuarios {
+    display: inline-block;
+
+    margin-top: 10px;
+    padding: 11px 18px;
+
+    color: #FFFFFF;
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+
+/* Botão Alterar Senha */
+
+.botao-senha {
+    background: linear-gradient(
+        135deg,
+        #174E87,
+        #2563A6
+    );
+}
+
+.botao-senha:hover {
+    background: linear-gradient(
+        135deg,
+        #123E6B,
+        #174E87
+    );
+
+    transform: translateY(-3px);
+}
+
+.form-alterar-senha {
+    display: none;
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.96),
+        rgba(246, 248, 252, 0.92)
+    );
+
+    padding: 24px;
+
+    margin-top: 20px;
+
+    width: 49%;
+
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08),
+        0 2px 6px rgba(15, 23, 42, 0.04);
+
+}
+.form-alterar-senha .campo {
+    margin-bottom: 15px;
+}
+
+.form-alterar-senha label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.form-alterar-senha input {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+.form-alterar-senha input:focus {
+    border-color: #174E87;
+}
+
+.botao-salvar-senha {
+    margin-top: 5px;
+    padding: 10px 16px;
+
+    background-color: #174E87;
+    border: none;
+    border-radius: 8px;
+
+    color: #FFFFFF;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.botao-salvar-senha:hover {
+    background-color: #123E6B;
+}
+
+
+/* Botão Ver Usuários */
+
+.botao-usuarios {
+    background: linear-gradient(
+        135deg,
+        #2E8B57,
+        #4ECC89
+    );
+}
+
+.botao-usuarios:hover {
+    background: linear-gradient(
+        135deg,
+        #247347,
+        #4ECC89
+    );
+
+    transform: translateY(-3px);
+}
+
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+
+@media (max-width: 1000px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .conteudo {
+        gap: 18px;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 12px;
+        padding: 0;
+    }
+
+    .sidebar ul {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+    }
+
+    .sidebar li {
+        margin-bottom: 0;
+    }
+
+    .sidebar a {
+        padding: 9px 12px;
+        font-size: 14px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .topo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .conteudo {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    main {
+        padding: 15px;
+    }
+
+    .topo h1 {
+        font-size: 26px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .card h2 {
+        font-size: 14px;
+    }
+
+    #nome,
+    #email,
+    #usuario,
+    #cargo {
+        font-size: 14px;
+    }
+
+    #criadas,
+    #concluidas,
+    #andamento {
+        font-size: 14px;
+    }
+
+    .botao-senha,
+    .botao-usuarios {
+        width: 100%;
+        text-align: center;
+    }
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios</title>
+    <link rel="stylesheet" href="styleUsuarios.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class = "sidebar">
+                <h2>Workflow</h2>
+
+                <ul>
+                    <li>
+                        <a href="indexDashboard.html">Dashboard</a>
+                    </li>
+
+                    <li>
+                        <a href="../lista-demanda/tela.html">Demandas</a>
+                    </li>
+
+                    <li>
+                        <a href="../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html">Nova Demanda</a>
+                    </li>
+
+                    <li>
+                        <a href="../usuarios/indexUsuarios.html" class="ativo">Meu Perfil</a>
+                    </li>
+
+                    <li>
+                        <a href="../Login/indexLogin.html">Sair</a>
+                    </li>
+                </ul>
+        </aside>
+
+        <main>
+            <section class="topo">
+                <div>
+                    <h1>Meu Perfil</h1>
+                </div>
+            </section>
+
+            <section class="conteudo">
+                <div class="card">
+                    <h2>Informações do Usuário</h2>
+                    <p id="nome"><strong>Nome:</strong>     Guilherme Baez Machado</p>
+
+                    <p id="email"><strong>Email:</strong>     guilherme.bm@gmail.com</p>
+
+                    <p id="usuario"><strong>Usuário:</strong>    guilhermeBM</p>
+
+                    <p id="cargo"><strong>Cargo:</strong>     Administrador</p>
+
+                    <button class="botao-senha" type="button">Alterar Senha</button>
+
+                </div>
+
+
+                <div class="card">
+                    <h2>Demandas</h2>
+                    <p id="criadas"><strong>Criadas:</strong>12</p>
+
+                    <p id="concluidas"><strong>Concluídas:</strong>8</p>
+
+                    <p id="andamento"><strong>Em Andamento:</strong>4</p>
+
+                    <a href="../verUsuarios/verUsuarios.html" class="botao-usuarios">Ver Usuários</a>
+                </div>
+            </section>
+
+            <section class="formulario">
+                <div class="form-alterar-senha">
+
+                    <div class="campo">
+                        <label for="senhaAtual">Senha atual:</label>
+                        <input type="password" id="senhaAtual">
+                    </div>
+
+                    <div class="campo">
+                        <label for="novaSenha">Nova senha:</label>
+                        <input type="password" id="novaSenha">
+                    </div>
+
+                    <div class="campo">
+                        <label for="confirmarSenha">Confirmar nova senha:</label>
+                        <input type="password" id="confirmarSenha">
+                    </div>
+
+                    <button type="submit" class="botao-salvar-senha">
+                        Salvar nova senha
+                    </button>
+
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="scriptUsuarios.js"></script>
+</body>
+</html>
