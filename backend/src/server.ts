@@ -272,7 +272,9 @@ const demandas = [
     status: "aberta",
     prioridade: "critica",
     tipo: "defeito",
-    prazo: "2026-10-10"
+    prazo: "2026-10-10",
+    projeto: "Sistema de Gestão",
+    responsavel: "joaoSM"
   },
   {
     id: 2,
@@ -280,7 +282,9 @@ const demandas = [
     status: "andamento",
     prioridade: "alta",
     tipo: "tarefa",
-    prazo: "2026-10-08"
+    prazo: "2026-10-08",
+    projeto: "Construção de Site",
+    responsavel: "vitorZGB"
   },
   {
     id: 3,
@@ -288,7 +292,9 @@ const demandas = [
     status: "aberta",
     prioridade: "media",
     tipo: "documentação",
-    prazo: "2026-10-09"
+    prazo: "2026-10-09",
+    projeto: "Manutenção de Sistema",
+    responsavel: "guilhermeBM"
   },
   {
     id: 4,
@@ -296,7 +302,9 @@ const demandas = [
     status: "revisao",
     prioridade: "alta",
     tipo: "melhoria",
-    prazo: "2026-10-11"
+    prazo: "2026-10-11",
+    projeto: "Criação de Aplicativo",
+    responsavel: "mariaOS"
   },
   {
     id: 5,
@@ -304,6 +312,94 @@ const demandas = [
     status: "aberta",
     prioridade: "critica",
     tipo: "defeito",
-    prazo: "2026-10-07"
+    prazo: "2026-10-07",
+    projeto: "Portal Web",
+    responsavel: "lucasMF"
   }
 ];
+
+// Lista Demandas
+
+app.get("/api/demandas", (_request, response) => {
+
+  let resultado = [...demandas];
+
+  const {
+    status,
+    prioridade,
+    tipo,
+    busca,
+    ordenar,
+    ordem
+  } = _request.query;
+
+  if (typeof status === "string") {
+    resultado = resultado.filter(
+      (demanda) => demanda.status === status.toLowerCase()
+    );
+  }
+
+  if (typeof prioridade === "string") {
+    resultado = resultado.filter(
+      (demanda) => demanda.prioridade === prioridade.toLowerCase()
+    );
+  }
+
+  if (typeof tipo === "string") {
+    resultado = resultado.filter(
+      (demanda) => demanda.tipo === tipo.toLowerCase()
+    );
+  }
+
+  if (typeof busca === "string" && busca.trim() !== "") {
+    const textoBusca = busca.trim().toLowerCase();
+
+    resultado = resultado.filter(
+      (demanda) =>
+        demanda.titulo.toLowerCase().includes(textoBusca)
+    );
+  }
+
+  if (typeof ordenar === "string") {
+
+    const direcao = ordem === "desc" ? -1 : 1;
+
+    resultado.sort((a, b) => {
+
+      if (ordenar === "id") {
+        return (a.id - b.id) * direcao;
+      }
+
+      if (ordenar === "titulo") {
+        return a.titulo.localeCompare(b.titulo) * direcao;
+      }
+
+      if (ordenar === "prazo") {
+        return (
+          (new Date(a.prazo).getTime() -
+            new Date(b.prazo).getTime()) * direcao
+        );
+      }
+
+      if (ordenar === "prioridade") {
+        const pesoPrioridade: Record<string, number> = {
+          critica: 4,
+          alta: 3,
+          media: 2,
+          baixa: 1
+        };
+        return (
+          (pesoPrioridade[a.prioridade] -
+            pesoPrioridade[b.prioridade]) * direcao
+        );
+      }
+
+      return 0;
+    });
+  }
+
+  response.status(200).json({
+    total: resultado.length,
+    demandas: resultado
+  });
+});
