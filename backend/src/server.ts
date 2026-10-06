@@ -24,6 +24,8 @@ app.post("/api/login", (request, response) => {
     senha?: unknown;
   };
 
+
+
   const erros: { email?: string; senha?: string } = {};
 
   if (typeof email !== "string") {
@@ -170,3 +172,138 @@ server.on("error", (error) => {
   console.error("Não foi possível iniciar o servidor backend:", error);
   process.exitCode = 1;
 });
+
+// Dashboard
+app.get("/api/dashboard", (_request, response) => {
+  const total = demandas.length;
+
+  const abertas = demandas.filter(
+    (demanda) => demanda.status === "aberta"
+  ).length;
+
+  const andamento = demandas.filter(
+    (demanda) => demanda.status === "andamento"
+  ).length;
+
+  const revisao = demandas.filter(
+    (demanda) => demanda.status === "revisao"
+  ).length;
+
+  const concluidas = demandas.filter(
+    (demanda) => demanda.status === "concluida"
+  ).length;
+
+  const canceladas = demandas.filter(
+    (demanda) => demanda.status === "cancelada"
+  ).length;
+
+  const prioridades = {
+  critica: demandas.filter(
+    (demanda) => demanda.prioridade === "critica"
+  ).length,
+
+  alta: demandas.filter(
+    (demanda) => demanda.prioridade === "alta"
+  ).length,
+
+  media: demandas.filter(
+    (demanda) => demanda.prioridade === "media"
+  ).length,
+
+  baixa: demandas.filter(
+    (demanda) => demanda.prioridade === "baixa"
+  ).length
+};
+
+const tipos = {
+  tarefa: demandas.filter(
+    (demanda) => demanda.tipo === "tarefa"
+  ).length,
+
+  defeito: demandas.filter(
+    (demanda) => demanda.tipo === "defeito"
+  ).length,
+
+  melhoria: demandas.filter(
+    (demanda) => demanda.tipo === "melhoria"
+  ).length,
+
+  documentacao: demandas.filter(
+    (demanda) => demanda.tipo === "documentação"
+  ).length
+};
+
+const criticasAbertas = demandas.filter(
+  (demanda) =>
+    demanda.status === "aberta" &&
+    demanda.prioridade === "critica"
+);
+
+const hoje = new Date();
+const limitePrazo = new Date(hoje);
+limitePrazo.setDate(hoje.getDate() + 7);
+
+const proximasDoPrazo = demandas.filter((demanda) => {
+  const prazo = new Date(demanda.prazo);
+
+  return prazo >= hoje && prazo <= limitePrazo;
+});
+
+  response.status(200).json({
+    total,
+    status: {
+      abertas,
+      andamento,
+      revisao,
+      concluidas,
+      canceladas
+    },
+    prioridades,
+    tipos,
+    criticasAbertas,
+    proximasDoPrazo
+  });
+});
+
+const demandas = [
+  {
+    id: 1,
+    titulo: "Corrigir erro de Login",
+    status: "aberta",
+    prioridade: "critica",
+    tipo: "defeito",
+    prazo: "2026-10-10"
+  },
+  {
+    id: 2,
+    titulo: "Criar Dashboard",
+    status: "andamento",
+    prioridade: "alta",
+    tipo: "tarefa",
+    prazo: "2026-10-08"
+  },
+  {
+    id: 3,
+    titulo: "Documentar API",
+    status: "aberta",
+    prioridade: "media",
+    tipo: "documentação",
+    prazo: "2026-10-09"
+  },
+  {
+    id: 4,
+    titulo: "Ajustar formulário",
+    status: "revisao",
+    prioridade: "alta",
+    tipo: "melhoria",
+    prazo: "2026-10-11"
+  },
+  {
+    id: 5,
+    titulo: "Falha no servidor",
+    status: "aberta",
+    prioridade: "critica",
+    tipo: "defeito",
+    prazo: "2026-10-07"
+  }
+];
