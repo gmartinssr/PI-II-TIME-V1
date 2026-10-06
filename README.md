@@ -27,11 +27,3 @@ Os comandos devem ser executados dentro da pasta `backend`:
 - `npm run front`: inicia somente o frontend em `http://localhost:3030`.
 - `npm start`: inicia backend e frontend juntos no mesmo servidor, em `http://localhost:3000`.
 
-O formulário de login envia os dados para `POST /api/login`. A validação do
-email e da senha é feita no backend, que aceita domínios comuns como `.com`,
-`.com.br`, `.org`, `.net`, `.edu`, `.gov`, `.io`, `.dev` e `.app`. O email
-deve ter entre 6 e 254 caracteres e a senha deve ter pelo menos 6 caracteres.
-Quando há erro, a API retorna mensagens específicas por campo, e o frontend
-as exibe abaixo do email ou da senha correspondente.
-A senha também deve conter pelo menos uma letra maiúscula, uma letra minúscula,
-um número e um caractere especial permitido (`.`, `_`, `@`, `!`, `$` ou `#`).
