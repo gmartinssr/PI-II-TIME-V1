@@ -1,0 +1,140 @@
+h1 {
+  color: #fff;
+}
+
+.lista-projetos {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: 40px;
+    margin-right: 40px;
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr; 
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #eee;
+  grid-template-columns: 2fr 1fr 1fr minmax(280px, auto);
+}
+
+.linha:last-child {
+  border-bottom: none;
+}
+
+.linha--cabecalho span:last-child {
+  text-align: center;
+}
+
+.linha__acoes {
+  display: flex;
+  gap: 8px;
+  justify-content: center; 
+}
+
+.linha--cabecalho {
+  background: #fafafa;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+}
+
+.linha__nome {
+  font-weight: 600;
+  color: #e7e8ed;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.btn--principal {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.btn--secundario {
+  border: 1px solid rgb(12, 12, 12);
+  color: #222325;
+  background: #F1F5F9;
+}
+
+.barra-topo {
+  display: flex;
+  align-items: center;
+}
+
+.barra-busca {
+  margin-left: auto;  
+  position: relative;
+}
+
+.barra-busca__icone {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%); 
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #888;
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none; 
+}
+
+.barra-busca input {
+  width: 280px;
+  padding: 10px 14px 10px 38px; 
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;                 
+  background-image: url("fundo.jpeg");
+  background-size: cover;            
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;      
+}
+
+.status {
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+.status--andamento  { background: #EFF6FF; color: #0a0a0b; }
+.status--finalizado { background: #d3f9d8; color: #2b8a3e; }
+.status--pausado    { background: #ffe3e3; color: #c92a2a; }
+
+.linha-demanda {
+  padding: 10px 20px 10px 40px; 
+  background: #f5f8ff;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+  color: #700;
+}
+
+.sem-resultado {
+  padding: 24px 20px;
+  text-align: center;
+  color: #667;
+}
+
+.container {
+    margin-left: 20px;
+    margin-right: 20px;
+}
