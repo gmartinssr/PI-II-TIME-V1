@@ -1,140 +1,284 @@
-h1 {
-  color: #fff;
-}
-
-.lista-projetos {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-left: 40px;
-    margin-right: 40px;
-}
-
-.linha {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 2fr; 
-  align-items: center;
-  gap: 16px;
-  padding: 14px 20px;
-  border-bottom: 1px solid #eee;
-  grid-template-columns: 2fr 1fr 1fr minmax(280px, auto);
-}
-
-.linha:last-child {
-  border-bottom: none;
-}
-
-.linha--cabecalho span:last-child {
-  text-align: center;
-}
-
-.linha__acoes {
-  display: flex;
-  gap: 8px;
-  justify-content: center; 
-}
-
-.linha--cabecalho {
-  background: #fafafa;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #888;
-}
-
-.linha__nome {
-  font-weight: 600;
-  color: #e7e8ed;
-}
-
-.btn {
-  padding: 8px 12px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.btn--principal {
-  background: #2563EB;
-  color: #FFFFFF;
-}
-
-.btn--secundario {
-  border: 1px solid rgb(12, 12, 12);
-  color: #222325;
-  background: #F1F5F9;
-}
-
-.barra-topo {
-  display: flex;
-  align-items: center;
-}
-
-.barra-busca {
-  margin-left: auto;  
-  position: relative;
-}
-
-.barra-busca__icone {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%); 
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: #888;
-  stroke-width: 2;
-  stroke-linecap: round;
-  pointer-events: none; 
-}
-
-.barra-busca input {
-  width: 280px;
-  padding: 10px 14px 10px 38px; 
-  border: 1px solid #d0d0d0;
-  border-radius: 6px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
-}
+    font-family: "Segoe UI", Arial, sans-serif;
 
-body {
-  margin: 0;
-  min-height: 100vh;                 
-  background-image: url("fundo.jpeg");
-  background-size: cover;            
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;      
-}
+    background-color: #E7E8ED;
+    background-image: url("fundo.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 
-.status {
-  justify-self: start;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-}
-.status--andamento  { background: #EFF6FF; color: #0a0a0b; }
-.status--finalizado { background: #d3f9d8; color: #2b8a3e; }
-.status--pausado    { background: #ffe3e3; color: #c92a2a; }
-
-.linha-demanda {
-  padding: 10px 20px 10px 40px; 
-  background: #f5f8ff;
-  border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
-  color: #700;
-}
-
-.sem-resultado {
-  padding: 24px 20px;
-  text-align: center;
-  color: #667;
+    color: #1F2937;
 }
 
 .container {
-    margin-left: 20px;
-    margin-right: 20px;
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 30px 40px;
+}
+
+/* Botão voltar */
+
+.botao-voltar {
+    display: inline-block;
+
+    margin-bottom: 25px;
+    padding: 8px 14px;
+
+    background: rgba(23, 26, 33, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+
+    color: #FFFFFF;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: 0.2s;
+}
+
+.botao-voltar:hover {
+    background: rgba(23, 26, 33, 0.70);
+    color: #FFFFFF;
+
+    transform: translateY(-3px);
+}
+
+/* Topo */
+
+.barra-topo {
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 30px;
+    padding: 20px 25px;
+
+    background: rgba(23, 26, 33, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.barra-topo h1 {
+    margin: 0;
+
+    color: #FFFFFF;
+
+    font-size: 32px;
+    font-weight: 600;
+}
+
+/* Barra de busca */
+
+.barra-busca {
+    margin-left: auto;
+
+    position: relative;
+}
+
+.barra-busca__icone {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.65);
+    stroke-width: 2;
+    stroke-linecap: round;
+
+    pointer-events: none;
+}
+
+.barra-busca input {
+    width: 280px;
+
+    padding: 10px 14px 10px 38px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 8px;
+
+    color: #FFFFFF;
+
+    outline: none;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: 0.2s;
+}
+
+.barra-busca input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.barra-busca input:focus {
+    border-color: rgba(255, 255, 255, 0.40);
+}
+
+/* Lista de projetos */
+
+.lista-projetos {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    background: rgba(23, 26, 33, 0.55);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Linhas */
+
+.linha {
+    display: grid;
+
+    grid-template-columns: 2fr 1fr 1fr minmax(280px, auto);
+
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 14px 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.linha:last-child {
+    border-bottom: none;
+}
+
+/* Cabeçalho da lista */
+
+.linha--cabecalho {
+    background: rgba(255, 255, 255, 0.05);
+
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.linha--cabecalho span:last-child {
+    text-align: center;
+}
+
+/* Nome do projeto */
+
+.linha__nome {
+    font-weight: 600;
+
+    color: #FFFFFF;
+}
+
+.linha__demandas {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Ações */
+
+.linha__acoes {
+    display: flex;
+
+    gap: 8px;
+
+    justify-content: center;
+}
+
+/* Botões */
+
+.btn {
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    font-size: 0.9rem;
+    white-space: nowrap;
+
+    transition: 0.2s;
+}
+
+.btn--principal {
+    background: #2563EB;
+
+    color: #FFFFFF;
+}
+
+.btn--principal:hover {
+    background: #1D4ED8;
+}
+
+.btn--secundario {
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    background: rgba(255, 255, 255, 0.10);
+
+    color: #FFFFFF;
+}
+
+.btn--secundario:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* Status */
+
+.status {
+    justify-self: start;
+
+    padding: 4px 10px;
+
+    border-radius: 999px;
+
+    font-size: 0.85rem;
+
+    color: #FFFFFF;
+}
+
+.status--aberta {
+    background: rgba(37, 99, 235, 0.25);
+    border: 1px solid rgba(37, 99, 235, 0.40);
+}
+
+.status--andamento {
+    background: rgba(245, 158, 11, 0.25);
+    border: 1px solid rgba(245, 158, 11, 0.40);
+}
+
+.status--revisao {
+    background: rgba(147, 51, 234, 0.25);
+    border: 1px solid rgba(147, 51, 234, 0.40);
+}
+
+.status--concluida {
+    background: rgba(22, 163, 74, 0.25);
+    border: 1px solid rgba(22, 163, 74, 0.40);
+}
+
+.status--cancelada {
+    background: rgba(220, 38, 38, 0.25);
+    border: 1px solid rgba(220, 38, 38, 0.40);
 }
