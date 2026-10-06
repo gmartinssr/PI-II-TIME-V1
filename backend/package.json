@@ -5,7 +5,9 @@
   "main": "dist/server.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "back": "tsx watch src/server.ts",
+    "front": "node scripts/frontend-server.mjs",
+    "start": "node scripts/start.mjs",
     "dev": "tsx watch src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

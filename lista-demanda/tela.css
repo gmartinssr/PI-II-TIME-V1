@@ -1,5 +1,5 @@
-/* CÓDIGO GERADO POR VITOR ZAGO GUEDES BATISTA -- RA: 26008322 */
-/*Alterações feitas por Guilherme Baez Machado -- RA: 26008322*/
+
+
 * {
     margin: 0;
     padding: 0;
@@ -93,7 +93,7 @@ main {
     font-weight: 600;
 }
 
-/* Botão Nova Demanda */
+
 
 .botao-nova {
     background: linear-gradient(135deg, #2E8B57, #4ecc89);
@@ -226,7 +226,7 @@ main {
     box-shadow: 0 0 0 3px rgba(23, 78, 135, 0.12);
 }
 
-/* Botão Filtrar */
+
 
 .botao-filtrar {
     height: 40px;
@@ -314,7 +314,7 @@ tbody tr:hover {
     font-weight: 600;
     white-space: nowrap;
 }
-/* Status */
+
 .aberta {
     background-color: #2563EB;
     color: white;
@@ -341,7 +341,7 @@ tbody tr:hover {
     color: white;
 }
 
-/* Prioridade */
+
 
 .critica {
     background-color: #FEE2E2;
@@ -450,7 +450,7 @@ tbody tr:hover {
     }
 }
 
-/* Tablet / celular */
+
 
 @media (max-width: 768px) {
 
@@ -524,7 +524,7 @@ tbody tr:hover {
     }
 }
 
-/* Celulares pequenos */
+
 
 @media (max-width: 480px) {
 
