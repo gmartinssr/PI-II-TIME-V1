@@ -17,9 +17,7 @@ body {
 }
 
 
-/* =========================
-   CONTAINER PRINCIPAL
-========================= */
+
 
 .usuarios-container {
     width: 100%;
@@ -29,9 +27,7 @@ body {
 }
 
 
-/* =========================
-   BOTÃO VOLTAR
-========================= */
+
 
 .botao-voltar {
     display: inline-block;
@@ -63,9 +59,7 @@ body {
 }
 
 
-/* =========================
-   TOPO
-========================= */
+
 
 .usuarios-topo {
     display: flex;
@@ -88,7 +82,7 @@ body {
 }
 
 
-/* PEQUENO TÍTULO */
+
 
 .subtitulo-topo {
     margin-bottom: 5px;
@@ -102,7 +96,7 @@ body {
 }
 
 
-/* TÍTULO */
+
 
 .usuarios-topo h1 {
     color: #FFFFFF;
@@ -112,7 +106,7 @@ body {
 }
 
 
-/* DESCRIÇÃO */
+
 
 .descricao-topo {
     margin-top: 5px;
@@ -123,9 +117,7 @@ body {
 }
 
 
-/* =========================
-   CAMPO DE BUSCA
-========================= */
+
 
 .campo-busca input {
     width: 300px;
@@ -160,9 +152,7 @@ body {
 }
 
 
-/* =========================
-   CONTAINER DA TABELA
-========================= */
+
 
 .tabela-container {
     width: 100%;
@@ -179,9 +169,7 @@ body {
 }
 
 
-/* =========================
-   TABELA
-========================= */
+
 
 table {
     width: 100%;
@@ -192,9 +180,7 @@ table {
 }
 
 
-/* =========================
-   CABEÇALHO
-========================= */
+
 
 thead {
     background: rgba(255, 255, 255, 0.08);
@@ -217,9 +203,7 @@ th {
 }
 
 
-/* =========================
-   LINHAS
-========================= */
+
 
 td {
     padding: 18px 22px;
@@ -232,7 +216,7 @@ td {
 }
 
 
-/* Efeito ao passar o mouse */
+
 
 tbody tr {
     transition: 0.2s;
@@ -243,16 +227,14 @@ tbody tr:hover {
 }
 
 
-/* Remove borda da última linha */
+
 
 tbody tr:last-child td {
     border-bottom: none;
 }
 
 
-/* =========================
-   CARGO
-========================= */
+
 
 .cargo {
     display: inline-block;
@@ -266,7 +248,7 @@ tbody tr:last-child td {
 }
 
 
-/* Administrador */
+
 
 .cargo.administrador {
     background: rgba(255, 220, 100, 0.20);
@@ -277,7 +259,7 @@ tbody tr:last-child td {
 }
 
 
-/* Usuário */
+
 
 .cargo.usuario {
     background: rgba(100, 180, 255, 0.18);
@@ -288,7 +270,7 @@ tbody tr:last-child td {
 }
 
 
-/* Gestor */
+
 
 .cargo.gestor {
     background: rgba(100, 255, 170, 0.18);
@@ -299,16 +281,14 @@ tbody tr:last-child td {
 }
 
 
-/* =========================
-   AÇÕES
-========================= */
+
 
 .acoes {
     white-space: nowrap;
 }
 
 
-/* Botões */
+
 
 .acoes button {
     padding: 8px 13px;
@@ -326,7 +306,7 @@ tbody tr:last-child td {
 }
 
 
-/* Editar */
+
 
 .botao-editar {
     margin-right: 6px;
@@ -345,7 +325,7 @@ tbody tr:last-child td {
 }
 
 
-/* Excluir */
+
 
 .botao-excluir {
     background: rgba(220, 70, 70, 0.20);
@@ -362,9 +342,7 @@ tbody tr:last-child td {
 }
 
 
-/* =========================
-   RESPONSIVIDADE
-========================= */
+
 
 @media (max-width: 900px) {
 
