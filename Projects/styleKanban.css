@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background-color: #E7E8ED;
+    background-image: url("fundo.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    color: #1F2937;
+}
+
+.kanban-container {
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 30px 40px;
+}
+
+.botao-voltar {
+    display: inline-block;
+
+    margin-bottom: 25px;
+    padding: 8px 14px;
+
+    background: rgba(23, 26, 33, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+
+    color: #FFFFFF;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: 0.2s;
+}
+
+.botao-voltar:hover {
+    background: rgba(23, 26, 33, 0.70);
+    color: #FFFFFF;
+
+    transform: translateY(-3px);
+}
+
+.kanban-topo {
+    margin-bottom: 30px;
+
+    padding: 20px 25px;
+
+    background: rgba(23, 26, 33, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.kanban-topo .subtitulo-topo {
+    margin-bottom: 5px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.kanban-topo h1 {
+    color: #FFFFFF;
+
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.kanban-topo .descricao-topo {
+    margin-top: 5px;
+
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 15px;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.kanban-coluna {
+    flex: 1;
+    min-width: 0;
+
+    height: 60vh;
+
+    padding: 20px;
+
+    background: rgba(23, 26, 33, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-coluna-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.kanban-coluna-topo h2 {
+    color: #FFFFFF;
+
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.kanban-coluna-topo span {
+    padding: 4px 9px;
+
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 20px;
+
+    color: #FFFFFF;
+
+    font-size: 13px;
+    font-weight: 600;
+}
