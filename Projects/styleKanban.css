@@ -141,3 +141,49 @@ body {
     font-size: 13px;
     font-weight: 600;
 }
+
+.kanban-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.seletor-projeto {
+    width: 100%;
+    max-width: 400px;
+
+    padding: 10px 14px;
+
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 8px;
+
+    color: #FFFFFF;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    outline: none;
+    cursor: pointer;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: 0.2s;
+}
+
+.seletor-projeto:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.seletor-projeto:focus {
+    border-color: rgba(255, 255, 255, 0.40);
+}
+
+.seletor-projeto option {
+    background: #1F2937;
+    color: #FFFFFF;
+}
