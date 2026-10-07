@@ -618,3 +618,32 @@ app.post("/api/demandas", (request, response) => {
   });
 });
  
+
+const STATUS_VALIDOS: StatusDemanda[] = ["aberta", "andamento", "revisao", "concluida", "cancelada"];
+ 
+app.options("/api/demandas/:id/status", (_request, response) => {
+  response.sendStatus(204);
+});
+ 
+app.patch("/api/demandas/:id/status", (request, response) => {
+  const id = Number(request.params.id);
+  const demanda = demandas.find((d) => d.id === id);
+ 
+  if (!demanda) {
+    response.status(404).json({ valido: false, erro: "Demanda não encontrada." });
+    return;
+  }
+ 
+  const corpo = (request.body ?? {}) as { status?: unknown };
+  const status = texto(corpo.status).toLowerCase();
+ 
+  if (!STATUS_VALIDOS.includes(status as StatusDemanda)) {
+    response.status(400).json({ valido: false, erro: "Status inválido." });
+    return;
+  }
+ 
+  demanda.status = status as StatusDemanda;
+ 
+  response.status(200).json({ valido: true, demanda });
+});
+ 
