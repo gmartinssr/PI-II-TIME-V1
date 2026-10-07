@@ -403,3 +403,247 @@ app.get("/api/demandas", (_request, response) => {
     demandas: resultado
   });
 });
+
+// Cadastro Demandas
+
+ 
+type StatusDemanda = "aberta" | "andamento" | "revisao" | "concluida" | "cancelada";
+type Prioridade = "baixa" | "media" | "alta" | "critica";
+type Tipo = "tarefa" | "defeito" | "melhoria" | "documentação";
+ 
+interface Anexo {
+  nome: string;
+  tamanho: number; 
+}
+ 
+
+interface Demanda {
+  id: number;
+  titulo: string;
+  status: StatusDemanda;
+  prioridade: Prioridade;
+  tipo: Tipo; 
+  prazo: string; 
+  projeto: string;
+  responsavel: string;
+  descricao?: string;
+  solicitante?: string;
+  abertura?: string;
+  anexo?: Anexo | null;
+}
+ 
+
+type NovaDemanda = Omit<Demanda, "id" | "status">;
+ 
+type CampoCadastro =
+  | "titulo" | "descricao" | "categoria" | "projeto" | "prioridade"
+  | "responsavel" | "solicitante" | "abertura" | "prazo" | "anexo";
+type ErrosCadastro = Partial<Record<CampoCadastro, string>>;
+ 
+type ResultadoValidacao =
+  | { ok: true; dados: NovaDemanda }
+  | { ok: false; erros: ErrosCadastro };
+ 
+const REGRAS = {
+  titulo: { min: 5, max: 80 },
+  descricao: { min: 10, max: 1000 },
+  projeto: { max: 100 },
+  solicitante: { min: 3, max: 100 },
+  anexoMaxMb: 5,
+  anexoExtensoes: ["png", "jpg", "jpeg", "pdf", "doc", "docx", "xls", "xlsx", "csv"],
+};
+ 
+const PRIORIDADES: Prioridade[] = ["baixa", "media", "alta", "critica"];
+const TIPOS: Tipo[] = ["tarefa", "defeito", "melhoria", "documentação"];
+ 
+
+
+function texto(valor: unknown): string {
+  return typeof valor === "string" ? valor.trim() : "";
+}
+ 
+function dataDeHoje(): string {
+  return new Date().toLocaleDateString("sv-SE"); 
+}
+ 
+
+function dataValida(valor: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
+  const data = new Date(`${valor}T00:00:00Z`);
+  return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor;
+}
+ 
+function proximoId(): number {
+  return demandas.reduce((maior, d) => Math.max(maior, d.id), 0) + 1;
+}
+
+
+function validarDemanda(corpo: unknown): ResultadoValidacao {
+  const body = (typeof corpo === "object" && corpo !== null ? corpo : {}) as Record<string, unknown>;
+  const erros: ErrosCadastro = {};
+ 
+  const titulo = texto(body.titulo);
+  const descricao = texto(body.descricao);
+  const categoria = texto(body.categoria).toLowerCase();
+  const projeto = texto(body.projeto);
+  const prioridade = (texto(body.prioridade).toLowerCase() || "baixa");
+  const responsavel = texto(body.responsavel);
+  const solicitante = texto(body.solicitante);
+  const abertura = texto(body.abertura) || dataDeHoje();
+  const prazo = texto(body.prazo);
+ 
+
+  if (!titulo) {
+    erros.titulo = "Informe o título da demanda.";
+  } else if (titulo.length < REGRAS.titulo.min) {
+    erros.titulo = `O título precisa ter pelo menos ${REGRAS.titulo.min} caracteres.`;
+  } else if (titulo.length > REGRAS.titulo.max) {
+    erros.titulo = `O título não pode ter mais de ${REGRAS.titulo.max} caracteres.`;
+  }
+ 
+
+  if (!descricao) {
+    erros.descricao = "Descreva a demanda.";
+  } else if (descricao.length < REGRAS.descricao.min) {
+    erros.descricao = `A descrição precisa ter pelo menos ${REGRAS.descricao.min} caracteres.`;
+  } else if (descricao.length > REGRAS.descricao.max) {
+    erros.descricao = `A descrição não pode ter mais de ${REGRAS.descricao.max} caracteres.`;
+  }
+ 
+
+  if (!categoria) {
+    erros.categoria = "Selecione uma categoria.";
+  } else if (!TIPOS.includes(categoria as Tipo)) {
+    erros.categoria = "Categoria inválida.";
+  }
+ 
+  if (!projeto) {
+    erros.projeto = "Selecione o projeto relacionado.";
+  } else if (projeto.length > REGRAS.projeto.max) {
+    erros.projeto = `O projeto não pode ter mais de ${REGRAS.projeto.max} caracteres.`;
+  }
+ 
+
+  if (!PRIORIDADES.includes(prioridade as Prioridade)) {
+    erros.prioridade = "Prioridade inválida.";
+  }
+ 
+
+  if (solicitante && solicitante.length < REGRAS.solicitante.min) {
+    erros.solicitante = `O nome precisa ter pelo menos ${REGRAS.solicitante.min} caracteres.`;
+  } else if (solicitante.length > REGRAS.solicitante.max) {
+    erros.solicitante = `O nome não pode ter mais de ${REGRAS.solicitante.max} caracteres.`;
+  }
+ 
+
+  if (!dataValida(abertura)) {
+    erros.abertura = "Data de abertura inválida.";
+  } else if (abertura > dataDeHoje()) {
+    erros.abertura = "A data de abertura não pode ser no futuro.";
+  }
+ 
+  if (!prazo) {
+    erros.prazo = "Informe o prazo.";
+  } else if (!dataValida(prazo)) {
+    erros.prazo = "Prazo inválido.";
+  } else if (!erros.abertura && prazo < abertura) {
+    erros.prazo = "O prazo não pode ser anterior à data de abertura.";
+  }
+ 
+
+  let anexo: Anexo | null = null;
+  if (body.anexo !== null && body.anexo !== undefined) {
+    const a = body.anexo as Record<string, unknown>;
+    const nome = texto(a.nome);
+    const tamanho = typeof a.tamanho === "number" ? a.tamanho : NaN;
+    const extensao = nome.split(".").pop()?.toLowerCase() ?? "";
+ 
+    if (!nome || Number.isNaN(tamanho) || tamanho < 0) {
+      erros.anexo = "Anexo inválido.";
+    } else if (!REGRAS.anexoExtensoes.includes(extensao)) {
+      erros.anexo = `Tipo de arquivo não permitido (.${extensao}).`;
+    } else if (tamanho / (1024 * 1024) > REGRAS.anexoMaxMb) {
+      erros.anexo = `O arquivo deve ter no máximo ${REGRAS.anexoMaxMb} MB.`;
+    } else {
+      anexo = { nome, tamanho };
+    }
+  }
+ 
+  if (Object.keys(erros).length > 0) {
+    return { ok: false, erros };
+  }
+ 
+  return {
+    ok: true,
+    dados: {
+      titulo,
+      descricao,
+      tipo: categoria as Tipo,
+      projeto,
+      prioridade: prioridade as Prioridade,
+      responsavel: responsavel || "Não atribuído",
+      solicitante,
+      abertura,
+      prazo,
+      anexo,
+    },
+  };
+}
+ 
+
+app.options("/api/demandas", (_request, response) => {
+  response.sendStatus(204);
+});
+ 
+app.post("/api/demandas", (request, response) => {
+  const resultado = validarDemanda(request.body);
+ 
+  if (!resultado.ok) {
+    response.status(400).json({ valido: false, erros: resultado.erros });
+    return;
+  }
+ 
+  const novaDemanda: Demanda = {
+    id: proximoId(),
+    ...resultado.dados,
+    status: "aberta", 
+  };
+ 
+  demandas.push(novaDemanda);
+ 
+  response.status(201).json({
+    valido: true,
+    mensagem: "Demanda cadastrada com sucesso.",
+    demanda: novaDemanda,
+  });
+});
+ 
+
+const STATUS_VALIDOS: StatusDemanda[] = ["aberta", "andamento", "revisao", "concluida", "cancelada"];
+ 
+app.options("/api/demandas/:id/status", (_request, response) => {
+  response.sendStatus(204);
+});
+ 
+app.patch("/api/demandas/:id/status", (request, response) => {
+  const id = Number(request.params.id);
+  const demanda = demandas.find((d) => d.id === id);
+ 
+  if (!demanda) {
+    response.status(404).json({ valido: false, erro: "Demanda não encontrada." });
+    return;
+  }
+ 
+  const corpo = (request.body ?? {}) as { status?: unknown };
+  const status = texto(corpo.status).toLowerCase();
+ 
+  if (!STATUS_VALIDOS.includes(status as StatusDemanda)) {
+    response.status(400).json({ valido: false, erro: "Status inválido." });
+    return;
+  }
+ 
+  demanda.status = status as StatusDemanda;
+ 
+  response.status(200).json({ valido: true, demanda });
+});
+ 
