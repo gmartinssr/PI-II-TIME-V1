@@ -286,6 +286,40 @@ body {
     background: var(--accent-ink);
 }
 
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink);
+    background: #FBFAF8;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    resize: vertical;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.comment-form .btn-primary {
+    border: none;
+    cursor: pointer;
+}
 
 @media (max-width: 720px) {
     .detail-grid {
