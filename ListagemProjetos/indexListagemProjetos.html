@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meus Projetos</title>
+
+    <link rel="stylesheet" href="styleListagemProjetos.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <a href="../Dashboard/indexDashboard.html" class="botao-voltar">
+            ← Voltar para Dashboard
+        </a>
+
+        <div class="barra-topo">
+
+            <h1>Meus projetos</h1>
+
+            <div class="barra-busca">
+
+                <svg class="barra-busca__icone" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+                </svg>
+
+                <input
+                    type="search"
+                    id="campo-busca"
+                    placeholder="Buscar projeto..."
+                >
+
+            </div>
+
+        </div>
+
+        <section class="lista-projetos" id="lista-projetos">
+
+            <div class="linha linha--cabecalho">
+                <span>PROJETO</span>
+                <span>DEMANDAS</span>
+                <span>SITUAÇÃO</span>
+                <span>AÇÕES</span>
+            </div>
+
+            <div id="linhas-projetos"></div>
+
+            <p class="sem-resultado" id="sem-resultado" hidden>
+                Nenhum projeto encontrado.
+            </p>
+
+        </section>
+
+    </div>
+
+    <script src="scriptListagemProjetos.js"></script>
+
+</body>
+
+</html>
