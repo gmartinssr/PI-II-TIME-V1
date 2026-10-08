@@ -282,3 +282,9 @@ body {
     background: rgba(220, 38, 38, 0.25);
     border: 1px solid rgba(220, 38, 38, 0.40);
 }
+
+.sem-resultado {
+    padding: 24px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.65);
+}
