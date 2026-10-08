@@ -19,3 +19,11 @@
 
 **Professor Orientador**: Fernando Silveira
 
+## Execução
+
+Os comandos devem ser executados dentro da pasta `backend`:
+
+- `npm run back`: inicia somente o backend na porta 3333.
+- `npm run front`: inicia somente o frontend em `http://localhost:3030`.
+- `npm start`: inicia backend e frontend juntos no mesmo servidor, em `http://localhost:3000`.
+

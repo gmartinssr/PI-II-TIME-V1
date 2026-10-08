@@ -24,7 +24,7 @@ body {
     padding: 30px 40px;
 }
 
-/* Botão voltar */
+
 
 .botao-voltar {
     display: inline-block;
@@ -55,7 +55,7 @@ body {
     transform: translateY(-3px);
 }
 
-/* Topo */
+
 
 .barra-topo {
     display: flex;
@@ -81,7 +81,7 @@ body {
     font-weight: 600;
 }
 
-/* Barra de busca */
+
 
 .barra-busca {
     margin-left: auto;
@@ -136,7 +136,7 @@ body {
     border-color: rgba(255, 255, 255, 0.40);
 }
 
-/* Lista de projetos */
+
 
 .lista-projetos {
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -150,7 +150,7 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* Linhas */
+
 
 .linha {
     display: grid;
@@ -170,7 +170,7 @@ body {
     border-bottom: none;
 }
 
-/* Cabeçalho da lista */
+
 
 .linha--cabecalho {
     background: rgba(255, 255, 255, 0.05);
@@ -185,7 +185,7 @@ body {
     text-align: center;
 }
 
-/* Nome do projeto */
+
 
 .linha__nome {
     font-weight: 600;
@@ -197,7 +197,7 @@ body {
     color: rgba(255, 255, 255, 0.75);
 }
 
-/* Ações */
+
 
 .linha__acoes {
     display: flex;
@@ -207,7 +207,7 @@ body {
     justify-content: center;
 }
 
-/* Botões */
+
 
 .btn {
     padding: 8px 12px;
@@ -244,7 +244,7 @@ body {
     background: rgba(255, 255, 255, 0.18);
 }
 
-/* Status */
+
 
 .status {
     justify-self: start;

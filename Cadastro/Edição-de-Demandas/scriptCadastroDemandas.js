@@ -1,116 +1,210 @@
-console.log("JavaScript conectado!");
+"use strict";
+const REGRAS = {
+    titulo: { min: 5, max: 80 },
+    descricao: { min: 10, max: 1000 },
+    solicitante: { min: 3, max: 100 },
+    anexoMaxMb: 5,
+    anexoExtensoes: ["png", "jpg", "jpeg", "pdf", "doc", "docx", "xls", "xlsx", "csv"],
+};
 
-// Pega o campo de descrição pelo ID
-const descricao = document.getElementById("descricao"); 
-// "descricao" passa a referenciar o elemento <textarea>
 
-// Pega o elemento que mostra a quantidade de caracteres
-const contador = document.querySelector(".char-count"); 
-// "contador" passa a referenciar o elemento com class="char-count"
-
-// Pega os campos que serão validados
-const categoria = document.getElementById("categoria");
-const projeto = document.getElementById("projeto");
-const prazo = document.getElementById("prazo");
-const abertura = document.getElementById("abertura");
-
-// Atualiza o contador sempre que o usuário digitar.
-descricao.addEventListener("input", function() { 
-    // Detecta quando ocorre um evento de input e chama a função
-    contador.textContent = `${descricao.value.length} / 1000`; 
-    // Pega o tamanho do texto do textarea e atualiza o contador na tela
-});
-
-// Pega o campo de título pelo ID
-const titulo = document.getElementById("titulo");
-
-// Pega o formulário da página
-const form = document.querySelector("form");
-
-// Mostra uma mensagem de erro abaixo de um campo
-function mostrarErro(campo, mensagem) { //Cria uma função com os parâmetros campo e mensagem
-    campo.classList.add("campo-erro"); //Adiciona a classe campo-erro ao campo recebido
-
-    // Verifica se já existe uma mensagem para esse campo
-    if (campo.parentElement.querySelector(".mensagem-erro")) {
-        return;
-    }
-
-    const mensagemErro = document.createElement("span"); //cria um span novo
-    mensagemErro.className = "mensagem-erro"; //chama a mensagem erro
-    mensagemErro.textContent = mensagem; //mostra a mensagem
-
-    campo.parentElement.appendChild(mensagemErro); //Adiciona a mensagem de erro ao elemento pai do campo selecionado
+function obter(id) {
+    const el = document.getElementById(id);
+    if (!el)
+        throw new Error(`Elemento #${id} não encontrado no HTML`);
+    return el;
 }
 
-// Remove o destaque e a mensagem de erro de um campo
-function removerErro(campo) { //Cria uma função para remover a mensagem de erro com o parâmetro que é o campo onde a função vai atuar
-    campo.classList.remove("campo-erro"); //Remove a classe CSS campo-erro do parâmetro campo
+function hoje() {
+    return new Date().toLocaleDateString("sv-SE");
+}
 
-    const mensagemErro = campo.parentElement.querySelector(".mensagem-erro"); //Dentro do elemento pai do campo parâmetro, a função irá procurar um elemento com a classe mensagem erro
+function coletarDados() {
+    const valor = (id) => obter(id).value.trim();
+    const prioridadeMarcada = document.querySelector('input[name="prioridade"]:checked');
+    return {
+        titulo: valor("titulo"),
+        descricao: valor("descricao"),
+        categoria: valor("categoria"),
+        projeto: valor("projeto"),
+        prioridade: (prioridadeMarcada?.value ?? "baixa"),
+        responsavel: valor("responsavel"),
+        solicitante: valor("solicitante"),
+        abertura: valor("abertura") || hoje(), // se vazio, assume hoje
+        prazo: valor("prazo"),
+        anexo: obter("anexo").files?.[0] ?? null,
+    };
+}
 
-    if (mensagemErro) { //Se ele achar a mensagem erro
-        mensagemErro.remove(); //Ele remove a mensagem erro
+function validarDemanda(d) {
+    const erros = {};
+
+    if (!d.titulo) {
+        erros.titulo = "Informe o título da demanda.";
+    }
+    else if (d.titulo.length < REGRAS.titulo.min) {
+        erros.titulo = `O título precisa ter pelo menos ${REGRAS.titulo.min} caracteres.`;
+    }
+
+    if (!d.descricao) {
+        erros.descricao = "Descreva a demanda.";
+    }
+    else if (d.descricao.length < REGRAS.descricao.min) {
+        erros.descricao = `A descrição precisa ter pelo menos ${REGRAS.descricao.min} caracteres.`;
+    }
+
+    if (!d.categoria)
+        erros.categoria = "Selecione uma categoria.";
+    if (!d.projeto)
+        erros.projeto = "Selecione o projeto relacionado.";
+
+    if (d.solicitante && d.solicitante.length < REGRAS.solicitante.min) {
+        erros.solicitante = `O nome precisa ter pelo menos ${REGRAS.solicitante.min} caracteres.`;
+    }
+
+    if (d.abertura > hoje()) {
+        erros.abertura = "A data de abertura não pode ser no futuro.";
+    }
+    if (!d.prazo) {
+        erros.prazo = "Informe o prazo.";
+    }
+    else if (d.prazo < d.abertura) {
+        erros.prazo = "O prazo não pode ser anterior à data de abertura.";
+    }
+
+    if (d.anexo) {
+        const extensao = d.anexo.name.split(".").pop()?.toLowerCase() ?? "";
+        const tamanhoMb = d.anexo.size / (1024 * 1024);
+        if (!REGRAS.anexoExtensoes.includes(extensao)) {
+            erros.anexo = `Tipo de arquivo não permitido (.${extensao}).`;
+        }
+        else if (tamanhoMb > REGRAS.anexoMaxMb) {
+            erros.anexo = `O arquivo deve ter no máximo ${REGRAS.anexoMaxMb} MB.`;
+        }
+    }
+    return erros;
+}
+
+function mostrarErro(campo, mensagem) {
+    const input = document.getElementById(campo);
+    const container = input?.closest(".field, .dropzone");
+    if (!input || !container)
+        return;
+
+    container.querySelector(".error-message")?.remove();
+    container.classList.toggle("has-error", Boolean(mensagem));
+    input.setAttribute("aria-invalid", String(Boolean(mensagem)));
+    if (mensagem) {
+        const span = document.createElement("span");
+        span.className = "error-message";
+        span.setAttribute("role", "alert");
+        span.textContent = mensagem; 
+        container.appendChild(span);
     }
 }
 
-// Detecta quando o formulário é enviado e serve também para validar as informações que o user colocou
-form.addEventListener("submit", function(event) {
-    // Impede o envio padrão do formulário
-    event.preventDefault();
+function validarCampo(campo) {
+    const erros = validarDemanda(coletarDados());
+    mostrarErro(campo, erros[campo]);
+}
 
-    let erro = false; //Inicializa a variável que avisa se existe ou não um erro
-
-    // Verifica se o título está vazio
-    if (titulo.value.trim() === "") {
-        mostrarErro(titulo, "O título é obrigatório.");
-        erro = true;
-    } else {
-        removerErro(titulo);
-    }
-
-    // Verifica se a descrição está vazia
-    if (descricao.value.trim() === "") {
-        mostrarErro(descricao, "A descrição é obrigatória.");
-        erro = true;
-    } else {
-        removerErro(descricao);
-    }
-
-    // Verifica se uma categoria foi selecionada
-    if (categoria.value === "") {
-        mostrarErro(categoria, "Selecione uma categoria.");
-        erro = true;
-    } else {
-        removerErro(categoria);
-    }
-
-    // Verifica se um projeto foi selecionado
-    if (projeto.value === "") {
-        mostrarErro(projeto, "Selecione um projeto.");
-        erro = true;
-    } else {
-        removerErro(projeto);
-    }
-
-    // Verifica se o prazo foi preenchido
-    if (prazo.value === "") {
-        mostrarErro(prazo, "Informe o prazo.");
-        erro = true;
-    } else {
-        removerErro(prazo);
-    }
-    // Verifica se o prazo é anterior à data de abertura
-    if (abertura.value !== "" && prazo.value !== "" && prazo.value < abertura.value) {
-        mostrarErro(prazo, "O prazo não pode ser anterior à data de abertura.");
-        erro = true;
-    }
-
-    // Se algum campo tiver erro, interrompe o envio
-    if (erro) {
-        console.log("Preencha todos os campos obrigatórios.");
+function iniciarContador() {
+    const textarea = obter("descricao");
+    const contador = document.querySelector(".char-count");
+    if (!contador)
         return;
-    }
+    const atualizar = () => {
+        contador.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+    };
+    textarea.addEventListener("input", atualizar);
+    atualizar();
+}
 
-    console.log("Formulário válido!");
-});
+function iniciarDropzone() {
+    const zona = document.querySelector(".dropzone");
+    const inputArquivo = obter("anexo");
+    if (!zona)
+        return;
+    zona.addEventListener("dragover", (e) => {
+        e.preventDefault(); 
+        zona.classList.add("dragover");
+    });
+    zona.addEventListener("dragleave", () => zona.classList.remove("dragover"));
+    zona.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zona.classList.remove("dragover");
+        if (e.dataTransfer?.files.length) {
+            inputArquivo.files = e.dataTransfer.files;
+            validarCampo("anexo");
+        }
+    });
+}
+
+
+
+const API_URL = "http://localhost:3333/api/demandas";
+async function salvarDemanda(dados) {
+
+    const { anexo, ...resto } = dados;
+    const corpo = {
+        ...resto,
+        anexo: anexo ? { nome: anexo.name, tamanho: anexo.size } : null,
+    };
+    try {
+        const resposta = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(corpo),
+        });
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            const errosServidor = (resultado.erros ?? {});
+            Object.keys(errosServidor).forEach((campo) => mostrarErro(campo, errosServidor[campo]));
+            return;
+        }
+        alert("Demanda cadastrada com sucesso!");
+        window.location.href = "../../lista-demanda/tela.html";
+    }
+    catch {
+        alert("Não foi possível conectar ao servidor. Verifique se o backend está rodando.");
+    }
+}
+
+function iniciar() {
+    const form = document.querySelector("form");
+    if (!form)
+        return;
+
+    const abertura = obter("abertura");
+    if (!abertura.value)
+        abertura.value = hoje();
+    iniciarContador();
+    iniciarDropzone();
+
+    const campos = [
+        "titulo", "descricao", "categoria", "projeto",
+        "solicitante", "abertura", "prazo", "anexo",
+    ];
+    campos.forEach((campo) => {
+        const el = obter(campo);
+        el.addEventListener("blur", () => validarCampo(campo));
+        el.addEventListener("change", () => validarCampo(campo));
+    });
+
+    form.addEventListener("submit", async (evento) => {
+        evento.preventDefault(); 
+        const dados = coletarDados();
+        const erros = validarDemanda(dados);
+        
+        campos.forEach((campo) => mostrarErro(campo, erros[campo]));
+        
+        const primeiroInvalido = campos.find((campo) => erros[campo]);
+        if (primeiroInvalido) {
+            obter(primeiroInvalido).focus();
+            return;
+        }
+        await salvarDemanda(dados);
+    });
+}
+document.addEventListener("DOMContentLoaded", iniciar);

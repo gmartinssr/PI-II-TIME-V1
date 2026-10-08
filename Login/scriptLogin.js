@@ -1,19 +1,15 @@
-console.log("JavaScript do Login conectado!");
-
-// Pega o campo de email pelo ID
 const email = document.getElementById("email");
 
-// Pega o campo de senha pelo ID
 const senha = document.getElementById("senha");
 
-// Pega o formulário pelo ID
 const form = document.getElementById("formLogin");
 
-//Reutilizando as funções inicialmente criadas no JavaScript do cadastro de demandas
 function mostrarErro(campo, mensagem) {
     campo.classList.add("campo-erro");
 
-    if (campo.parentElement.querySelector(".mensagem-erro")) {
+    const mensagemAtual = campo.parentElement.querySelector(".mensagem-erro");
+    if (mensagemAtual) {
+        mensagemAtual.textContent = mensagem;
         return;
     }
 
@@ -34,43 +30,39 @@ function removerErro(campo) {
     }
 }
 
-//Validações dos campos do login
-form.addEventListener("submit", function(event) {
-
+form.addEventListener("submit", async function(event) {
     event.preventDefault();
 
-    let erro = false;
+    removerErro(email);
+    removerErro(senha);
 
-    // Verifica se o email está vazio
-    if (email.value.trim() === "") {
-        mostrarErro(email, "O email é obrigatório.");
-        erro = true;
-    } else {
-        removerErro(email);
+    try {
+        const apiUrl = window.location.port === "3030"
+            ? "http://localhost:3333/api/login"
+            : "/api/login";
+        const resposta = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: email.value,
+                senha: senha.value,
+            }),
+        });
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            if (resultado.erros?.email) {
+                mostrarErro(email, resultado.erros.email);
+            }
+            if (resultado.erros?.senha) {
+                mostrarErro(senha, resultado.erros.senha);
+            }
+            return;
+        }
+
+        window.location.href = "../Dashboard/indexDashboard.html";
+    } catch (error) {
+        console.error("Não foi possível validar o login:", error);
+        mostrarErro(email, "Não foi possível conectar ao servidor.");
     }
-
-    // Verifica se o formato do email é válido
-    if (email.value.trim() !== "" && !email.value.includes("@")) {
-        mostrarErro(email, "Digite um email válido.");
-        erro = true;
-    }
-
-    // Verifica se a senha está vazia
-    if (senha.value.trim() === "") {
-        mostrarErro(senha, "A senha é obrigatória.");
-        erro = true;
-    } else {
-        removerErro(senha);
-    }
-
-    // Se encontrou algum erro, interrompe
-    if (erro) {
-        console.log("Existem campos inválidos.");
-        return;
-    }
-
-    console.log("Login válido!");
-
-    // Redireciona para o Dashboard
-    window.location.href = "../Dashboard/indexDashboard.html";
 });

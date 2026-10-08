@@ -1,0 +1,391 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background-color: #E7E8ED;
+    background-image: url("fundo-verUsuarios.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    color: #FFFFFF;
+}
+
+
+
+
+.usuarios-container {
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 30px 40px;
+}
+
+
+
+
+.botao-voltar {
+    display: inline-block;
+
+    margin-bottom: 25px;
+    padding: 10px 14px;
+
+    background: rgba(23, 26, 33, 0.55);
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+
+    color: #FFFFFF;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: 0.2s;
+}
+
+.botao-voltar:hover {
+    background: rgba(23, 26, 33, 0.70);
+
+    transform: translateY(-3px);
+}
+
+
+
+
+.usuarios-topo {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 30px;
+
+    margin-bottom: 30px;
+    padding: 20px 25px;
+
+    background: rgba(23, 26, 33, 0.55);
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+
+
+
+.subtitulo-topo {
+    margin-bottom: 5px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+
+
+
+.usuarios-topo h1 {
+    color: #FFFFFF;
+
+    font-size: 32px;
+    font-weight: 600;
+}
+
+
+
+
+.descricao-topo {
+    margin-top: 5px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 15px;
+}
+
+
+
+
+.campo-busca input {
+    width: 300px;
+
+    padding: 12px 15px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 8px;
+
+    color: #FFFFFF;
+
+    font-size: 15px;
+
+    outline: none;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: 0.2s;
+}
+
+.campo-busca input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.campo-busca input:focus {
+    border-color: rgba(255, 255, 255, 0.45);
+
+    background: rgba(255, 255, 255, 0.15);
+}
+
+
+
+
+.tabela-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: rgba(23, 26, 33, 0.55);
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+
+
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 850px;
+}
+
+
+
+
+thead {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+th {
+    padding: 18px 22px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-align: left;
+
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+
+
+
+td {
+    padding: 18px 22px;
+
+    color: rgba(255, 255, 255, 0.90);
+
+    font-size: 15px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+
+
+
+tbody tr {
+    transition: 0.2s;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+
+
+.cargo {
+    display: inline-block;
+
+    padding: 5px 11px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+
+
+.cargo.administrador {
+    background: rgba(255, 220, 100, 0.20);
+
+    border: 1px solid rgba(255, 220, 100, 0.35);
+
+    color: #FFE58A;
+}
+
+
+
+
+.cargo.usuario {
+    background: rgba(100, 180, 255, 0.18);
+
+    border: 1px solid rgba(100, 180, 255, 0.30);
+
+    color: #9DD5FF;
+}
+
+
+
+
+.cargo.gestor {
+    background: rgba(100, 255, 170, 0.18);
+
+    border: 1px solid rgba(100, 255, 170, 0.30);
+
+    color: #9CFFBE;
+}
+
+
+
+
+.acoes {
+    white-space: nowrap;
+}
+
+
+
+
+.acoes button {
+    padding: 8px 13px;
+
+    border-radius: 7px;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+
+
+.botao-editar {
+    margin-right: 6px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    color: #FFFFFF;
+}
+
+.botao-editar:hover {
+    background: rgba(255, 255, 255, 0.20);
+
+    transform: translateY(-2px);
+}
+
+
+
+
+.botao-excluir {
+    background: rgba(220, 70, 70, 0.20);
+
+    border: 1px solid rgba(255, 100, 100, 0.30);
+
+    color: #FFAAAA;
+}
+
+.botao-excluir:hover {
+    background: rgba(220, 70, 70, 0.35);
+
+    transform: translateY(-2px);
+}
+
+
+
+
+@media (max-width: 900px) {
+
+    .usuarios-container {
+        padding: 25px;
+    }
+
+    .usuarios-topo {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .campo-busca {
+        width: 100%;
+    }
+
+    .campo-busca input {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .usuarios-container {
+        padding: 20px 15px;
+    }
+
+    .usuarios-topo {
+        padding: 18px;
+    }
+
+    .usuarios-topo h1 {
+        font-size: 26px;
+    }
+
+    .descricao-topo {
+        font-size: 14px;
+    }
+
+    .tabela-container {
+        border-radius: 12px;
+    }
+
+}

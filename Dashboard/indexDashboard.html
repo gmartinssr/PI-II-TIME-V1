@@ -1,4 +1,3 @@
-<!--Código Feito Por Guilherme Baez Machado -- RA: 26002725-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,6 +23,10 @@
 
                     <li>
                         <a href="../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html">Nova Demanda</a>
+                    </li>
+
+                    <li>
+                        <a href="../usuarios/indexUsuarios.html">Meu Perfil</a>
                     </li>
 
                     <li>
@@ -111,44 +114,44 @@
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Crítica</p>
-                                        <p class="numero">4</p>
+                                        <p class="numero" id="prioridade-critica">4</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida critica"></div>
+                                        <div class="barra-preenchida critica" id="barra-critica"></div>
                                     </div>
                                 </div>
 
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Alta</p>
-                                        <p class="numero">7</p>
+                                        <p class="numero" id="prioridade-alta">7</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida alta"></div>
+                                        <div class="barra-preenchida alta" id="barra-alta"></div>
                                     </div>
                                 </div>
 
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Média</p>
-                                        <p class="numero">10</p>
+                                        <p class="numero" id="prioridade-media">10</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida media"></div>
+                                        <div class="barra-preenchida media" id="barra-media"></div>
                                     </div>
                                 </div>
 
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Baixa</p>
-                                        <p class="numero">3</p>
+                                        <p class="numero" id="prioridade-baixa">3</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida baixa"></div>
+                                        <div class="barra-preenchida baixa" id="barra-baixa"></div>
                                     </div>
                                 </div>
                             </div>
@@ -160,44 +163,44 @@
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Tarefa</p>
-                                        <p class="numero">10</p>
+                                        <p class="numero" id="tipo-tarefa">10</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida tarefa"></div>
+                                        <div class="barra-preenchida tarefa" id="barra-tarefa"></div>
                                     </div>
                                 </div>
 
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Defeito</p>
-                                        <p class="numero">6</p>
+                                        <p class="numero" id="tipo-defeito">6</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida defeito"></div>
+                                        <div class="barra-preenchida defeito" id="barra-defeito"></div>
                                     </div>
                                 </div>
 
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Melhoria</p>
-                                        <p class="numero">5</p>
+                                        <p class="numero" id="tipo-melhoria">5</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida melhoria"></div>
+                                        <div class="barra-preenchida melhoria" id="barra-melhoria"></div>
                                     </div>
                                 </div>
 
                                 <div class="tipo">
                                     <div class="linha-tipo">
                                         <p>Documentação</p>
-                                        <p class="numero">3</p>
+                                        <p class="numero" id="tipo-documentacao">3</p>
                                     </div>
 
                                     <div class="barra">
-                                        <div class="barra-preenchida documentacao"></div>
+                                        <div class="barra-preenchida documentacao" id="barra-documentacao"></div>
                                     </div>
                                 </div>
                             </div>
@@ -211,42 +214,14 @@
                     <div class="col-md-6">
                         <div class="card">
                             <h2>Demandas Críticas em Aberto</h2>
-
-                            <div class="demanda-alerta">
-                                <p>#001 - Corrigir erro de Login</p>
-                                <p>Crítica</p>
-                            </div>
-
-                            <div class="demanda-alerta">
-                                <p>#008 - Falha no servidor</p>
-                                <p>Crítica</p>
-                            </div>
-
-                            <div class="demanda-alerta">
-                                <p>#012 - Erro no cadastro</p>
-                                <p>Crítica</p>
-                            </div>
+                            <div id="criticas-abertas"></div>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="card">
                             <h2>Demandas Próximas do Prazo</h2>
-
-                            <div class="demanda-alerta">
-                                <p>#002 - Criar Dashboard</p>
-                                <p>08/09/2026</p>
-                            </div>
-
-                            <div class="demanda-alerta">
-                                <p>#003 - Documentar API</p>
-                                <p>10/09/2026</p>
-                            </div>
-
-                            <div class="demanda-alerta">
-                                <p>#007 - Ajustar formulário</p>
-                                <p>11/09/2026</p>
-                            </div>
+                            <div id="proximas-ao-prazo"></div>
                         </div>
                     </div>
 
