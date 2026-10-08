@@ -646,4 +646,139 @@ app.patch("/api/demandas/:id/status", (request, response) => {
  
   response.status(200).json({ valido: true, demanda });
 });
+
+//Visualizar demanda
+
+app.get("/api/demandas/:id", (request, response) => {
+    const id = Number(request.params.id);
+
+    const demanda = demandas.find((d) => d.id === id);
+
+    if (!demanda) {
+        response.status(404).json({
+            valido: false,
+            erro: "Demanda não encontrada."
+        });
+
+        return;
+    }
+
+    response.status(200).json({
+        valido: true,
+        demanda
+    });
+});
+
+interface Comentario {
+  id: number;
+  demandaId: number;
+  autor: string;
+  texto: string;
+  criadoEm: string;
+}
+
+const comentarios: Comentario[] = [
+  {
+    id: 1,
+    demandaId: 1,
+    autor: "joaoSM",
+    texto: "O erro acontece somente quando a senha está incorreta.",
+    criadoEm: "2026-10-08"
+  },
+  {
+    id: 2,
+    demandaId: 1,
+    autor: "guilhermeBM",
+    texto: "Vou verificar a validação do formulário.",
+    criadoEm: "2026-10-08"
+  },
+  {
+    id: 3,
+    demandaId: 2,
+    autor: "vitorZGB",
+    texto: "Dashboard em desenvolvimento.",
+    criadoEm: "2026-10-07"
+  }
+];
+
+function proximoIdComentario(): number {
+  return comentarios.reduce((maior, comentario) => Math.max(maior, comentario.id), 0) + 1;
+}
+
+app.get("/api/demandas/:id/comentarios", (request, response) => {
+  const demandaId = Number(request.params.id);
+
+  const demanda = demandas.find((d) => d.id === demandaId);
+
+  if (!demanda) {
+    response.status(404).json({
+      valido: false,
+      erro: "Demanda não encontrada."
+    });
+    return;
+  }
+
+  const resultado = comentarios.filter(
+    (comentario) => comentario.demandaId === demandaId
+  );
+
+  response.status(200).json({
+    total: resultado.length,
+    comentarios: resultado
+  });
+});
+
+app.post("/api/demandas/:id/comentarios", (request, response) => {
+  const id = Number(request.params.id);
+
+  if (Number.isNaN(id)) {
+    response.status(400).json({
+      valido: false,
+      erro: "ID inválido."
+    });
+    return;
+  }
+
+  const demanda = demandas.find((d) => d.id === id);
+
+  if (!demanda) {
+    response.status(404).json({
+      valido: false,
+      erro: "Demanda não encontrada."
+    });
+    return;
+  }
+
+  const corpo = request.body as {
+    autor?: unknown;
+    texto?: unknown;
+  };
+
+  const autor = texto(corpo.autor);
+  const textoComentario = texto(corpo.texto);
+
+  if (!autor || !textoComentario) {
+    response.status(400).json({
+      valido: false,
+      erro: "Os campos 'autor' e 'texto' são obrigatórios."
+    });
+    return;
+  }
+
+  const novoComentario: Comentario = {
+    id: proximoIdComentario(),
+    demandaId: id,
+    autor,
+    texto: textoComentario,
+    criadoEm: new Date().toISOString()
+  };
+
+  comentarios.push(novoComentario);
+
+  response.status(201).json({
+    valido: true,
+    mensagem: "Comentário adicionado com sucesso.",
+    comentario: novoComentario
+  });
+});
  
