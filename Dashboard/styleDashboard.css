@@ -98,22 +98,6 @@ main {
     margin-top: 12px !important;
 }
 
-.botao-nova {
-    background: linear-gradient(135deg, #2E8B57, #4ecc89);
-    color: #FFFFFF;
-    text-decoration: none;
-    padding: 11px 18px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    transition: 0.2s;
-}
-
-.botao-nova:hover {
-    background: linear-gradient(135deg, #247347, #4ecc89);
-    transform: translateY(-2px);
-}
-
 .resumo-dashboard {
     display: flex;
     align-items: center;
@@ -507,7 +491,6 @@ main {
 
     .sidebar h2 {
         margin-bottom: 12px;
-        padding: 0;
     }
 
     .sidebar ul {
@@ -533,11 +516,6 @@ main {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
-    }
-
-    .botao-nova {
-        width: 100%;
-        text-align: center;
     }
 
     .resumo-dashboard {
