@@ -8,10 +8,30 @@ const serveFrontend = process.env.SERVE_FRONTEND === "true";
 
 app.use(express.json());
 app.use((_request, response, next) => {
-  response.setHeader("Access-Control-Allow-Origin", "http://localhost:3030");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  next();
+    const origem = _request.headers.origin;
+
+    const origensPermitidas = [
+        "http://localhost:3030",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:3000"
+    ];
+
+    if (origem && origensPermitidas.includes(origem)) {
+        response.setHeader("Access-Control-Allow-Origin", origem);
+    }
+
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+
+    if (_request.method === "OPTIONS") {
+        return response.sendStatus(204);
+    }
+
+    next();
 });
 
 app.options("/api/login", (_request, response) => {
@@ -23,8 +43,6 @@ app.post("/api/login", (request, response) => {
     email?: unknown;
     senha?: unknown;
   };
-
-
 
   const erros: { email?: string; senha?: string } = {};
 

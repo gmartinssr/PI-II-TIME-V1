@@ -37,9 +37,10 @@ form.addEventListener("submit", async function(event) {
     removerErro(senha);
 
     try {
-        const apiUrl = window.location.port === "3030"
-            ? "http://localhost:3333/api/login"
-            : "/api/login";
+        const apiUrl =
+            window.location.port === "3030"
+                ? "http://localhost:3333/api/login"
+                : "http://localhost:3000/api/login";
         const resposta = await fetch(apiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
