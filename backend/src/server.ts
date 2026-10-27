@@ -292,7 +292,8 @@ const demandas = [
     tipo: "defeito",
     prazo: "2026-10-10",
     projeto: "Sistema de Gestão",
-    responsavel: "joaoSM"
+    responsavel: "joaoSM",
+    dataCriacao: "2026-05-10"
   },
   {
     id: 2,
@@ -302,7 +303,8 @@ const demandas = [
     tipo: "tarefa",
     prazo: "2026-10-08",
     projeto: "Construção de Site",
-    responsavel: "vitorZGB"
+    responsavel: "vitorZGB",
+    dataCriacao: "2026-05-08"
   },
   {
     id: 3,
@@ -312,7 +314,8 @@ const demandas = [
     tipo: "documentação",
     prazo: "2026-10-09",
     projeto: "Manutenção de Sistema",
-    responsavel: "guilhermeBM"
+    responsavel: "guilhermeBM",
+    dataCriacao: "2026-05-09"
   },
   {
     id: 4,
@@ -322,7 +325,8 @@ const demandas = [
     tipo: "melhoria",
     prazo: "2026-10-11",
     projeto: "Criação de Aplicativo",
-    responsavel: "mariaOS"
+    responsavel: "mariaOS",
+    dataCriacao: "2026-05-10"
   },
   {
     id: 5,
@@ -332,7 +336,8 @@ const demandas = [
     tipo: "defeito",
     prazo: "2026-10-07",
     projeto: "Portal Web",
-    responsavel: "lucasMF"
+    responsavel: "lucasMF",
+    dataCriacao: "2026-09-07"
   }
 ];
 
@@ -436,22 +441,23 @@ interface Anexo {
  
 
 interface Demanda {
-  id: number;
-  titulo: string;
-  status: StatusDemanda;
-  prioridade: Prioridade;
-  tipo: Tipo; 
-  prazo: string; 
-  projeto: string;
-  responsavel: string;
-  descricao?: string;
-  solicitante?: string;
-  abertura?: string;
-  anexo?: Anexo | null;
+    id: number;
+    titulo: string;
+    status: StatusDemanda;
+    prioridade: Prioridade;
+    tipo: Tipo;
+    prazo: string;
+    projeto: string;
+    responsavel: string;
+    dataCriacao: string;
+    descricao?: string;
+    solicitante?: string;
+    abertura?: string;
+    anexo?: Anexo | null;
 }
  
 
-type NovaDemanda = Omit<Demanda, "id" | "status">;
+type NovaDemanda = Omit<Demanda, "id" | "status" | "dataCriacao">;
  
 type CampoCadastro =
   | "titulo" | "descricao" | "categoria" | "projeto" | "prioridade"
@@ -622,9 +628,10 @@ app.post("/api/demandas", (request, response) => {
   }
  
   const novaDemanda: Demanda = {
-    id: proximoId(),
-    ...resultado.dados,
-    status: "aberta", 
+      id: proximoId(),
+      ...resultado.dados,
+      status: "aberta",
+      dataCriacao: dataDeHoje(),
   };
  
   demandas.push(novaDemanda);
