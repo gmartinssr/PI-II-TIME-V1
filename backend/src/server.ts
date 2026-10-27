@@ -806,4 +806,33 @@ app.post("/api/demandas/:id/comentarios", (request, response) => {
     comentario: novoComentario
   });
 });
+
+app.put("/api/demandas/:id", (Request, Response) => {
+  const id = Number(Request.params.id);
+  if (isNaN(id)) {
+    return Response.status(400).json({mensagem: "O ID precisa ser um numero."})
+  }
+
+  const index = demandas.findIndex((d) => d.id === id);
+
+  if (index === -1) {
+    return Response.status(404).json({mensagem: "Demanda nao encontrada"}); 
+  }
+
+  const validacoes = validarDemanda(Request.body);
+  if(!validacoes.ok) {
+    return Response.status(400).json({validado: false, erros: validacoes.erros});
+  }  
+
+  demandas[index] = {
+    ...demandas[index],
+    ...validacoes.dados,
+  };
+
+  Response.status(200).json({
+    valido: true,
+    mensagem: "Demanda atualizada com sucesso.",
+    demanda: demandas[index],
+  });
+});
  
