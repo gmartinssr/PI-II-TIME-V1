@@ -23,10 +23,10 @@ function renderizar(lista) {
                 <span class="status status--andamento">${projeto.status}</span>
 
                 <div class="linha__acoes">
-                    <a class="btn btn--secundario" href="demandas.html?projeto=${projeto.id}">
+                    <a class="btn btn--secundario" href="../verDemanda/visualizar-demanda.html?projetoId=${projeto.id}">
                         Ver demandas
                     </a>
-                    <a class="btn btn--principal" href="projeto.html?id=${projeto.id}">
+                    <a class="btn btn--principal" href="../Projects/indexKanban.html?id=${projeto.id}">
                         Acessar projeto
                     </a>
                 </div>
