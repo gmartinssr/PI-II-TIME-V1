@@ -93,6 +93,21 @@ main {
     font-weight: 600;
 }
 
+.botao-projetos {
+    background: linear-gradient(135deg, #1f4eb6, #2563EB);
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.botao-projetos:hover {
+    background: linear-gradient(135deg, #163e93, #2563EB);
+    transform: translateY(-2px);
+}
 
 
 .botao-nova {
@@ -109,6 +124,11 @@ main {
 .botao-nova:hover {
     background: linear-gradient(135deg, #247347, #4ecc89);
     transform: translateY(-2px);
+}
+
+.botao-topo {
+    display: flex;
+    gap: 10px;
 }
 
 .botao-limpar {
