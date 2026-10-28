@@ -1,6 +1,9 @@
 
 
-const API_URL = "http://localhost:3333/api/demandas";
+const API_URL =
+    window.location.port === "3030"
+        ? "http://localhost:3333/api/demandas"
+        : "http://localhost:3000/api/demandas";
 
 
 const COLUNAS = ["aberta", "andamento", "revisao", "concluida"];
@@ -140,7 +143,7 @@ function criarCard(demanda) {
     idArrastado = demanda.id;
     evento.dataTransfer.effectAllowed = "move";
     evento.dataTransfer.setData("text/plain", String(demanda.id)); 
-l
+
     setTimeout(() => card.classList.add("arrastando"), 0);
   });
 

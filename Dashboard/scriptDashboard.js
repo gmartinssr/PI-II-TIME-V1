@@ -27,7 +27,10 @@ const criticasAbertas = document.getElementById("criticas-abertas");
 const proximasDoPrazo = document.getElementById("proximas-ao-prazo");
 
 //Buscar do Backend
-fetch("http://localhost:3333/api/dashboard")
+
+
+
+fetch("http://localhost:3000/api/dashboard")
     .then(response => response.json())
     .then(dados => {
         console.log("Dados recebidos do backend:", dados);

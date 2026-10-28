@@ -8,10 +8,30 @@ const serveFrontend = process.env.SERVE_FRONTEND === "true";
 
 app.use(express.json());
 app.use((_request, response, next) => {
-  response.setHeader("Access-Control-Allow-Origin", "http://localhost:3030");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  next();
+    const origem = _request.headers.origin;
+
+    const origensPermitidas = [
+        "http://localhost:3030",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:3000"
+    ];
+
+    if (origem && origensPermitidas.includes(origem)) {
+        response.setHeader("Access-Control-Allow-Origin", origem);
+    }
+
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+
+    if (_request.method === "OPTIONS") {
+        return response.sendStatus(204);
+    }
+
+    next();
 });
 
 app.options("/api/login", (_request, response) => {
@@ -23,8 +43,6 @@ app.post("/api/login", (request, response) => {
     email?: unknown;
     senha?: unknown;
   };
-
-
 
   const erros: { email?: string; senha?: string } = {};
 
@@ -274,7 +292,8 @@ const demandas = [
     tipo: "defeito",
     prazo: "2026-10-10",
     projeto: "Sistema de Gestão",
-    responsavel: "joaoSM"
+    responsavel: "joaoSM",
+    dataCriacao: "2026-05-10"
   },
   {
     id: 2,
@@ -284,7 +303,8 @@ const demandas = [
     tipo: "tarefa",
     prazo: "2026-10-08",
     projeto: "Construção de Site",
-    responsavel: "vitorZGB"
+    responsavel: "vitorZGB",
+    dataCriacao: "2026-05-08"
   },
   {
     id: 3,
@@ -294,7 +314,8 @@ const demandas = [
     tipo: "documentação",
     prazo: "2026-10-09",
     projeto: "Manutenção de Sistema",
-    responsavel: "guilhermeBM"
+    responsavel: "guilhermeBM",
+    dataCriacao: "2026-05-09"
   },
   {
     id: 4,
@@ -304,7 +325,8 @@ const demandas = [
     tipo: "melhoria",
     prazo: "2026-10-11",
     projeto: "Criação de Aplicativo",
-    responsavel: "mariaOS"
+    responsavel: "mariaOS",
+    dataCriacao: "2026-05-10"
   },
   {
     id: 5,
@@ -314,7 +336,8 @@ const demandas = [
     tipo: "defeito",
     prazo: "2026-10-07",
     projeto: "Portal Web",
-    responsavel: "lucasMF"
+    responsavel: "lucasMF",
+    dataCriacao: "2026-09-07"
   }
 ];
 
@@ -418,22 +441,23 @@ interface Anexo {
  
 
 interface Demanda {
-  id: number;
-  titulo: string;
-  status: StatusDemanda;
-  prioridade: Prioridade;
-  tipo: Tipo; 
-  prazo: string; 
-  projeto: string;
-  responsavel: string;
-  descricao?: string;
-  solicitante?: string;
-  abertura?: string;
-  anexo?: Anexo | null;
+    id: number;
+    titulo: string;
+    status: StatusDemanda;
+    prioridade: Prioridade;
+    tipo: Tipo;
+    prazo: string;
+    projeto: string;
+    responsavel: string;
+    dataCriacao: string;
+    descricao?: string;
+    solicitante?: string;
+    abertura?: string;
+    anexo?: Anexo | null;
 }
  
 
-type NovaDemanda = Omit<Demanda, "id" | "status">;
+type NovaDemanda = Omit<Demanda, "id" | "status" | "dataCriacao">;
  
 type CampoCadastro =
   | "titulo" | "descricao" | "categoria" | "projeto" | "prioridade"
@@ -604,9 +628,10 @@ app.post("/api/demandas", (request, response) => {
   }
  
   const novaDemanda: Demanda = {
-    id: proximoId(),
-    ...resultado.dados,
-    status: "aberta", 
+      id: proximoId(),
+      ...resultado.dados,
+      status: "aberta",
+      dataCriacao: dataDeHoje(),
   };
  
   demandas.push(novaDemanda);
@@ -779,6 +804,35 @@ app.post("/api/demandas/:id/comentarios", (request, response) => {
     valido: true,
     mensagem: "Comentário adicionado com sucesso.",
     comentario: novoComentario
+  });
+});
+
+app.put("/api/demandas/:id", (Request, Response) => {
+  const id = Number(Request.params.id);
+  if (isNaN(id)) {
+    return Response.status(400).json({mensagem: "O ID precisa ser um numero."})
+  }
+
+  const index = demandas.findIndex((d) => d.id === id);
+
+  if (index === -1) {
+    return Response.status(404).json({mensagem: "Demanda nao encontrada"}); 
+  }
+
+  const validacoes = validarDemanda(Request.body);
+  if(!validacoes.ok) {
+    return Response.status(400).json({validado: false, erros: validacoes.erros});
+  }  
+
+  demandas[index] = {
+    ...demandas[index],
+    ...validacoes.dados,
+  };
+
+  Response.status(200).json({
+    valido: true,
+    mensagem: "Demanda atualizada com sucesso.",
+    demanda: demandas[index],
   });
 });
  

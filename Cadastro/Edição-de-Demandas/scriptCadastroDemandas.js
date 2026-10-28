@@ -7,6 +7,9 @@ const REGRAS = {
     anexoExtensoes: ["png", "jpg", "jpeg", "pdf", "doc", "docx", "xls", "xlsx", "csv"],
 };
 
+// Obtém o ID da demanda a partir dos parâmetros de busca da URL (ex: ?id=2)
+const urlParams = new URLSearchParams(window.location.search);
+const demandaId = urlParams.get("id");
 
 function obter(id) {
     const el = document.getElementById(id);
@@ -30,10 +33,34 @@ function coletarDados() {
         prioridade: (prioridadeMarcada?.value ?? "baixa"),
         responsavel: valor("responsavel"),
         solicitante: valor("solicitante"),
-        abertura: valor("abertura") || hoje(), // se vazio, assume hoje
+        abertura: valor("abertura") || hoje(),
         prazo: valor("prazo"),
         anexo: obter("anexo").files?.[0] ?? null,
     };
+}
+
+function preencherFormulario(demanda) {
+    obter("titulo").value = demanda.titulo || "";
+    obter("descricao").value = demanda.descricao || "";
+    obter("categoria").value = demanda.tipo || "";
+    obter("projeto").value = demanda.projeto || "";
+    obter("responsavel").value = demanda.responsavel || "";
+    obter("solicitante").value = demanda.solicitante || "";
+    obter("abertura").value = demanda.abertura || demanda.dataCriacao || hoje();
+    obter("prazo").value = demanda.prazo || "";
+
+    // Seleciona a opção de rádio correspondente à prioridade
+    if (demanda.prioridade) {
+        const radio = document.querySelector(`input[name="prioridade"][value="${demanda.prioridade}"]`);
+        if (radio) radio.checked = true;
+    }
+
+    // Atualiza o contador de caracteres da descrição após preencher
+    const textarea = obter("descricao");
+    const contador = document.querySelector(".char-count");
+    if (contador && textarea) {
+        contador.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+    }
 }
 
 function validarDemanda(d) {
@@ -140,19 +167,41 @@ function iniciarDropzone() {
     });
 }
 
+const API_BASE_URL =
+    window.location.port === "3030"
+        ? "http://localhost:3333/api/demandas"
+        : "http://localhost:3000/api/demandas";
 
+// Busca os dados da demanda quando estiver no modo de edição
+async function carregarDadosDemanda(id) {
+    try {
+        const resposta = await fetch(`${API_BASE_URL}/${id}`);
+        const resultado = await resposta.json();
 
-const API_URL = "http://localhost:3333/api/demandas";
+        if (resposta.ok && resultado.valido) {
+            preencherFormulario(resultado.demanda);
+        } else {
+            alert(resultado.erro || "Não foi possível carregar os dados da demanda.");
+        }
+    } catch {
+        alert("Erro ao tentar carregar a demanda para edição.");
+    }
+}
+
 async function salvarDemanda(dados) {
-
     const { anexo, ...resto } = dados;
     const corpo = {
         ...resto,
         anexo: anexo ? { nome: anexo.name, tamanho: anexo.size } : null,
     };
+
+    // Configura dinamicamente a rota e o método (POST para cadastro, PUT para edição)
+    const url = demandaId ? `${API_BASE_URL}/${demandaId}` : API_BASE_URL;
+    const metodo = demandaId ? "PUT" : "POST";
+
     try {
-        const resposta = await fetch(API_URL, {
-            method: "POST",
+        const resposta = await fetch(url, {
+            method: metodo,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(corpo),
         });
@@ -163,7 +212,12 @@ async function salvarDemanda(dados) {
             Object.keys(errosServidor).forEach((campo) => mostrarErro(campo, errosServidor[campo]));
             return;
         }
-        alert("Demanda cadastrada com sucesso!");
+
+        const mensagemSucesso = demandaId 
+            ? "Demanda atualizada com sucesso!" 
+            : "Demanda cadastrada com sucesso!";
+            
+        alert(mensagemSucesso);
         window.location.href = "../../lista-demanda/tela.html";
     }
     catch {
@@ -171,7 +225,7 @@ async function salvarDemanda(dados) {
     }
 }
 
-function iniciar() {
+async function iniciar() {
     const form = document.querySelector("form");
     if (!form)
         return;
@@ -179,8 +233,17 @@ function iniciar() {
     const abertura = obter("abertura");
     if (!abertura.value)
         abertura.value = hoje();
+        
     iniciarContador();
     iniciarDropzone();
+
+    // Se houver um ID na URL, altera o título da tela e carrega os dados
+    if (demandaId) {
+        const tituloPagina = document.querySelector("h1");
+        if (tituloPagina) tituloPagina.textContent = "Editar Demanda";
+        
+        await carregarDadosDemanda(demandaId);
+    }
 
     const campos = [
         "titulo", "descricao", "categoria", "projeto",
@@ -207,4 +270,5 @@ function iniciar() {
         await salvarDemanda(dados);
     });
 }
+
 document.addEventListener("DOMContentLoaded", iniciar);
