@@ -1,6 +1,7 @@
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { iniciarPool, testarPool } from "./bd.js"; 
 
 const app = express();
 const port = Number(process.env.PORT) || 3333;
@@ -835,4 +836,18 @@ app.put("/api/demandas/:id", (Request, Response) => {
     demanda: demandas[index],
   });
 });
+
+//Banco 
+async function iniciarServidor() {
+    try {
+        await iniciarPool();
+        await testarPool();
+
+    } catch (erro) {
+        console.error("Falha ao iniciar ou testar o pool Oracle:");
+        console.error(erro);
+    }
+}
+
+iniciarServidor();
  
