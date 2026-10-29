@@ -69,6 +69,7 @@ form.addEventListener("submit", async function(event) {
             return;
         }
 
+        sessionStorage.setItem("usuario", JSON.stringify(resultado.usuario));
         window.location.href = "../Dashboard/indexDashboard.html";
     } catch (error) {
         console.error("Não foi possível validar o login:", error);
