@@ -24,7 +24,7 @@
         <section class="usuarios-topo">
 
             <div>
-                <p class="subtitulo-topo">ADMINISTRADOR</p>
+                <p class="subtitulo-topo" id="perfilLogado"></p>
 
                 <h1>Usuários</h1>
 
@@ -59,56 +59,7 @@
                     </tr>
                 </thead>
 
-                <tbody>
-
-                    <tr>
-                        <td>Guilherme Baez Machado</td>
-                        <td>guilhermeBM</td>
-                        <td>guilherme.bm@gmail.com</td>
-                        <td>
-                            <span class="cargo administrador">
-                                Administrador
-                            </span>
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>Vitor Zago Guedes Batista</td>
-                        <td>vitorZGB</td>
-                        <td>vitor.zgb@gmail.com</td>
-                        <td>
-                            <span class="cargo usuario">
-                                Membro da Equipe
-                            </span>
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>João Silva Mattos</td>
-                        <td>joaoSM</td>
-                        <td>joao.sm@gmail.com</td>
-                        <td>
-                            <span class="cargo usuario">
-                                Membro da Equipe
-                            </span>
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>Maria Oliveira Souza</td>
-                        <td>mariaOS</td>
-                        <td>maria.os@gmail.com</td>
-                        <td>
-                            <span class="cargo gestor">
-                                Líder do Projeto
-                            </span>
-                        </td>
-                    </tr>
-
-                </tbody>
+                <tbody id="listaUsuarios"></tbody>
 
             </table>
 
@@ -116,6 +67,7 @@
 
     </div>
 
+    <script src="scriptVerUsuarios.js"></script>
 </body>
 
 </html>
