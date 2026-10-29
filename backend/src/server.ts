@@ -2,6 +2,7 @@ import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { iniciarPool, testarPool } from "./bd.js"; 
+import oracledb from "oracledb";
 
 const app = express();
 const port = Number(process.env.PORT) || 3333;
@@ -39,43 +40,131 @@ app.options("/api/login", (_request, response) => {
   response.sendStatus(204);
 });
 
-app.post("/api/login", (request, response) => {
-  const { email, senha } = request.body as {
-    email?: unknown;
-    senha?: unknown;
-  };
 
-  const erros: { email?: string; senha?: string } = {};
+app.post("/api/login", async (request, response) => {
+    const { email, senha } = request.body as {
+        email?: unknown;
+        senha?: unknown;
+    };
 
-  if (typeof email !== "string") {
-    erros.email = "O email é obrigatório.";
-  } else {
-    erros.email = validarEmail(email);
-  }
+    const erros: { email?: string; senha?: string } = {};
 
-  if (typeof senha !== "string" || senha.trim() === "") {
-    erros.senha = "A senha é obrigatória.";
-  } else {
-    erros.senha = validarSenha(senha);
-  }
+    if (typeof email !== "string") {
+        erros.email = "O email é obrigatório.";
+    } else {
+        erros.email = validarEmail(email);
+    }
 
-  if (!erros.email) {
-    delete erros.email;
-  }
-  if (!erros.senha) {
-    delete erros.senha;
-  }
+    if (typeof senha !== "string" || senha.trim() === "") {
+        erros.senha = "A senha é obrigatória.";
+    } else {
+        erros.senha = validarSenha(senha);
+    }
 
-  if (Object.keys(erros).length > 0) {
-    response.status(400).json({ valido: false, erros });
-    return;
-  }
+    if (!erros.email) {
+        delete erros.email;
+    }
 
-  response.status(200).json({
-    valido: true,
-    mensagem: "Dados de login válidos.",
-  });
+    if (!erros.senha) {
+        delete erros.senha;
+    }
+
+    if (Object.keys(erros).length > 0) {
+        response.status(400).json({
+            valido: false,
+            erros
+        });
+        return;
+    }
+
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const resultado = await conexao.execute(
+            `SELECT
+                u.id_usuario AS "idUsuario",
+                u.nome AS "nome",
+                u.email AS "email",
+                u.senha AS "senha",
+                u.ativo AS "ativo",
+                u.id_perfil AS "idPerfil",
+                p.tipo AS "perfil"
+             FROM usuario u
+             INNER JOIN perfil p
+                ON p.id_perfil = u.id_perfil
+             WHERE LOWER(u.email) = LOWER(:email)`,
+            {
+                email: (email as string).trim()
+            },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        interface UsuarioLogin {
+            idUsuario: number;
+            nome: string;
+            email: string;
+            senha: string;
+            ativo: number;
+            idPerfil: number;
+            perfil: string;
+        }
+
+        const usuario = (resultado.rows?.[0] as UsuarioLogin | undefined);
+
+        if (!usuario) {
+            response.status(404).json({
+                valido: false,
+                mensagem: "Este email não está cadastrado no sistema."
+            });
+            return;
+        }
+
+        if (Number(usuario.ativo) !== 1) {
+            response.status(403).json({
+                valido: false,
+                mensagem: "Este usuário está inativo no sistema."
+            });
+            return;
+        }
+
+        if (usuario.senha !== senha) {
+            response.status(401).json({
+                valido: false,
+                mensagem: "Senha incorreta."
+            });
+            return;
+        }
+
+        response.status(200).json({
+            valido: true,
+            mensagem: "Login realizado com sucesso.",
+            usuario: {
+                idUsuario: usuario.idUsuario,
+                nome: usuario.nome,
+                email: usuario.email,
+                idPerfil: usuario.idPerfil,
+                perfil: usuario.perfil
+            }
+        });
+
+    } catch (erro) {
+        console.error("Erro ao realizar login:", erro);
+
+        response.status(500).json({
+            valido: false,
+            mensagem: "Erro interno ao realizar login."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
 });
+
 
 if (serveFrontend) {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -193,95 +282,209 @@ server.on("error", (error) => {
 });
 
 // Dashboard
-app.get("/api/dashboard", (_request, response) => {
-  const total = demandas.length;
+app.get("/api/dashboard", async (_request, response) => {
+    let conexao: oracledb.Connection | undefined;
 
-  const abertas = demandas.filter(
-    (demanda) => demanda.status === "aberta"
-  ).length;
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
 
-  const andamento = demandas.filter(
-    (demanda) => demanda.status === "andamento"
-  ).length;
+        // Total de demandas
+        const resultadoTotal = await conexao.execute(
+            `SELECT COUNT(*) AS TOTAL FROM demanda`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
 
-  const revisao = demandas.filter(
-    (demanda) => demanda.status === "revisao"
-  ).length;
+        const total = Number(
+            (resultadoTotal.rows?.[0] as { TOTAL: number })?.TOTAL ?? 0
+        );
 
-  const concluidas = demandas.filter(
-    (demanda) => demanda.status === "concluida"
-  ).length;
+        // Quantidade por status
+        const resultadoStatus = await conexao.execute(
+            `SELECT LOWER(s.nome) AS NOME, COUNT(*) AS QUANTIDADE
+             FROM demanda d
+             JOIN status s ON s.id_status = d.id_status
+             GROUP BY LOWER(s.nome)`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
 
-  const canceladas = demandas.filter(
-    (demanda) => demanda.status === "cancelada"
-  ).length;
+        const statusBanco = {
+            abertas: 0,
+            andamento: 0,
+            revisao: 0,
+            concluidas: 0,
+            canceladas: 0
+        };
 
-  const prioridades = {
-  critica: demandas.filter(
-    (demanda) => demanda.prioridade === "critica"
-  ).length,
+        for (const linha of (resultadoStatus.rows ?? []) as {
+            NOME: string;
+            QUANTIDADE: number;
+        }[]) {
+            const quantidade = Number(linha.QUANTIDADE);
 
-  alta: demandas.filter(
-    (demanda) => demanda.prioridade === "alta"
-  ).length,
+            switch (linha.NOME) {
+                case "aberta":
+                    statusBanco.abertas = quantidade;
+                    break;
+                case "em andamento":
+                    statusBanco.andamento = quantidade;
+                    break;
+                case "em revisão":
+                    statusBanco.revisao = quantidade;
+                    break;
+                case "concluída":
+                    statusBanco.concluidas = quantidade;
+                    break;
+                case "cancelada":
+                    statusBanco.canceladas = quantidade;
+                    break;
+            }
+        }
 
-  media: demandas.filter(
-    (demanda) => demanda.prioridade === "media"
-  ).length,
+        // Quantidade por prioridade
+        const resultadoPrioridades = await conexao.execute(
+            `SELECT LOWER(p.nome) AS NOME, COUNT(*) AS QUANTIDADE
+             FROM demanda d
+             JOIN prioridade p ON p.id_prioridade = d.id_prioridade
+             GROUP BY LOWER(p.nome)`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
 
-  baixa: demandas.filter(
-    (demanda) => demanda.prioridade === "baixa"
-  ).length
-};
+        const prioridades = {
+            critica: 0,
+            alta: 0,
+            media: 0,
+            baixa: 0
+        };
 
-const tipos = {
-  tarefa: demandas.filter(
-    (demanda) => demanda.tipo === "tarefa"
-  ).length,
+        for (const linha of (resultadoPrioridades.rows ?? []) as {
+            NOME: string;
+            QUANTIDADE: number;
+        }[]) {
+            const quantidade = Number(linha.QUANTIDADE);
 
-  defeito: demandas.filter(
-    (demanda) => demanda.tipo === "defeito"
-  ).length,
+            switch (linha.NOME) {
+                case "crítica":
+                    prioridades.critica = quantidade;
+                    break;
+                case "alta":
+                    prioridades.alta = quantidade;
+                    break;
+                case "média":
+                    prioridades.media = quantidade;
+                    break;
+                case "baixa":
+                    prioridades.baixa = quantidade;
+                    break;
+            }
+        }
 
-  melhoria: demandas.filter(
-    (demanda) => demanda.tipo === "melhoria"
-  ).length,
+        // Quantidade por tipo
+        const resultadoTipos = await conexao.execute(
+            `SELECT LOWER(t.nome) AS NOME, COUNT(*) AS QUANTIDADE
+             FROM demanda d
+             JOIN tipo_demanda t ON t.id_tipo = d.id_tipo
+             GROUP BY LOWER(t.nome)`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
 
-  documentacao: demandas.filter(
-    (demanda) => demanda.tipo === "documentação"
-  ).length
-};
+        const tipos = {
+            tarefa: 0,
+            defeito: 0,
+            melhoria: 0,
+            documentacao: 0
+        };
 
-const criticasAbertas = demandas.filter(
-  (demanda) =>
-    demanda.status === "aberta" &&
-    demanda.prioridade === "critica"
-);
+        for (const linha of (resultadoTipos.rows ?? []) as {
+            NOME: string;
+            QUANTIDADE: number;
+        }[]) {
+            const quantidade = Number(linha.QUANTIDADE);
 
-const hoje = new Date();
-const limitePrazo = new Date(hoje);
-limitePrazo.setDate(hoje.getDate() + 7);
+            switch (linha.NOME) {
+                case "tarefa":
+                    tipos.tarefa = quantidade;
+                    break;
+                case "defeito":
+                    tipos.defeito = quantidade;
+                    break;
+                case "melhoria":
+                    tipos.melhoria = quantidade;
+                    break;
+                case "documentação":
+                    tipos.documentacao = quantidade;
+                    break;
+            }
+        }
 
-const proximasDoPrazo = demandas.filter((demanda) => {
-  const prazo = new Date(demanda.prazo);
+        // Demandas críticas ainda abertas
+        const resultadoCriticas = await conexao.execute(
+            `SELECT
+                d.id_demanda AS "id",
+                d.titulo AS "titulo",
+                TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo"
+             FROM demanda d
+             JOIN status s ON s.id_status = d.id_status
+             JOIN prioridade p ON p.id_prioridade = d.id_prioridade
+             WHERE LOWER(s.nome) = 'aberta'
+               AND LOWER(p.nome) = 'crítica'
+             ORDER BY d.prazo ASC NULLS LAST`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
 
-  return prazo >= hoje && prazo <= limitePrazo;
-});
+        const criticasAbertas = (resultadoCriticas.rows ?? []) as {
+            id: number;
+            titulo: string;
+            prazo: string | null;
+        }[];
 
-  response.status(200).json({
-    total,
-    status: {
-      abertas,
-      andamento,
-      revisao,
-      concluidas,
-      canceladas
-    },
-    prioridades,
-    tipos,
-    criticasAbertas,
-    proximasDoPrazo
-  });
+        // Demandas com prazo entre hoje e os próximos 7 dias
+        const resultadoPrazos = await conexao.execute(
+            `SELECT
+                d.id_demanda AS "id",
+                d.titulo AS "titulo",
+                TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo"
+             FROM demanda d
+             WHERE d.prazo >= TRUNC(SYSDATE)
+               AND d.prazo < TRUNC(SYSDATE) + 8
+             ORDER BY d.prazo ASC`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const proximasDoPrazo = (resultadoPrazos.rows ?? []) as {
+            id: number;
+            titulo: string;
+            prazo: string | null;
+        }[];
+
+        // Resposta compatível com o scriptDashboard.js
+        response.status(200).json({
+            total,
+            status: statusBanco,
+            prioridades,
+            tipos,
+            criticasAbertas,
+            proximasDoPrazo
+        });
+
+    } catch (erro) {
+        console.error("Erro ao consultar o Dashboard:", erro);
+
+        response.status(500).json({
+            erro: "Erro interno ao consultar o Dashboard."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
 });
 
 const demandas = [
@@ -344,88 +547,231 @@ const demandas = [
 
 // Lista Demandas
 
-app.get("/api/demandas", (_request, response) => {
+interface DemandaBanco {
+    id: number;
+    titulo: string;
+    descricao: string;
+    status: string;
+    prioridade: string;
+    tipo: string;
+    prazo: string | null;
+    projeto: string;
+    responsavel: string | null;
+    dataCriacao: string;
+}
 
-  let resultado = [...demandas];
+app.get("/api/demandas", async (_request, response) => {
+    let conexao: oracledb.Connection | undefined;
 
-  const {
-    status,
-    prioridade,
-    tipo,
-    busca,
-    ordenar,
-    ordem
-  } = _request.query;
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
 
-  if (typeof status === "string") {
-    resultado = resultado.filter(
-      (demanda) => demanda.status === status.toLowerCase()
-    );
-  }
+        const {
+            status,
+            prioridade,
+            tipo,
+            busca,
+            ordenar,
+            ordem
+        } = _request.query;
 
-  if (typeof prioridade === "string") {
-    resultado = resultado.filter(
-      (demanda) => demanda.prioridade === prioridade.toLowerCase()
-    );
-  }
+        const condicoes: string[] = [];
+        const binds: Record<string, string> = {};
 
-  if (typeof tipo === "string") {
-    resultado = resultado.filter(
-      (demanda) => demanda.tipo === tipo.toLowerCase()
-    );
-  }
-
-  if (typeof busca === "string" && busca.trim() !== "") {
-    const textoBusca = busca.trim().toLowerCase();
-
-    resultado = resultado.filter(
-      (demanda) =>
-        demanda.titulo.toLowerCase().includes(textoBusca)
-    );
-  }
-
-  if (typeof ordenar === "string") {
-
-    const direcao = ordem === "desc" ? -1 : 1;
-
-    resultado.sort((a, b) => {
-
-      if (ordenar === "id") {
-        return (a.id - b.id) * direcao;
-      }
-
-      if (ordenar === "titulo") {
-        return a.titulo.localeCompare(b.titulo) * direcao;
-      }
-
-      if (ordenar === "prazo") {
-        return (
-          (new Date(a.prazo).getTime() -
-            new Date(b.prazo).getTime()) * direcao
-        );
-      }
-
-      if (ordenar === "prioridade") {
-        const pesoPrioridade: Record<string, number> = {
-          critica: 4,
-          alta: 3,
-          media: 2,
-          baixa: 1
+        // Filtro por status
+        const statusBanco: Record<string, string> = {
+            aberta: "Aberta",
+            andamento: "Em andamento",
+            revisao: "Em revisão",
+            concluida: "Concluída",
+            cancelada: "Cancelada"
         };
-        return (
-          (pesoPrioridade[a.prioridade] -
-            pesoPrioridade[b.prioridade]) * direcao
+
+        if (typeof status === "string") {
+            const valor = statusBanco[status.toLowerCase()];
+
+            if (!valor) {
+                response.status(400).json({
+                    valido: false,
+                    erro: "Status inválido."
+                });
+                return;
+            }
+
+            condicoes.push("LOWER(s.nome) = LOWER(:status)");
+            binds.status = valor;
+        }
+
+        // Filtro por prioridade
+        const prioridadeBanco: Record<string, string> = {
+            baixa: "Baixa",
+            media: "Média",
+            alta: "Alta",
+            critica: "Crítica"
+        };
+
+        if (typeof prioridade === "string") {
+            const valor = prioridadeBanco[prioridade.toLowerCase()];
+
+            if (!valor) {
+                response.status(400).json({
+                    valido: false,
+                    erro: "Prioridade inválida."
+                });
+                return;
+            }
+
+            condicoes.push("LOWER(p.nome) = LOWER(:prioridade)");
+            binds.prioridade = valor;
+        }
+
+        // Filtro por tipo
+        const tipoBanco: Record<string, string> = {
+            tarefa: "Tarefa",
+            defeito: "Defeito",
+            melhoria: "Melhoria",
+            "documentação": "Documentação"
+        };
+
+        if (typeof tipo === "string") {
+            const valor = tipoBanco[tipo.toLowerCase()];
+
+            if (!valor) {
+                response.status(400).json({
+                    valido: false,
+                    erro: "Tipo de demanda inválido."
+                });
+                return;
+            }
+
+            condicoes.push("LOWER(td.nome) = LOWER(:tipo)");
+            binds.tipo = valor;
+        }
+
+        // Busca por título ou descrição
+        if (typeof busca === "string" && busca.trim() !== "") {
+            condicoes.push(
+                "(LOWER(d.titulo) LIKE :busca OR LOWER(d.descricao) LIKE :busca)"
+            );
+
+            binds.busca = `%${busca.trim().toLowerCase()}%`;
+        }
+
+        // Colunas permitidas para ordenação
+        const colunasOrdenacao: Record<string, string> = {
+            id: "d.id_demanda",
+            titulo: "d.titulo",
+            prazo: "d.prazo",
+            prioridade: `
+                CASE LOWER(p.nome)
+                    WHEN 'baixa' THEN 1
+                    WHEN 'média' THEN 2
+                    WHEN 'alta' THEN 3
+                    WHEN 'crítica' THEN 4
+                END
+            `
+        };
+
+        const coluna = typeof ordenar === "string"
+            ? colunasOrdenacao[ordenar]
+            : undefined;
+
+        if (typeof ordenar === "string" && !coluna) {
+            response.status(400).json({
+                valido: false,
+                erro: "Campo de ordenação inválido."
+            });
+            return;
+        }
+
+        const direcao = ordem === "desc" ? "DESC" : "ASC";
+
+        const orderBy = coluna
+            ? `ORDER BY ${coluna} ${direcao}`
+            : "ORDER BY d.id_demanda ASC";
+
+        const where = condicoes.length > 0
+            ? `WHERE ${condicoes.join(" AND ")}`
+            : "";
+
+        const sql = `
+            SELECT
+                d.id_demanda AS "id",
+                d.titulo AS "titulo",
+                d.descricao AS "descricao",
+
+                CASE LOWER(s.nome)
+                    WHEN 'aberta' THEN 'aberta'
+                    WHEN 'em andamento' THEN 'andamento'
+                    WHEN 'em revisão' THEN 'revisao'
+                    WHEN 'concluída' THEN 'concluida'
+                    WHEN 'cancelada' THEN 'cancelada'
+                END AS "status",
+
+                CASE LOWER(p.nome)
+                    WHEN 'baixa' THEN 'baixa'
+                    WHEN 'média' THEN 'media'
+                    WHEN 'alta' THEN 'alta'
+                    WHEN 'crítica' THEN 'critica'
+                END AS "prioridade",
+
+                LOWER(td.nome) AS "tipo",
+                TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo",
+                pr.nome AS "projeto",
+                u.nome AS "responsavel",
+                TO_CHAR(d.data_criacao, 'YYYY-MM-DD') AS "dataCriacao"
+
+            FROM demanda d
+
+            INNER JOIN status s
+                ON s.id_status = d.id_status
+
+            INNER JOIN prioridade p
+                ON p.id_prioridade = d.id_prioridade
+
+            INNER JOIN tipo_demanda td
+                ON td.id_tipo = d.id_tipo
+
+            INNER JOIN projeto pr
+                ON pr.id_projeto = d.id_projeto
+
+            LEFT JOIN usuario u
+                ON u.id_usuario = d.id_responsavel
+
+            ${where}
+            ${orderBy}
+        `;
+
+        const resultado = await conexao.execute<DemandaBanco>(
+            sql,
+            binds,
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
-      }
 
-      return 0;
-    });
-  }
+        const demandas = (resultado.rows ?? []).map((linha) => ({
+            ...linha,
+            responsavel: linha.responsavel ?? "Não atribuído"
+        }));
 
-  response.status(200).json({
-    total: resultado.length,
-    demandas: resultado
-  });
+        response.status(200).json({
+            total: demandas.length,
+            demandas
+        });
+
+    } catch (erro) {
+        console.error("Erro ao listar demandas:", erro);
+
+        response.status(500).json({
+            valido: false,
+            erro: "Erro interno ao consultar as demandas."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
 });
 
 // Cadastro Demandas

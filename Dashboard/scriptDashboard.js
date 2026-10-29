@@ -26,10 +26,15 @@ const barraDocumentacao = document.getElementById("barra-documentacao");
 const criticasAbertas = document.getElementById("criticas-abertas");
 const proximasDoPrazo = document.getElementById("proximas-ao-prazo");
 
+function calcularPorcentagem(valor, total) {
+    if (total === 0) {
+        return 0;
+    }
+
+    return (valor / total) * 100;
+}
+
 //Buscar do Backend
-
-
-
 fetch("http://localhost:3000/api/dashboard")
     .then(response => response.json())
     .then(dados => {
@@ -51,10 +56,17 @@ fetch("http://localhost:3000/api/dashboard")
         prioridadeMedia.textContent = dados.prioridades.media;
         prioridadeBaixa.textContent = dados.prioridades.baixa;
 
-        barraCritica.style.width = `${(dados.prioridades.critica / dados.total) * 100}%`;
-        barraAlta.style.width = `${(dados.prioridades.alta / dados.total) * 100}%`;
-        barraMedia.style.width = `${(dados.prioridades.media / dados.total) * 100}%`;
-        barraBaixa.style.width = `${(dados.prioridades.baixa / dados.total) * 100}%`;
+        barraCritica.style.width =
+            `${calcularPorcentagem(dados.prioridades.critica, dados.total)}%`;
+
+        barraAlta.style.width =
+            `${calcularPorcentagem(dados.prioridades.alta, dados.total)}%`;
+
+        barraMedia.style.width =
+            `${calcularPorcentagem(dados.prioridades.media, dados.total)}%`;
+
+        barraBaixa.style.width =
+            `${calcularPorcentagem(dados.prioridades.baixa, dados.total)}%`;
 
         //Tipo
         tipoTarefa.textContent = dados.tipos.tarefa;
@@ -62,10 +74,17 @@ fetch("http://localhost:3000/api/dashboard")
         tipoMelhoria.textContent = dados.tipos.melhoria;
         tipoDocumentacao.textContent = dados.tipos.documentacao;
 
-        barraTarefa.style.width = `${(dados.tipos.tarefa / dados.total) * 100}%`;
-        barraDefeito.style.width = `${(dados.tipos.defeito / dados.total) * 100}%`;
-        barraMelhoria.style.width = `${(dados.tipos.melhoria / dados.total) * 100}%`;
-        barraDocumentacao.style.width = `${(dados.tipos.documentacao / dados.total) * 100}%`;
+        barraTarefa.style.width =
+            `${calcularPorcentagem(dados.tipos.tarefa, dados.total)}%`;
+
+        barraDefeito.style.width =
+            `${calcularPorcentagem(dados.tipos.defeito, dados.total)}%`;
+
+        barraMelhoria.style.width =
+            `${calcularPorcentagem(dados.tipos.melhoria, dados.total)}%`;
+
+        barraDocumentacao.style.width =
+            `${calcularPorcentagem(dados.tipos.documentacao, dados.total)}%`;
 
 
         criticasAbertas.innerHTML = "";

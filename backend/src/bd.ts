@@ -34,7 +34,7 @@ export async function testarPool() {
         conexao = await pool.getConnection();
 
         const resultado = await conexao.execute(
-            "SELECT 1 FROM DUAL"
+            "SELECT * FROM USUARIO"
         );
 
         console.log("Conexão pelo pool funcionando!");

@@ -55,9 +55,17 @@ form.addEventListener("submit", async function(event) {
             if (resultado.erros?.email) {
                 mostrarErro(email, resultado.erros.email);
             }
+
             if (resultado.erros?.senha) {
                 mostrarErro(senha, resultado.erros.senha);
             }
+
+            if (resultado.mensagem === "Este email não está cadastrado no sistema.") {
+                mostrarErro(email, resultado.mensagem);
+            } else if (resultado.mensagem === "Senha incorreta.") {
+                mostrarErro(senha, resultado.mensagem);
+            }
+
             return;
         }
 
