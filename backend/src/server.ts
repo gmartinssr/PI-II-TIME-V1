@@ -2428,6 +2428,7 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
     }
 });
 
+
 //Banco 
 async function iniciarServidor() {
     try {
