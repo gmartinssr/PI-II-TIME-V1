@@ -1,5 +1,8 @@
 # npm
 node_modules
+env
+.env
+*.env
 dist
 package-lock.json
 npm-shrinkwrap.json

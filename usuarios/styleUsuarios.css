@@ -97,12 +97,8 @@ main {
 
 .conteudo {
     display: grid;
-
-    
-    grid-template-columns: 1fr 1fr;
-
+    grid-template-columns: minmax(0, 1fr);
     gap: 24px;
-
     align-items: stretch;
 }
 
@@ -179,34 +175,6 @@ main {
 
 
 
-#criadas,
-#concluidas,
-#andamento {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 14px;
-    padding: 14px 16px;
-
-    background-color: #F8FAFC;
-
-    border: 1px solid #E2E8F0;
-    border-radius: 10px;
-
-    font-size: 15px;
-    color: #475569;
-}
-
-#criadas strong,
-#concluidas strong,
-#andamento strong {
-    color: #174E87;
-}
-
-
-
-
 .botao-senha,
 .botao-usuarios {
     display: inline-block;
@@ -225,7 +193,11 @@ main {
     transition: 0.2s;
 }
 
-
+.acoes-perfil {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
 
 .botao-senha {
@@ -299,6 +271,33 @@ main {
     border-color: #174E87;
 }
 
+.form-alterar-senha input.campo-invalido {
+    border-color: #DC2626;
+}
+
+.mensagem-campo {
+    display: block;
+    min-height: 18px;
+    margin-top: 5px;
+    color: #DC2626;
+    font-size: 13px;
+}
+
+.mensagem-formulario {
+    min-height: 20px;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.mensagem-formulario.erro {
+    color: #DC2626;
+}
+
+.mensagem-formulario.sucesso {
+    color: #16803C;
+}
+
 .botao-salvar-senha {
     margin-top: 5px;
     padding: 10px 16px;
@@ -355,9 +354,6 @@ main {
         padding: 20px;
     }
 
-    .conteudo {
-        gap: 18px;
-    }
 }
 
 
@@ -434,15 +430,13 @@ main {
         font-size: 14px;
     }
 
-    #criadas,
-    #concluidas,
-    #andamento {
-        font-size: 14px;
-    }
-
     .botao-senha,
     .botao-usuarios {
-        width: 100%;
         text-align: center;
+    }
+
+    .acoes-perfil {
+        align-items: stretch;
+        flex-direction: column;
     }
 }

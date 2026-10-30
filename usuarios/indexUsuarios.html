@@ -48,54 +48,53 @@
             <section class="conteudo">
                 <div class="card">
                     <h2>Informações do Usuário</h2>
-                    <p id="nome"><strong>Nome:</strong>     Guilherme Baez Machado</p>
+                    <p id="nome"><strong>Nome:</strong> <span></span></p>
 
-                    <p id="email"><strong>Email:</strong>     guilherme.bm@gmail.com</p>
+                    <p id="email"><strong>Email:</strong> <span></span></p>
 
-                    <p id="usuario"><strong>Usuário:</strong>    guilhermeBM</p>
+                    <p id="usuario"><strong>Usuário:</strong> <span></span></p>
 
-                    <p id="cargo"><strong>Cargo:</strong>     Administrador</p>
+                    <p id="cargo"><strong>Cargo:</strong> <span></span></p>
 
-                    <button class="botao-senha" type="button">Alterar Senha</button>
+                    <div class="acoes-perfil">
+                        <button class="botao-senha" type="button">Alterar Senha</button>
 
-                </div>
+                        <a href="../verUsuarios/indexVerUsuarios.html" class="botao-usuarios" id="linkUsuarios">
+                            Ver Usuários
+                        </a>
+                    </div>
 
-
-                <div class="card">
-                    <h2>Demandas</h2>
-                    <p id="criadas"><strong>Criadas:</strong>12</p>
-
-                    <p id="concluidas"><strong>Concluídas:</strong>8</p>
-
-                    <p id="andamento"><strong>Em Andamento:</strong>4</p>
-
-                    <a href="../verUsuarios/indexVerUsuarios.html" class="botao-usuarios">Ver Usuários</a>
+                    <p class="mensagem-formulario erro" id="avisoUsuarios"></p>
                 </div>
             </section>
 
             <section class="formulario">
-                <div class="form-alterar-senha">
+                <form class="form-alterar-senha">
 
                     <div class="campo">
                         <label for="senhaAtual">Senha atual:</label>
                         <input type="password" id="senhaAtual">
+                        <span class="mensagem-campo" id="mensagemSenhaAtual"></span>
                     </div>
 
                     <div class="campo">
                         <label for="novaSenha">Nova senha:</label>
                         <input type="password" id="novaSenha">
+                        <span class="mensagem-campo" id="mensagemNovaSenha"></span>
                     </div>
 
                     <div class="campo">
                         <label for="confirmarSenha">Confirmar nova senha:</label>
                         <input type="password" id="confirmarSenha">
+                        <span class="mensagem-campo" id="mensagemConfirmarSenha"></span>
                     </div>
 
                     <button type="submit" class="botao-salvar-senha">
                         Salvar nova senha
                     </button>
+                    <p class="mensagem-formulario" id="mensagemFormulario"></p>
 
-                </div>
+                </form>
             </section>
         </main>
     </div>

@@ -189,39 +189,92 @@ async function carregarDadosDemanda(id) {
 }
 
 async function salvarDemanda(dados) {
+    // Recupera o usuário que realizou o login
+    const usuarioSalvo = sessionStorage.getItem("usuario");
+
+    if (!usuarioSalvo) {
+        alert("Sua sessão não foi encontrada. Faça login novamente.");
+        return;
+    }
+
+    let usuario;
+
+    try {
+        usuario = JSON.parse(usuarioSalvo);
+    } catch {
+        alert("Os dados da sessão são inválidos. Faça login novamente.");
+        return;
+    }
+
+    if (!usuario?.idUsuario) {
+        alert("Não foi possível identificar o usuário logado.");
+        return;
+    }
+
+    // Prepara os dados para enviar ao backend
     const { anexo, ...resto } = dados;
+
     const corpo = {
         ...resto,
-        anexo: anexo ? { nome: anexo.name, tamanho: anexo.size } : null,
+        idCriador: usuario.idUsuario,
+        anexo: anexo
+            ? {
+                nome: anexo.name,
+                tamanho: anexo.size,
+            }
+            : null,
     };
 
-    // Configura dinamicamente a rota e o método (POST para cadastro, PUT para edição)
-    const url = demandaId ? `${API_BASE_URL}/${demandaId}` : API_BASE_URL;
+    // POST para cadastrar e PUT para editar
+    const url = demandaId
+        ? `${API_BASE_URL}/${demandaId}`
+        : API_BASE_URL;
+
     const metodo = demandaId ? "PUT" : "POST";
 
     try {
         const resposta = await fetch(url, {
             method: metodo,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify(corpo),
         });
+
         const resultado = await resposta.json();
 
         if (!resposta.ok) {
-            const errosServidor = (resultado.erros ?? {});
-            Object.keys(errosServidor).forEach((campo) => mostrarErro(campo, errosServidor[campo]));
+            const errosServidor = resultado.erros ?? {};
+
+            Object.keys(errosServidor).forEach((campo) => {
+                mostrarErro(campo, errosServidor[campo]);
+            });
+
+            if (Object.keys(errosServidor).length === 0) {
+                alert(
+                    resultado.mensagem ||
+                    resultado.erro ||
+                    "Não foi possível salvar a demanda."
+                );
+            }
+
             return;
         }
 
-        const mensagemSucesso = demandaId 
-            ? "Demanda atualizada com sucesso!" 
+        const mensagemSucesso = demandaId
+            ? "Demanda atualizada com sucesso!"
             : "Demanda cadastrada com sucesso!";
-            
+
         alert(mensagemSucesso);
+
         window.location.href = "../../lista-demanda/tela.html";
-    }
-    catch {
-        alert("Não foi possível conectar ao servidor. Verifique se o backend está rodando.");
+    } catch (erro) {
+        console.error("Erro ao salvar demanda:", erro);
+
+        alert(
+            "Não foi possível conectar ao servidor. " +
+            "Verifique se o backend está rodando."
+        );
     }
 }
 
@@ -236,6 +289,9 @@ async function iniciar() {
         
     iniciarContador();
     iniciarDropzone();
+
+    await carregarResponsaveis();
+    await carregarProjetos();
 
     // Se houver um ID na URL, altera o título da tela e carrega os dados
     if (demandaId) {
@@ -269,6 +325,69 @@ async function iniciar() {
         }
         await salvarDemanda(dados);
     });
+}
+
+async function carregarResponsaveis() {
+    const select = obter("responsavel");
+
+    try {
+        const resposta = await fetch(
+            API_BASE_URL.replace("/demandas", "/responsaveis")
+        );
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível consultar os responsáveis.");
+        }
+
+        const resultado = await resposta.json();
+
+        resultado.responsaveis.forEach((responsavel) => {
+            const opcao = document.createElement("option");
+
+            opcao.value = responsavel.idUsuario;
+            opcao.textContent = responsavel.nome;
+
+            select.appendChild(opcao);
+        });
+
+    } catch (erro) {
+        console.error("Erro ao carregar responsáveis:", erro);
+        alert("Não foi possível carregar a lista de responsáveis.");
+    }
+}
+
+async function carregarProjetos() {
+    const select = obter("projeto");
+
+    try {
+        const resposta = await fetch(
+            API_BASE_URL.replace("/demandas", "/projetos")
+        );
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível consultar os projetos.");
+        }
+
+        const resultado = await resposta.json();
+
+        select.innerHTML = '<option value="">Selecione</option>';
+
+        resultado.projetos.forEach((projeto) => {
+            const opcao = document.createElement("option");
+
+            opcao.value = projeto.nome;  
+            opcao.textContent = projeto.nome;
+
+            select.appendChild(opcao);
+        });
+
+    } catch (erro) {
+        console.error("Erro ao carregar projetos:", erro);
+
+        select.innerHTML = '<option value="">Erro ao carregar projetos</option>';
+
+        alert("Não foi possível carregar a lista de projetos.");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", iniciar);

@@ -1,10 +1,10 @@
-
-
 const API_URL =
     window.location.port === "3030"
-        ? "http://localhost:3333/api/demandas"
-        : "http://localhost:3000/api/demandas";
+        ? "http://localhost:3333/api"
+        : "http://localhost:3000/api";
 
+const PAGINA_LOGIN = "../Login/indexLogin.html";
+const PAGINA_PROJETOS = "../ListagemProjetos/indexListagemProjetos.html";
 
 const COLUNAS = ["aberta", "andamento", "revisao", "concluida"];
 
@@ -22,33 +22,38 @@ const NOMES_PRIORIDADE = {
   baixa: "Baixa",
 };
 
-
-const DEMANDAS_EXEMPLO = [
-  { id: 1, titulo: "Corrigir erro de Login", status: "aberta", prioridade: "critica", tipo: "defeito", prazo: "2026-10-10", projeto: "Sistema de Gestão", responsavel: "joaoSM" },
-  { id: 2, titulo: "Criar Dashboard", status: "andamento", prioridade: "alta", tipo: "tarefa", prazo: "2026-10-08", projeto: "Construção de Site", responsavel: "vitorZGB" },
-  { id: 3, titulo: "Documentar API", status: "aberta", prioridade: "media", tipo: "documentação", prazo: "2026-10-09", projeto: "Manutenção de Sistema", responsavel: "guilhermeBM" },
-  { id: 4, titulo: "Ajustar formulário", status: "revisao", prioridade: "alta", tipo: "melhoria", prazo: "2026-10-11", projeto: "Criação de Aplicativo", responsavel: "mariaOS" },
-  { id: 5, titulo: "Falha no servidor", status: "aberta", prioridade: "critica", tipo: "defeito", prazo: "2026-10-07", projeto: "Portal Web", responsavel: "lucasMF" },
-];
-
-
+const idProjeto = Number(new URLSearchParams(window.location.search).get("id"));
 
 let demandas = [];
-let modoExemplo = false;
-let projetoSelecionado = "todos";
-let idArrastado = null; 
+let nomeProjeto = "";
+let idArrastado = null;
 
 const seletorProjeto = document.querySelector(".seletor-projeto");
 const colunas = document.querySelectorAll(".kanban-coluna");
 
-
-
-function hoje() {
-  return new Date().toLocaleDateString("sv-SE"); 
+function obterUsuario() {
+  try {
+    const salvo = sessionStorage.getItem("usuario");
+    const usuario = salvo ? JSON.parse(salvo) : null;
+    return usuario && usuario.idUsuario ? usuario : null;
+  } catch {
+    return null;
+  }
 }
 
+const usuarioLogado = obterUsuario();
+
+function irParaLogin() {
+  sessionStorage.removeItem("usuario");
+  window.location.href = PAGINA_LOGIN;
+}
+
+function hoje() {
+  return new Date().toLocaleDateString("sv-SE");
+}
 
 function formatarData(data) {
+  if (!data) return "Sem prazo";
   const [ano, mes, dia] = data.split("-");
   return `${dia}/${mes}/${ano}`;
 }
@@ -66,7 +71,6 @@ function mostrarAviso(mensagem, erro = false) {
   setTimeout(() => aviso.remove(), 5000);
 }
 
-
 function criar(tag, classe, texto) {
   const el = document.createElement(tag);
   if (classe) el.className = classe;
@@ -74,38 +78,97 @@ function criar(tag, classe, texto) {
   return el;
 }
 
+async function carregarKanban() {
+  let resposta;
 
-
-async function carregarDemandas() {
   try {
-    const resposta = await fetch(API_URL);
-    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-    const dados = await resposta.json();
-    demandas = dados.demandas;
+    resposta = await fetch(
+      `${API_URL}/projetos/${idProjeto}/kanban?idUsuario=${encodeURIComponent(usuarioLogado.idUsuario)}`
+    );
   } catch (erro) {
-    console.warn("Não foi possível carregar do servidor:", erro);
-    modoExemplo = true;
-    demandas = structuredClone(DEMANDAS_EXEMPLO);
-    mostrarAviso("Servidor indisponível: mostrando dados de exemplo. Mudanças não serão salvas.", true);
+    console.error("Falha de rede:", erro);
+    mostrarAviso("Não foi possível conectar ao servidor. Verifique se o backend está rodando.", true);
+    return;
+  }
+
+  if (resposta.status === 401) {
+    irParaLogin();
+    return;
+  }
+
+  let resultado;
+
+  try {
+    resultado = await resposta.json();
+  } catch (erro) {
+    console.error("Resposta não é JSON. Status:", resposta.status, erro);
+    mostrarAviso(
+      `O servidor respondeu algo inesperado (HTTP ${resposta.status}). Reinicie o backend para carregar as rotas novas.`,
+      true
+    );
+    return;
+  }
+
+  if (!resposta.ok || !resultado.valido) {
+    mostrarAviso(resultado.mensagem || "Não foi possível carregar o projeto.", true);
+
+    if (resposta.status === 403 || resposta.status === 404) {
+      setTimeout(() => {
+        window.location.href = PAGINA_PROJETOS;
+      }, 2500);
+    }
+    return;
+  }
+
+  nomeProjeto = resultado.projeto.nome;
+  demandas = resultado.demandas;
+}
+
+async function carregarSeletor() {
+  try {
+    const resposta = await fetch(
+      `${API_URL}/projetos/listagem?idUsuario=${encodeURIComponent(usuarioLogado.idUsuario)}`
+    );
+
+    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+
+    const resultado = await resposta.json();
+
+    seletorProjeto.replaceChildren(
+      ...resultado.projetos.map((projeto) => new Option(projeto.nome, projeto.id))
+    );
+    seletorProjeto.value = String(idProjeto);
+  } catch (erro) {
+    console.error("Erro ao carregar projetos:", erro);
+    seletorProjeto.replaceChildren(new Option(nomeProjeto || "Projeto", idProjeto));
   }
 }
 
 async function salvarStatus(id, status) {
-  const resposta = await fetch(`${API_URL}/${id}/status`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
-  });
-  if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-}
+  let resposta;
 
+  try {
+    resposta = await fetch(`${API_URL}/demandas/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, idUsuario: usuarioLogado.idUsuario }),
+    });
+  } catch {
+    throw new Error("Não foi possível conectar ao servidor.");
+  }
+
+  if (!resposta.ok) {
+    const resultado = await resposta.json().catch(() => ({}));
+    throw new Error(resultado.erro || "Não foi possível salvar a mudança.");
+  }
+}
 
 function criarCard(demanda) {
   const card = criar("article", "kanban-card");
   card.dataset.id = demanda.id;
   card.dataset.prioridade = demanda.prioridade;
   card.draggable = true;
-  if (demanda.descricao) card.title = demanda.descricao; 
+  if (demanda.descricao) card.title = demanda.descricao;
 
   card.appendChild(criar("h3", "card-titulo", demanda.titulo));
 
@@ -118,14 +181,13 @@ function criarCard(demanda) {
 
   card.appendChild(criar("p", "card-projeto", demanda.projeto));
 
-
   const rodape = criar("div", "card-rodape");
 
   const semResponsavel = !demanda.responsavel || demanda.responsavel === "Não atribuído";
   rodape.appendChild(criar("span", "card-avatar", semResponsavel ? "?" : demanda.responsavel.charAt(0).toUpperCase()));
   rodape.appendChild(criar("span", "card-responsavel", semResponsavel ? "Não atribuído" : demanda.responsavel));
 
-  const atrasado = demanda.prazo < hoje() && demanda.status !== "concluida";
+  const atrasado = Boolean(demanda.prazo) && demanda.prazo < hoje() && demanda.status !== "concluida";
   rodape.appendChild(
     criar("span", atrasado ? "card-prazo atrasado" : "card-prazo", formatarData(demanda.prazo))
   );
@@ -138,11 +200,10 @@ function criarCard(demanda) {
 
   card.appendChild(rodape);
 
-
   card.addEventListener("dragstart", (evento) => {
     idArrastado = demanda.id;
     evento.dataTransfer.effectAllowed = "move";
-    evento.dataTransfer.setData("text/plain", String(demanda.id)); 
+    evento.dataTransfer.setData("text/plain", String(demanda.id));
 
     setTimeout(() => card.classList.add("arrastando"), 0);
   });
@@ -168,44 +229,25 @@ function criarBotaoMover(demanda, novaPosicao, simbolo) {
   return botao;
 }
 
-
-
 function render() {
   colunas.forEach((coluna) => {
     const status = coluna.dataset.status;
     const area = coluna.querySelector(".kanban-cards");
     const contador = coluna.querySelector(".kanban-coluna-topo span");
 
-    const daColuna = demandas.filter(
-      (d) =>
-        d.status === status &&
-        (projetoSelecionado === "todos" || d.projeto === projetoSelecionado)
-    );
+    const daColuna = demandas.filter((d) => d.status === status);
 
-    area.replaceChildren(...daColuna.map(criarCard)); 
+    area.replaceChildren(...daColuna.map(criarCard));
     contador.textContent = daColuna.length;
   });
 }
-
-function preencherProjetos() {
-  const projetos = [...new Set(demandas.map((d) => d.projeto))].sort((a, b) => a.localeCompare(b));
-
-  seletorProjeto.replaceChildren(
-    new Option("Todos os projetos", "todos"),
-    ...projetos.map((projeto) => new Option(projeto, projeto))
-  );
-  seletorProjeto.value = projetoSelecionado;
-}
-
-
 
 async function moverDemanda(id, novoStatus, idAntes = null) {
   const demanda = demandas.find((d) => d.id === id);
   if (!demanda) return;
 
   const mudouDeColuna = demanda.status !== novoStatus;
-  const backup = { lista: [...demandas], status: demanda.status }; 
-
+  const backup = { lista: [...demandas], status: demanda.status };
 
   demandas = demandas.filter((d) => d.id !== id);
   demanda.status = novoStatus;
@@ -217,9 +259,9 @@ async function moverDemanda(id, novoStatus, idAntes = null) {
     demandas.splice(indice, 0, demanda);
   }
 
-  render(); 
+  render();
 
-  if (!mudouDeColuna || modoExemplo) return;
+  if (!mudouDeColuna) return;
 
   try {
     await salvarStatus(id, novoStatus);
@@ -228,10 +270,9 @@ async function moverDemanda(id, novoStatus, idAntes = null) {
     demandas = backup.lista;
     demanda.status = backup.status;
     render();
-    mostrarAviso("Não foi possível salvar a mudança. O card voltou para a coluna anterior.", true);
+    mostrarAviso(`${erro.message} O card voltou para a coluna anterior.`, true);
   }
 }
-
 
 function cardSeguinte(area, mouseY) {
   const cards = [...area.querySelectorAll(".kanban-card:not(.arrastando)")];
@@ -239,7 +280,7 @@ function cardSeguinte(area, mouseY) {
   return (
     cards.find((card) => {
       const caixa = card.getBoundingClientRect();
-      return mouseY < caixa.top + caixa.height / 2; 
+      return mouseY < caixa.top + caixa.height / 2;
     }) ?? null
   );
 }
@@ -255,21 +296,18 @@ function configurarColunas() {
     const status = coluna.dataset.status;
     const area = coluna.querySelector(".kanban-cards");
 
-
     coluna.addEventListener("dragover", (evento) => {
       if (idArrastado === null) return;
-      evento.preventDefault(); 
+      evento.preventDefault();
       evento.dataTransfer.dropEffect = "move";
       coluna.classList.add("alvo");
     });
-
 
     coluna.addEventListener("dragleave", (evento) => {
       if (!coluna.contains(evento.relatedTarget)) {
         coluna.classList.remove("alvo");
       }
     });
-
 
     coluna.addEventListener("drop", (evento) => {
       evento.preventDefault();
@@ -285,16 +323,25 @@ function configurarColunas() {
   });
 }
 
-
 async function iniciar() {
-  await carregarDemandas();
-  preencherProjetos();
+  if (!usuarioLogado) {
+    irParaLogin();
+    return;
+  }
+
+  if (!Number.isInteger(idProjeto) || idProjeto <= 0) {
+    window.location.href = PAGINA_PROJETOS;
+    return;
+  }
+
   configurarColunas();
+
+  await carregarKanban();
+  await carregarSeletor();
   render();
 
   seletorProjeto.addEventListener("change", () => {
-    projetoSelecionado = seletorProjeto.value;
-    render();
+    window.location.search = `?id=${encodeURIComponent(seletorProjeto.value)}`;
   });
 }
 
