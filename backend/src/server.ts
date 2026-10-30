@@ -1448,30 +1448,7 @@ app.options("/api/demandas/:id/status", (_request, response) => {
   response.sendStatus(204);
 });
  
-app.patch("/api/demandas/:id/status", (request, response) => {
-  const id = Number(request.params.id);
-  const demanda = demandas.find((d) => d.id === id);
- 
-  if (!demanda) {
-    response.status(404).json({ valido: false, erro: "Demanda não encontrada." });
-    return;
-  }
- 
-  const corpo = (request.body ?? {}) as { status?: unknown };
-  const status = texto(corpo.status).toLowerCase();
- 
-  if (!STATUS_VALIDOS.includes(status as StatusDemanda)) {
-    response.status(400).json({ valido: false, erro: "Status inválido." });
-    return;
-  }
- 
-  demanda.status = status as StatusDemanda;
- 
-  response.status(200).json({ valido: true, demanda });
-});
-
 //Visualizar demanda
-
 app.get("/api/demandas/:id", async (request, response) => {
     const id = Number(request.params.id);
 
@@ -1780,6 +1757,223 @@ interface DemandaAtual {
   status: string;
 }
 
+async function verificarAcessoProjeto(
+    conexao: oracledb.Connection,
+    idUsuario: number,
+    idProjeto: number
+): Promise<{ idPerfil: number; permitido: boolean } | null> {
+    const resultado = await conexao.execute<{ idPerfil: number; vinculos: number }>(
+        `SELECT
+            u.id_perfil AS "idPerfil",
+            (SELECT COUNT(*)
+               FROM projeto_usuario pu
+              WHERE pu.id_projeto = :idProjeto
+                AND pu.id_usuario = u.id_usuario) AS "vinculos"
+         FROM usuario u
+         WHERE u.id_usuario = :idUsuario
+           AND u.ativo = 1`,
+        { idProjeto, idUsuario },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const linha = resultado.rows?.[0];
+
+    if (!linha) {
+        return null;
+    }
+
+    const idPerfil = Number(linha.idPerfil);
+
+    return {
+        idPerfil,
+        permitido: idPerfil === 1 || Number(linha.vinculos) > 0
+    };
+}
+
+const ID_STATUS: Record<StatusDemanda, number> = {
+    aberta: 1,
+    andamento: 2,
+    revisao: 3,
+    concluida: 4,
+    cancelada: 5
+};
+
+const STATUS_POR_ID: Record<number, StatusDemanda> = {
+    1: "aberta",
+    2: "andamento",
+    3: "revisao",
+    4: "concluida",
+    5: "cancelada"
+};
+
+const NOME_STATUS: Record<StatusDemanda, string> = {
+    aberta: "Aberta",
+    andamento: "Em andamento",
+    revisao: "Em revisão",
+    concluida: "Concluída",
+    cancelada: "Cancelada"
+};
+
+const TRANSICOES: Record<StatusDemanda, StatusDemanda[]> = {
+    aberta: ["andamento", "cancelada"],
+    andamento: ["revisao", "cancelada"],
+    revisao: ["concluida", "andamento", "cancelada"],
+    concluida: [],
+    cancelada: []
+};
+
+app.patch("/api/demandas/:id/status", async (request, response) => {
+    const id = Number(request.params.id);
+    const corpo = (request.body ?? {}) as { status?: unknown; idUsuario?: unknown };
+    const idUsuario = Number(corpo.idUsuario);
+    const novoStatus = texto(corpo.status).toLowerCase() as StatusDemanda;
+
+    if (!Number.isInteger(id) || id <= 0) {
+        response.status(400).json({ valido: false, erro: "ID da demanda inválido." });
+        return;
+    }
+
+    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+        response.status(400).json({ valido: false, erro: "Usuário inválido." });
+        return;
+    }
+
+    if (!STATUS_VALIDOS.includes(novoStatus)) {
+        response.status(400).json({ valido: false, erro: "Status inválido." });
+        return;
+    }
+
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const consulta = await conexao.execute<{
+            idProjeto: number;
+            idResponsavel: number | null;
+            idStatus: number;
+        }>(
+            `SELECT
+                id_projeto AS "idProjeto",
+                id_responsavel AS "idResponsavel",
+                id_status AS "idStatus"
+             FROM demanda
+             WHERE id_demanda = :id
+             FOR UPDATE`,
+            { id },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const demanda = consulta.rows?.[0];
+
+        if (!demanda) {
+            response.status(404).json({ valido: false, erro: "Demanda não encontrada." });
+            return;
+        }
+
+        const acesso = await verificarAcessoProjeto(
+            conexao,
+            idUsuario,
+            Number(demanda.idProjeto)
+        );
+
+        if (!acesso) {
+            response.status(401).json({
+                valido: false,
+                erro: "Usuário não encontrado ou inativo."
+            });
+            return;
+        }
+
+        if (!acesso.permitido) {
+            response.status(403).json({
+                valido: false,
+                erro: "Você não faz parte do projeto desta demanda."
+            });
+            return;
+        }
+
+        const ehAdmin = acesso.idPerfil === 1;
+        const ehLider = acesso.idPerfil === 2;
+        const ehResponsavel =
+            demanda.idResponsavel !== null && Number(demanda.idResponsavel) === idUsuario;
+
+        if (novoStatus === "cancelada" && !ehAdmin && !ehLider) {
+            response.status(403).json({
+                valido: false,
+                erro: "Apenas Administrador ou Líder de Projeto podem cancelar demandas."
+            });
+            return;
+        }
+
+        if (!ehAdmin && !ehLider && !ehResponsavel) {
+            response.status(403).json({
+                valido: false,
+                erro: "Apenas o responsável pela demanda pode alterar o status."
+            });
+            return;
+        }
+
+        const statusAtual = STATUS_POR_ID[Number(demanda.idStatus)];
+
+        if (!TRANSICOES[statusAtual].includes(novoStatus)) {
+            response.status(409).json({
+                valido: false,
+                erro: `Não é permitido mover de "${NOME_STATUS[statusAtual]}" para "${NOME_STATUS[novoStatus]}".`
+            });
+            return;
+        }
+
+        await conexao.execute(
+            `UPDATE demanda
+                SET id_status = :idStatus,
+                    data_ultima_atualizacao = SYSTIMESTAMP
+              WHERE id_demanda = :id`,
+            { idStatus: ID_STATUS[novoStatus], id }
+        );
+
+        await conexao.execute(
+            `INSERT INTO historico_alteracao
+                (tipo_alteracao, valor_anterior, valor_novo, id_demanda, id_usuario)
+             VALUES
+                (:tipo, :anterior, :novo, :id, :idUsuario)`,
+            {
+                tipo: novoStatus === "cancelada" ? "CANCELAMENTO" : "STATUS",
+                anterior: NOME_STATUS[statusAtual],
+                novo: NOME_STATUS[novoStatus],
+                id,
+                idUsuario
+            }
+        );
+
+        await conexao.commit();
+
+        response.status(200).json({
+            valido: true,
+            mensagem: "Status atualizado com sucesso.",
+            demanda: { id, status: novoStatus }
+        });
+
+    } catch (erro) {
+        if (conexao) {
+            try { await conexao.rollback(); } catch { }
+        }
+
+        console.error("Erro ao atualizar status:", erro);
+
+        response.status(500).json({
+            valido: false,
+            erro: "Erro interno ao atualizar o status."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
+
 app.put("/api/demandas/:id", async (request, response) => {
   const id = Number(request.params.id);
 
@@ -1788,7 +1982,6 @@ app.put("/api/demandas/:id", async (request, response) => {
     return;
   }
 
-  // Validação de formato (mesma função do POST)
   const validacao = validarDemanda(request.body);
   if (!validacao.ok) {
     response.status(400).json({ valido: false, erros: validacao.erros });
@@ -1797,8 +1990,6 @@ app.put("/api/demandas/:id", async (request, response) => {
 
   const dados = validacao.dados;
 
-  // Usuário que está editando (o front envia como idCriador).
-  // Quando houver JWT, isto deve vir do token.
   const idUsuario = Number((request.body as Record<string, unknown>).idCriador);
   if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
     response.status(400).json({
@@ -1808,15 +1999,12 @@ app.put("/api/demandas/:id", async (request, response) => {
     return;
   }
 
-  // TODO: validar aqui se dados.prazo é feriado nacional (API de feriados)
-
   let conexao: oracledb.Connection | undefined;
 
   try {
     const pool = await iniciarPool();
     conexao = await pool.getConnection();
 
-    // 1) Estado atual da demanda
     const consultaAtual = await conexao.execute<DemandaAtual>(
       `SELECT
           d.id_prioridade AS "idPrioridade",
@@ -1841,7 +2029,6 @@ app.put("/api/demandas/:id", async (request, response) => {
       return;
     }
 
-    // Demanda cancelada não pode mais ser editada (histórico preservado)
     if (atual.status === "cancelada") {
       response.status(409).json({
         valido: false,
@@ -1850,7 +2037,6 @@ app.put("/api/demandas/:id", async (request, response) => {
       return;
     }
 
-    // 2) Resolver chaves estrangeiras
     const erros: ErrosCadastro = {};
 
     const idProjeto = await buscarIdPorNome(
@@ -1908,7 +2094,6 @@ app.put("/api/demandas/:id", async (request, response) => {
       return;
     }
 
-    // 3) UPDATE (não mexe em id_criador, data_criacao nem id_status)
     await conexao.execute(
       `UPDATE demanda
           SET titulo = :titulo,
@@ -1932,7 +2117,6 @@ app.put("/api/demandas/:id", async (request, response) => {
       }
     );
 
-    // 4) Histórico automático: só grava o que realmente mudou
     const registrarHistorico = async (
       tipoAlteracao: "PRIORIDADE" | "PRAZO" | "RESPONSAVEL",
       valorAnterior: string | null,
@@ -1960,7 +2144,6 @@ app.put("/api/demandas/:id", async (request, response) => {
       await registrarHistorico("RESPONSAVEL", atual.responsavel, nomeResponsavel);
     }
 
-    // 5) Tudo ou nada
     await conexao.commit();
 
     response.status(200).json({
@@ -1981,7 +2164,7 @@ app.put("/api/demandas/:id", async (request, response) => {
 
   } catch (erro) {
     if (conexao) {
-      try { await conexao.rollback(); } catch { /* ignora */ }
+      try { await conexao.rollback(); } catch { }
     }
 
     console.error("Erro ao atualizar demanda:", erro);
@@ -1995,6 +2178,257 @@ app.put("/api/demandas/:id", async (request, response) => {
       await conexao.close();
     }
   }
+});
+
+interface DemandaKanban {
+    id: number;
+    titulo: string;
+    descricao: string;
+    status: string;
+    prioridade: string;
+    tipo: string;
+    prazo: string | null;
+    projeto: string;
+    responsavel: string | null;
+}
+
+app.get("/api/projetos/listagem", async (request, response) => {
+    const idUsuario = Number(request.query.idUsuario);
+
+    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+        response.status(400).json({
+            valido: false,
+            mensagem: "Usuário inválido."
+        });
+        return;
+    }
+
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const consultaUsuario = await conexao.execute<{ idPerfil: number }>(
+            `SELECT id_perfil AS "idPerfil"
+             FROM usuario
+             WHERE id_usuario = :idUsuario
+               AND ativo = 1`,
+            { idUsuario },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const usuario = consultaUsuario.rows?.[0];
+
+        if (!usuario) {
+            response.status(401).json({
+                valido: false,
+                mensagem: "Usuário não encontrado ou inativo."
+            });
+            return;
+        }
+
+        const ehAdmin = Number(usuario.idPerfil) === 1;
+
+        const filtro = ehAdmin
+            ? ""
+            : `WHERE EXISTS (
+                   SELECT 1
+                   FROM projeto_usuario pu
+                   WHERE pu.id_projeto = pr.id_projeto
+                     AND pu.id_usuario = :idUsuario
+               )`;
+
+        const binds: Record<string, number> = ehAdmin ? {} : { idUsuario };
+
+        const resultado = await conexao.execute<{
+            id: number;
+            nome: string;
+            ativo: number;
+            demandas: number;
+            pendentes: number;
+        }>(
+            `SELECT
+                pr.id_projeto AS "id",
+                pr.nome AS "nome",
+                pr.ativo AS "ativo",
+                COUNT(d.id_demanda) AS "demandas",
+                COUNT(CASE WHEN d.id_status IN (1, 2, 3) THEN 1 END) AS "pendentes"
+             FROM projeto pr
+             LEFT JOIN demanda d
+                ON d.id_projeto = pr.id_projeto
+             ${filtro}
+             GROUP BY pr.id_projeto, pr.nome, pr.ativo
+             ORDER BY pr.nome`,
+            binds,
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const projetos = (resultado.rows ?? []).map((linha) => {
+            const demandas = Number(linha.demandas);
+            const pendentes = Number(linha.pendentes);
+
+            let situacao = "andamento";
+
+            if (Number(linha.ativo) !== 1) {
+                situacao = "inativo";
+            } else if (demandas === 0) {
+                situacao = "sem-demandas";
+            } else if (pendentes === 0) {
+                situacao = "concluido";
+            }
+
+            return {
+                id: Number(linha.id),
+                nome: linha.nome,
+                demandas,
+                situacao
+            };
+        });
+
+        response.status(200).json({
+            valido: true,
+            ehAdmin,
+            projetos
+        });
+
+    } catch (erro) {
+        console.error("Erro ao listar projetos:", erro);
+
+        response.status(500).json({
+            valido: false,
+            mensagem: "Erro interno ao consultar os projetos."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
+
+app.get("/api/projetos/:id/kanban", async (request, response) => {
+    const idProjeto = Number(request.params.id);
+    const idUsuario = Number(request.query.idUsuario);
+
+    if (!Number.isInteger(idProjeto) || idProjeto <= 0) {
+        response.status(400).json({
+            valido: false,
+            mensagem: "Projeto inválido."
+        });
+        return;
+    }
+
+    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+        response.status(400).json({
+            valido: false,
+            mensagem: "Usuário inválido."
+        });
+        return;
+    }
+
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const acesso = await verificarAcessoProjeto(conexao, idUsuario, idProjeto);
+
+        if (!acesso) {
+            response.status(401).json({
+                valido: false,
+                mensagem: "Usuário não encontrado ou inativo."
+            });
+            return;
+        }
+
+        if (!acesso.permitido) {
+            response.status(403).json({
+                valido: false,
+                mensagem: "Você não faz parte deste projeto."
+            });
+            return;
+        }
+
+        const consultaProjeto = await conexao.execute<{ id: number; nome: string }>(
+            `SELECT id_projeto AS "id", nome AS "nome"
+             FROM projeto
+             WHERE id_projeto = :idProjeto`,
+            { idProjeto },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const projeto = consultaProjeto.rows?.[0];
+
+        if (!projeto) {
+            response.status(404).json({
+                valido: false,
+                mensagem: "Projeto não encontrado."
+            });
+            return;
+        }
+
+        const resultado = await conexao.execute<DemandaKanban>(
+            `SELECT
+                d.id_demanda AS "id",
+                d.titulo AS "titulo",
+                d.descricao AS "descricao",
+
+                CASE d.id_status
+                    WHEN 1 THEN 'aberta'
+                    WHEN 2 THEN 'andamento'
+                    WHEN 3 THEN 'revisao'
+                    WHEN 4 THEN 'concluida'
+                END AS "status",
+
+                CASE d.id_prioridade
+                    WHEN 1 THEN 'baixa'
+                    WHEN 2 THEN 'media'
+                    WHEN 3 THEN 'alta'
+                    WHEN 4 THEN 'critica'
+                END AS "prioridade",
+
+                LOWER(td.nome) AS "tipo",
+                TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo",
+                pr.nome AS "projeto",
+                u.nome AS "responsavel"
+
+             FROM demanda d
+             INNER JOIN tipo_demanda td ON td.id_tipo = d.id_tipo
+             INNER JOIN projeto pr ON pr.id_projeto = d.id_projeto
+             LEFT JOIN usuario u ON u.id_usuario = d.id_responsavel
+             WHERE d.id_projeto = :idProjeto
+               AND d.id_status <> 5
+             ORDER BY d.prazo ASC NULLS LAST, d.id_demanda ASC`,
+            { idProjeto },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const demandasProjeto = (resultado.rows ?? []).map((linha) => ({
+            ...linha,
+            responsavel: linha.responsavel ?? "Não atribuído"
+        }));
+
+        response.status(200).json({
+            valido: true,
+            projeto: { id: Number(projeto.id), nome: projeto.nome },
+            demandas: demandasProjeto
+        });
+
+    } catch (erro) {
+        console.error("Erro ao carregar o Kanban:", erro);
+
+        response.status(500).json({
+            valido: false,
+            mensagem: "Erro interno ao carregar o Kanban."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
 });
 
 //Banco 
