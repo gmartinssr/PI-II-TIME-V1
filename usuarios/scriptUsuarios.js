@@ -7,10 +7,14 @@ const mensagemSenhaAtual = document.getElementById("mensagemSenhaAtual");
 const mensagemNovaSenha = document.getElementById("mensagemNovaSenha");
 const mensagemConfirmarSenha = document.getElementById("mensagemConfirmarSenha");
 const mensagemFormulario = document.getElementById("mensagemFormulario");
+const linkUsuarios = document.getElementById("linkUsuarios");
+const avisoUsuarios = document.getElementById("avisoUsuarios");
 
 const apiUrl = window.location.port === "3030"
     ? "http://localhost:3333"
     : "http://localhost:3000";
+
+let idPerfilLogado = null;
 
 botaoSenha.addEventListener("click", function() {
 
@@ -102,6 +106,15 @@ formularioSenha.addEventListener("submit", async function(event) {
     }
 });
 
+linkUsuarios.addEventListener("click", function(evento) {
+    if (idPerfilLogado === 1) {
+        avisoUsuarios.textContent = "";
+    } else {
+        evento.preventDefault();
+        avisoUsuarios.textContent = "Apenas o Administrador pode acessar a lista de usuários.";
+    }
+});
+
 async function carregarPerfil() {
     const usuarioSalvo = sessionStorage.getItem("usuario");
 
@@ -124,6 +137,7 @@ async function carregarPerfil() {
         document.querySelector("#email span").textContent = usuario.email;
         document.querySelector("#usuario span").textContent = usuario.usuario;
         document.querySelector("#cargo span").textContent = usuario.perfil;
+        idPerfilLogado = Number(usuario.idPerfil);
     } catch (erro) {
         console.error("Não foi possível carregar o perfil:", erro);
     }
