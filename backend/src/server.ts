@@ -1851,12 +1851,10 @@ app.patch("/api/demandas/:id/status", async (request, response) => {
 
         const consulta = await conexao.execute<{
             idProjeto: number;
-            idResponsavel: number | null;
             idStatus: number;
         }>(
             `SELECT
                 id_projeto AS "idProjeto",
-                id_responsavel AS "idResponsavel",
                 id_status AS "idStatus"
              FROM demanda
              WHERE id_demanda = :id
@@ -1896,8 +1894,6 @@ app.patch("/api/demandas/:id/status", async (request, response) => {
 
         const ehAdmin = acesso.idPerfil === 1;
         const ehLider = acesso.idPerfil === 2;
-        const ehResponsavel =
-            demanda.idResponsavel !== null && Number(demanda.idResponsavel) === idUsuario;
 
         if (novoStatus === "cancelada" && !ehAdmin && !ehLider) {
             response.status(403).json({
@@ -1907,20 +1903,21 @@ app.patch("/api/demandas/:id/status", async (request, response) => {
             return;
         }
 
-        if (!ehAdmin && !ehLider && !ehResponsavel) {
-            response.status(403).json({
+        const statusAtual = STATUS_POR_ID[Number(demanda.idStatus)];
+
+        if (statusAtual === "cancelada") {
+            response.status(409).json({
                 valido: false,
-                erro: "Apenas o responsável pela demanda pode alterar o status."
+                erro: "Demandas canceladas não podem ser movidas."
             });
             return;
         }
 
-        const statusAtual = STATUS_POR_ID[Number(demanda.idStatus)];
-
-        if (!TRANSICOES[statusAtual].includes(novoStatus)) {
-            response.status(409).json({
-                valido: false,
-                erro: `Não é permitido mover de "${NOME_STATUS[statusAtual]}" para "${NOME_STATUS[novoStatus]}".`
+        if (statusAtual === novoStatus) {
+            response.status(200).json({
+                valido: true,
+                mensagem: "A demanda já está neste status.",
+                demanda: { id, status: novoStatus }
             });
             return;
         }
