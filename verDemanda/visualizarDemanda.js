@@ -199,18 +199,12 @@ function renderizarComentarios(comentarios) {
 
     container.innerHTML = comentarios
         .map((c) => {
-            const dataFormatada = new Date(c.criadoEm).toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
+            const dataFormatada = c.data;
 
             return `
             <div class="attachment-item" style="flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px; margin-bottom: 8px;">
                 <div style="display: flex; justify-content: space-between; width: 100%; font-size: 12px; color: var(--ink-soft);">
-                    <strong>${c.autor}</strong>
+                    <strong>${c.usuario}</strong>
                     <span>${dataFormatada}</span>
                 </div>
                 <p style="margin: 4px 0 0; font-size: 13px; color: var(--ink); white-space: pre-wrap;">${c.texto}</p>
@@ -253,13 +247,21 @@ function iniciarFormularioComentario() {
         const texto = textarea.value.trim();
         if (!texto) return;
 
+        // Recupera o usuário autenticado
+        const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+
+        if (!usuario || !usuario.idUsuario) {
+            alert("Não foi possível identificar o usuário logado.");
+            return;
+        }
+
         try {
             const resposta = await fetch(`${API_BASE_URL}/${demandaId}/comentarios`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    autor: "Usuário Logado",
-                    texto: texto
+                    texto: texto,
+                    idUsuario: usuario.idUsuario
                 })
             });
 
@@ -269,7 +271,8 @@ function iniciarFormularioComentario() {
                 textarea.value = "";
                 await carregarComentarios();
             } else {
-                alert(resultado.erro || "Não foi possível adicionar o comentário.");
+                alert(resultado.mensagem || "Não foi possível adicionar o comentário.");
+                console.error("Erro retornado pelo servidor:", resultado);
             }
         } catch (erro) {
             console.error("Erro ao enviar comentário:", erro);

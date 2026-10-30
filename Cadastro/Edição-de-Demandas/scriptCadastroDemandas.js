@@ -290,6 +290,9 @@ async function iniciar() {
     iniciarContador();
     iniciarDropzone();
 
+    await carregarResponsaveis();
+    await carregarProjetos();
+
     // Se houver um ID na URL, altera o título da tela e carrega os dados
     if (demandaId) {
         const tituloPagina = document.querySelector("h1");
@@ -322,6 +325,69 @@ async function iniciar() {
         }
         await salvarDemanda(dados);
     });
+}
+
+async function carregarResponsaveis() {
+    const select = obter("responsavel");
+
+    try {
+        const resposta = await fetch(
+            API_BASE_URL.replace("/demandas", "/responsaveis")
+        );
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível consultar os responsáveis.");
+        }
+
+        const resultado = await resposta.json();
+
+        resultado.responsaveis.forEach((responsavel) => {
+            const opcao = document.createElement("option");
+
+            opcao.value = responsavel.idUsuario;
+            opcao.textContent = responsavel.nome;
+
+            select.appendChild(opcao);
+        });
+
+    } catch (erro) {
+        console.error("Erro ao carregar responsáveis:", erro);
+        alert("Não foi possível carregar a lista de responsáveis.");
+    }
+}
+
+async function carregarProjetos() {
+    const select = obter("projeto");
+
+    try {
+        const resposta = await fetch(
+            API_BASE_URL.replace("/demandas", "/projetos")
+        );
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível consultar os projetos.");
+        }
+
+        const resultado = await resposta.json();
+
+        select.innerHTML = '<option value="">Selecione</option>';
+
+        resultado.projetos.forEach((projeto) => {
+            const opcao = document.createElement("option");
+
+            opcao.value = projeto.nome;  
+            opcao.textContent = projeto.nome;
+
+            select.appendChild(opcao);
+        });
+
+    } catch (erro) {
+        console.error("Erro ao carregar projetos:", erro);
+
+        select.innerHTML = '<option value="">Erro ao carregar projetos</option>';
+
+        alert("Não foi possível carregar a lista de projetos.");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", iniciar);

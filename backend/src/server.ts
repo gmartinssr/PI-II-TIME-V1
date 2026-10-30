@@ -1147,7 +1147,7 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
       tipo: categoria as Tipo,
       projeto,
       prioridade: prioridade as Prioridade,
-      responsavel: responsavel || "Não atribuído",
+      responsavel,
       solicitante,
       abertura,
       prazo,
@@ -1165,12 +1165,77 @@ const nomesProjetos: Record<string, string> = {
   workflow: "Sistema de Gestão"
 };
 
-const nomesResponsaveis: Record<string, string> = {
-  joao: "joao@pi.com.br",
-  vitor: "vitor@pi.com.br",
-  gustavo: "gustavo@pi.com.br",
-  guilherme: "gui@pi.com.br"
-};
+app.get("/api/projetos", async (_request, response) => {
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const resultado = await conexao.execute(
+            `SELECT
+                id_projeto AS "idProjeto",
+                nome       AS "nome"
+             FROM projeto
+             WHERE ativo = 1
+             ORDER BY nome`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        response.status(200).json({
+            projetos: resultado.rows
+        });
+
+    } catch (erro) {
+        console.error("Erro ao consultar projetos:", erro);
+
+        response.status(500).json({
+            mensagem: "Erro ao consultar projetos."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
+
+app.get("/api/responsaveis", async (_request, response) => {
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const resultado = await conexao.execute(
+            `SELECT
+                id_usuario AS "idUsuario",
+                nome AS "nome"
+             FROM usuario
+             WHERE ativo = 1
+             ORDER BY nome`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        response.status(200).json({
+            responsaveis: resultado.rows
+        });
+
+    } catch (erro) {
+        console.error("Erro ao consultar responsáveis:", erro);
+
+        response.status(500).json({
+            mensagem: "Erro ao consultar responsáveis."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
 
 const nomesPrioridades: Record<Prioridade, string> = {
   baixa: "Baixa",
@@ -1234,7 +1299,6 @@ app.post("/api/demandas", async (request, response) => {
     conexao = await pool.getConnection();
 
     const projetoBusca = nomesProjetos[dados.projeto.toLowerCase()] ?? dados.projeto;
-    const responsavelBusca = nomesResponsaveis[dados.responsavel.toLowerCase()];
     const idProjeto = await buscarIdPorNome(
       conexao,
       "projeto",
@@ -1258,14 +1322,21 @@ app.post("/api/demandas", async (request, response) => {
     );
 
     let idResponsavel: number | null = null;
-    if (responsavelBusca) {
-      idResponsavel = await buscarIdPorNome(
-        conexao,
-        "usuario",
-        "id_usuario",
-        "email",
-        responsavelBusca
-      );
+
+    if (dados.responsavel) {
+        const resultadoResponsavel = await conexao.execute(
+            `SELECT id_usuario AS "id"
+            FROM usuario
+            WHERE id_usuario = :idResponsavel
+              AND ativo = 1`,
+            { idResponsavel: Number(dados.responsavel) },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const registro = resultadoResponsavel.rows?.[0] as
+            { id: number } | undefined;
+
+        idResponsavel = registro ? Number(registro.id) : null;
     }
 
     const idCriadorExiste = await buscarIdPorNome(
@@ -1285,8 +1356,8 @@ app.post("/api/demandas", async (request, response) => {
     if (idTipo === null) {
       erros.categoria = "Categoria não encontrada no banco de dados.";
     }
-    if (dados.responsavel && dados.responsavel !== "Não atribuído" && idResponsavel === null) {
-      erros.responsavel = "Responsável não encontrado no banco de dados.";
+    if (dados.responsavel && idResponsavel === null) {
+        erros.responsavel = "Responsável não encontrado ou usuário inativo.";
     }
     if (idCriadorExiste === null) {
       erros.idCriador = "Usuário criador não encontrado no banco de dados.";
@@ -1401,24 +1472,131 @@ app.patch("/api/demandas/:id/status", (request, response) => {
 
 //Visualizar demanda
 
-app.get("/api/demandas/:id", (request, response) => {
+app.get("/api/demandas/:id", async (request, response) => {
     const id = Number(request.params.id);
 
-    const demanda = demandas.find((d) => d.id === id);
-
-    if (!demanda) {
-        response.status(404).json({
+    if (!Number.isInteger(id) || id <= 0) {
+        response.status(400).json({
             valido: false,
-            erro: "Demanda não encontrada."
+            erro: "ID da demanda inválido."
         });
-
         return;
     }
 
-    response.status(200).json({
-        valido: true,
-        demanda
-    });
+    let conexao: oracledb.Connection | undefined;
+    interface DemandaDetalhe {
+      id: number;
+      titulo: string;
+      descricao: string;
+      status: string;
+      prioridade: string;
+      tipo: string;
+      categoria: string;
+      prazo: string | null;
+      abertura: string;
+      projeto: string;
+      responsavel: number | null;
+      idCriador: number;
+      solicitante: string;
+      nomeResponsavel: string | null;
+    }
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const resultado = await conexao.execute(
+            `SELECT
+                d.id_demanda AS "id",
+                d.titulo AS "titulo",
+                d.descricao AS "descricao",
+
+                CASE LOWER(s.nome)
+                    WHEN 'aberta' THEN 'aberta'
+                    WHEN 'em andamento' THEN 'andamento'
+                    WHEN 'em revisão' THEN 'revisao'
+                    WHEN 'concluída' THEN 'concluida'
+                    WHEN 'cancelada' THEN 'cancelada'
+                END AS "status",
+
+                CASE LOWER(p.nome)
+                    WHEN 'baixa' THEN 'baixa'
+                    WHEN 'média' THEN 'media'
+                    WHEN 'alta' THEN 'alta'
+                    WHEN 'crítica' THEN 'critica'
+                END AS "prioridade",
+
+                LOWER(td.nome) AS "tipo",
+                LOWER(td.nome) AS "categoria",
+
+                TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo",
+                TO_CHAR(d.data_criacao, 'YYYY-MM-DD') AS "abertura",
+
+                pr.nome AS "projeto",
+
+                d.id_responsavel AS "responsavel",
+                d.id_criador AS "idCriador",
+
+                uc.nome AS "solicitante",
+                ur.nome AS "nomeResponsavel"
+
+            FROM demanda d
+
+            INNER JOIN status s
+                ON s.id_status = d.id_status
+
+            INNER JOIN prioridade p
+                ON p.id_prioridade = d.id_prioridade
+
+            INNER JOIN tipo_demanda td
+                ON td.id_tipo = d.id_tipo
+
+            INNER JOIN projeto pr
+                ON pr.id_projeto = d.id_projeto
+
+            INNER JOIN usuario uc
+                ON uc.id_usuario = d.id_criador
+
+            LEFT JOIN usuario ur
+                ON ur.id_usuario = d.id_responsavel
+
+            WHERE d.id_demanda = :id`,
+            { id },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const demanda = resultado.rows?.[0] as DemandaDetalhe | undefined;
+
+        if (!demanda) {
+            response.status(404).json({
+                valido: false,
+                erro: "Demanda não encontrada."
+            });
+            return;
+        }
+
+        response.status(200).json({
+            valido: true,
+            demanda: {
+                ...demanda,
+                responsavel: demanda.responsavel
+                    ? String(demanda.responsavel)
+                    : ""
+            }
+        });
+
+    } catch (erro) {
+        console.error("Erro ao visualizar demanda:", erro);
+
+        response.status(500).json({
+            valido: false,
+            erro: "Erro interno ao consultar a demanda."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
 });
 
 interface Comentario {
@@ -1457,110 +1635,366 @@ function proximoIdComentario(): number {
   return comentarios.reduce((maior, comentario) => Math.max(maior, comentario.id), 0) + 1;
 }
 
-app.get("/api/demandas/:id/comentarios", (request, response) => {
-  const demandaId = Number(request.params.id);
 
-  const demanda = demandas.find((d) => d.id === demandaId);
+app.get("/api/demandas/:id/comentarios", async (request, response) => {
+    const idDemanda = Number(request.params.id);
 
-  if (!demanda) {
-    response.status(404).json({
-      valido: false,
-      erro: "Demanda não encontrada."
-    });
-    return;
-  }
+    if (!Number.isInteger(idDemanda) || idDemanda <= 0) {
+        return response.status(400).json({
+            valido: false,
+            mensagem: "ID da demanda inválido."
+        });
+    }
 
-  const resultado = comentarios.filter(
-    (comentario) => comentario.demandaId === demandaId
-  );
+    let conexao;
 
-  response.status(200).json({
-    total: resultado.length,
-    comentarios: resultado
-  });
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const resultado = await conexao.execute(
+            `SELECT
+                c.id_comentario AS "id",
+                c.texto AS "texto",
+                TO_CHAR(c.data_hora, 'DD/MM/YYYY HH24:MI') AS "data",
+                c.id_usuario AS "idUsuario",
+                u.nome AS "usuario"
+             FROM comentario c
+             INNER JOIN usuario u
+                ON u.id_usuario = c.id_usuario
+             WHERE c.id_demanda = :idDemanda
+             ORDER BY c.data_hora ASC`,
+            { idDemanda },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        return response.status(200).json({
+            valido: true,
+            comentarios: resultado.rows
+        });
+
+    } catch (erro) {
+        console.error("Erro ao buscar comentários:", erro);
+
+        return response.status(500).json({
+            valido: false,
+            mensagem: "Erro ao buscar comentários."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
 });
 
-app.post("/api/demandas/:id/comentarios", (request, response) => {
+
+
+app.post("/api/demandas/:id/comentarios", async (request, response) => {
+    const idDemanda = Number(request.params.id);
+    const { texto, idUsuario } = request.body;
+
+    if (!Number.isInteger(idDemanda) || idDemanda <= 0) {
+        return response.status(400).json({
+            valido: false,
+            mensagem: "ID da demanda inválido."
+        });
+    }
+
+    if (!texto || typeof texto !== "string" || !texto.trim()) {
+        return response.status(400).json({
+            valido: false,
+            mensagem: "O comentário não pode estar vazio."
+        });
+    }
+
+    const usuarioId = Number(idUsuario);
+
+    if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        return response.status(400).json({
+            valido: false,
+            mensagem: "Usuário inválido."
+        });
+    }
+
+    let conexao;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const resultado = await conexao.execute(
+            `INSERT INTO comentario (
+                texto,
+                id_demanda,
+                id_usuario
+            ) VALUES (
+                :texto,
+                :idDemanda,
+                :idUsuario
+            )
+            RETURNING id_comentario INTO :idComentario`,
+            {
+                texto: texto.trim(),
+                idDemanda,
+                idUsuario: usuarioId,
+                idComentario: {
+                    dir: oracledb.BIND_OUT,
+                    type: oracledb.NUMBER
+                }
+            },
+            { autoCommit: true }
+        );
+
+        const idComentario = (resultado.outBinds as {
+            idComentario: number[]
+        }).idComentario[0];
+
+        return response.status(201).json({
+            valido: true,
+            mensagem: "Comentário adicionado com sucesso.",
+            id: idComentario
+        });
+
+    } catch (erro) {
+        console.error("Erro ao adicionar comentário:", erro);
+
+        return response.status(500).json({
+            valido: false,
+            mensagem: "Erro ao adicionar comentário."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
+
+interface DemandaAtual {
+  idPrioridade: number;
+  prioridade: string;
+  prazo: string | null;
+  idResponsavel: number | null;
+  responsavel: string | null;
+  status: string;
+}
+
+app.put("/api/demandas/:id", async (request, response) => {
   const id = Number(request.params.id);
 
-  if (Number.isNaN(id)) {
+  if (!Number.isInteger(id) || id <= 0) {
+    response.status(400).json({ valido: false, erro: "ID da demanda inválido." });
+    return;
+  }
+
+  // Validação de formato (mesma função do POST)
+  const validacao = validarDemanda(request.body);
+  if (!validacao.ok) {
+    response.status(400).json({ valido: false, erros: validacao.erros });
+    return;
+  }
+
+  const dados = validacao.dados;
+
+  // Usuário que está editando (o front envia como idCriador).
+  // Quando houver JWT, isto deve vir do token.
+  const idUsuario = Number((request.body as Record<string, unknown>).idCriador);
+  if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
     response.status(400).json({
       valido: false,
-      erro: "ID inválido."
+      erros: { idCriador: "Não foi possível identificar o usuário logado." }
     });
     return;
   }
 
-  const demanda = demandas.find((d) => d.id === id);
+  // TODO: validar aqui se dados.prazo é feriado nacional (API de feriados)
 
-  if (!demanda) {
-    response.status(404).json({
+  let conexao: oracledb.Connection | undefined;
+
+  try {
+    const pool = await iniciarPool();
+    conexao = await pool.getConnection();
+
+    // 1) Estado atual da demanda
+    const consultaAtual = await conexao.execute<DemandaAtual>(
+      `SELECT
+          d.id_prioridade AS "idPrioridade",
+          p.nome          AS "prioridade",
+          TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo",
+          d.id_responsavel AS "idResponsavel",
+          ur.nome         AS "responsavel",
+          LOWER(s.nome)   AS "status"
+       FROM demanda d
+       INNER JOIN prioridade p ON p.id_prioridade = d.id_prioridade
+       INNER JOIN status s     ON s.id_status = d.id_status
+       LEFT JOIN usuario ur    ON ur.id_usuario = d.id_responsavel
+       WHERE d.id_demanda = :id`,
+      { id },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const atual = consultaAtual.rows?.[0];
+
+    if (!atual) {
+      response.status(404).json({ valido: false, erro: "Demanda não encontrada." });
+      return;
+    }
+
+    // Demanda cancelada não pode mais ser editada (histórico preservado)
+    if (atual.status === "cancelada") {
+      response.status(409).json({
+        valido: false,
+        erro: "Demandas canceladas não podem ser editadas."
+      });
+      return;
+    }
+
+    // 2) Resolver chaves estrangeiras
+    const erros: ErrosCadastro = {};
+
+    const idProjeto = await buscarIdPorNome(
+      conexao, "projeto", "id_projeto", "nome", dados.projeto
+    );
+    const idPrioridade = await buscarIdPorNome(
+      conexao, "prioridade", "id_prioridade", "nome", nomesPrioridades[dados.prioridade]
+    );
+    const idTipo = await buscarIdPorNome(
+      conexao, "tipo_demanda", "id_tipo", "nome", nomesTipos[dados.tipo]
+    );
+
+    let idResponsavel: number | null = null;
+    let nomeResponsavel: string | null = null;
+
+    if (dados.responsavel) {
+      const idInformado = Number(dados.responsavel);
+
+      if (!Number.isInteger(idInformado) || idInformado <= 0) {
+        erros.responsavel = "Responsável inválido.";
+      } else {
+        const consultaResp = await conexao.execute<{ id: number; nome: string }>(
+          `SELECT id_usuario AS "id", nome AS "nome"
+           FROM usuario
+           WHERE id_usuario = :idInformado AND ativo = 1`,
+          { idInformado },
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        const registro = consultaResp.rows?.[0];
+
+        if (registro) {
+          idResponsavel = Number(registro.id);
+          nomeResponsavel = registro.nome;
+        } else {
+          erros.responsavel = "Responsável não encontrado ou usuário inativo.";
+        }
+      }
+    }
+
+    const consultaEditor = await conexao.execute(
+      `SELECT 1 AS "ok" FROM usuario WHERE id_usuario = :idUsuario AND ativo = 1`,
+      { idUsuario },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    if (!consultaEditor.rows?.[0]) {
+      erros.idCriador = "Usuário logado não encontrado ou inativo.";
+    }
+
+    if (idProjeto === null)    erros.projeto = "Projeto não encontrado no banco de dados.";
+    if (idPrioridade === null) erros.prioridade = "Prioridade não encontrada no banco de dados.";
+    if (idTipo === null)       erros.categoria = "Categoria não encontrada no banco de dados.";
+
+    if (Object.keys(erros).length > 0) {
+      response.status(400).json({ valido: false, erros });
+      return;
+    }
+
+    // 3) UPDATE (não mexe em id_criador, data_criacao nem id_status)
+    await conexao.execute(
+      `UPDATE demanda
+          SET titulo = :titulo,
+              descricao = :descricao,
+              prazo = TO_DATE(:prazo, 'YYYY-MM-DD'),
+              id_projeto = :idProjeto,
+              id_prioridade = :idPrioridade,
+              id_tipo = :idTipo,
+              id_responsavel = :idResponsavel,
+              data_ultima_atualizacao = SYSTIMESTAMP
+        WHERE id_demanda = :id`,
+      {
+        titulo: dados.titulo,
+        descricao: dados.descricao,
+        prazo: dados.prazo,
+        idProjeto,
+        idPrioridade,
+        idTipo,
+        idResponsavel,
+        id
+      }
+    );
+
+    // 4) Histórico automático: só grava o que realmente mudou
+    const registrarHistorico = async (
+      tipoAlteracao: "PRIORIDADE" | "PRAZO" | "RESPONSAVEL",
+      valorAnterior: string | null,
+      valorNovo: string | null
+    ) => {
+      await conexao!.execute(
+        `INSERT INTO historico_alteracao
+           (tipo_alteracao, valor_anterior, valor_novo, id_demanda, id_usuario)
+         VALUES
+           (:tipoAlteracao, :valorAnterior, :valorNovo, :id, :idUsuario)`,
+        { tipoAlteracao, valorAnterior, valorNovo, id, idUsuario }
+      );
+    };
+
+    if (Number(atual.idPrioridade) !== idPrioridade) {
+      await registrarHistorico("PRIORIDADE", atual.prioridade, nomesPrioridades[dados.prioridade]);
+    }
+
+    if (atual.prazo !== dados.prazo) {
+      await registrarHistorico("PRAZO", atual.prazo, dados.prazo);
+    }
+
+    const idRespAtual = atual.idResponsavel === null ? null : Number(atual.idResponsavel);
+    if (idRespAtual !== idResponsavel) {
+      await registrarHistorico("RESPONSAVEL", atual.responsavel, nomeResponsavel);
+    }
+
+    // 5) Tudo ou nada
+    await conexao.commit();
+
+    response.status(200).json({
+      valido: true,
+      mensagem: "Demanda atualizada com sucesso.",
+      demanda: {
+        id,
+        titulo: dados.titulo,
+        descricao: dados.descricao,
+        projeto: dados.projeto,
+        prioridade: dados.prioridade,
+        tipo: dados.tipo,
+        prazo: dados.prazo,
+        status: atual.status,
+        idResponsavel
+      }
+    });
+
+  } catch (erro) {
+    if (conexao) {
+      try { await conexao.rollback(); } catch { /* ignora */ }
+    }
+
+    console.error("Erro ao atualizar demanda:", erro);
+    response.status(500).json({
       valido: false,
-      erro: "Demanda não encontrada."
+      mensagem: "Erro interno ao atualizar a demanda."
     });
-    return;
+
+  } finally {
+    if (conexao) {
+      await conexao.close();
+    }
   }
-
-  const corpo = request.body as {
-    autor?: unknown;
-    texto?: unknown;
-  };
-
-  const autor = texto(corpo.autor);
-  const textoComentario = texto(corpo.texto);
-
-  if (!autor || !textoComentario) {
-    response.status(400).json({
-      valido: false,
-      erro: "Os campos 'autor' e 'texto' são obrigatórios."
-    });
-    return;
-  }
-
-  const novoComentario: Comentario = {
-    id: proximoIdComentario(),
-    demandaId: id,
-    autor,
-    texto: textoComentario,
-    criadoEm: new Date().toISOString()
-  };
-
-  comentarios.push(novoComentario);
-
-  response.status(201).json({
-    valido: true,
-    mensagem: "Comentário adicionado com sucesso.",
-    comentario: novoComentario
-  });
-});
-
-app.put("/api/demandas/:id", (Request, Response) => {
-  const id = Number(Request.params.id);
-  if (isNaN(id)) {
-    return Response.status(400).json({mensagem: "O ID precisa ser um numero."})
-  }
-
-  const index = demandas.findIndex((d) => d.id === id);
-
-  if (index === -1) {
-    return Response.status(404).json({mensagem: "Demanda nao encontrada"}); 
-  }
-
-  const validacoes = validarDemanda(Request.body);
-  if(!validacoes.ok) {
-    return Response.status(400).json({validado: false, erros: validacoes.erros});
-  }  
-
-  demandas[index] = {
-    ...demandas[index],
-    ...validacoes.dados,
-  };
-
-  Response.status(200).json({
-    valido: true,
-    mensagem: "Demanda atualizada com sucesso.",
-    demanda: demandas[index],
-  });
 });
 
 //Banco 
