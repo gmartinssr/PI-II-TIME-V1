@@ -578,3 +578,27 @@ button {
         text-align: center;
     }
 }
+
+button.btn-danger-text {
+  background: red;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border: 1px solid #c9ced6;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.05);
+}

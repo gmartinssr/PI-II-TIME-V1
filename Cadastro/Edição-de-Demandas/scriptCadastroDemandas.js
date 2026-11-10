@@ -278,6 +278,55 @@ async function salvarDemanda(dados) {
     }
 }
 
+async function excluirDemanda() {
+    const confirmou = confirm(
+        "Tem certeza que deseja excluir esta demanda? Essa ação não pode ser desfeita."
+    );
+
+    if (!confirmou) return;
+
+    const usuarioSalvo = sessionStorage.getItem("usuario");
+
+    if (!usuarioSalvo) {
+        alert("Sua sessão não foi encontrada. Faça login novamente.");
+        return;
+    }
+
+    let usuario;
+
+    try {
+        usuario = JSON.parse(usuarioSalvo);
+    } catch {
+        alert("Os dados da sessão são inválidos. Faça login novamente.");
+        return;
+    }
+
+    if (!usuario?.idUsuario) {
+        alert("Não foi possível identificar o usuário logado.");
+        return;
+    }
+
+    try {
+        const resposta = await fetch(
+            `${API_BASE_URL}/${demandaId}?idUsuario=${usuario.idUsuario}`,
+            { method: "DELETE" }
+        );
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            alert(resultado.mensagem || "Não foi possível excluir a demanda.");
+            return;
+        }
+
+        alert("Demanda excluída com sucesso!");
+        window.location.href = "../../lista-demanda/tela.html";
+    } catch (erro) {
+        console.error("Erro ao excluir demanda:", erro);
+        alert("Não foi possível conectar ao servidor. Verifique se o backend está rodando.");
+    }
+}
+
 async function iniciar() {
     const form = document.querySelector("form");
     if (!form)
@@ -298,6 +347,10 @@ async function iniciar() {
         const tituloPagina = document.querySelector("h1");
         if (tituloPagina) tituloPagina.textContent = "Editar Demanda";
         
+        const botaoExcluir = obter("btn-excluir");
+        botaoExcluir.style.display = "";
+        botaoExcluir.addEventListener("click", excluirDemanda);
+
         await carregarDadosDemanda(demandaId);
     }
 
