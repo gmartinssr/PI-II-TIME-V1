@@ -773,6 +773,8 @@ app.get("/api/demandas", async (_request, response) => {
         const condicoes: string[] = [];
         const binds: Record<string, string> = {};
 
+        condicoes.push("pr.ativo = 1");  
+
         // Filtro por status
         const statusBanco: Record<string, string> = {
             aberta: "Aberta",
@@ -1346,6 +1348,20 @@ app.post("/api/demandas", async (request, response) => {
       "id_usuario",
       String(idCriador)
     );
+
+    if (idProjeto !== null) {
+    const consultaAtivo = await conexao.execute<{ ativo: number }>(
+        `SELECT ativo AS "ativo"
+         FROM projeto
+         WHERE id_projeto = :idProjeto`,
+        { idProjeto },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (Number(consultaAtivo.rows?.[0]?.ativo) !== 1) {
+        erros.projeto = "Este projeto está inativo.";
+    }
+    }
 
     if (idProjeto === null) {
       erros.projeto = "Projeto não encontrado no banco de dados.";
@@ -2228,13 +2244,14 @@ app.get("/api/projetos/listagem", async (request, response) => {
         const ehAdmin = Number(usuario.idPerfil) === 1;
 
         const filtro = ehAdmin
-            ? ""
-            : `WHERE EXISTS (
-                   SELECT 1
-                   FROM projeto_usuario pu
-                   WHERE pu.id_projeto = pr.id_projeto
-                     AND pu.id_usuario = :idUsuario
-               )`;
+             ? `WHERE pr.ativo = 1`
+             : `WHERE pr.ativo = 1
+                AND EXISTS (
+                SELECT 1
+                FROM projeto_usuario pu
+                WHERE pu.id_projeto = pr.id_projeto
+                AND pu.id_usuario = :idUsuario
+             )`;
 
         const binds: Record<string, number> = ehAdmin ? {} : { idUsuario };
 
@@ -2351,7 +2368,8 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
         const consultaProjeto = await conexao.execute<{ id: number; nome: string }>(
             `SELECT id_projeto AS "id", nome AS "nome"
              FROM projeto
-             WHERE id_projeto = :idProjeto`,
+             WHERE id_projeto = :idProjeto
+             AND ativo = 1`,
             { idProjeto },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -2419,6 +2437,121 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
         response.status(500).json({
             valido: false,
             mensagem: "Erro interno ao carregar o Kanban."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
+
+app.delete("/api/demandas/:id", async (request, response) => {
+    const idDemanda = Number(request.params.id);
+    const idUsuario = Number(request.query.idUsuario);
+
+    if (!Number.isInteger(idDemanda) || idDemanda <= 0) {
+        response.status(400).json({
+            valido: false,
+            mensagem: "ID da demanda inválido."
+        });
+        return;
+    }
+
+    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+        response.status(400).json({
+            valido: false,
+            mensagem: "Usuário inválido."
+        });
+        return;
+    }
+
+            let conexao: oracledb.Connection | undefined;
+
+            try {
+            const pool = await iniciarPool();
+            conexao = await pool.getConnection();
+
+        const consultaDemanda = await conexao.execute<{ idProjeto: number }>(
+            `SELECT id_projeto AS "idProjeto"
+             FROM demanda
+             WHERE id_demanda = :idDemanda`,
+            { idDemanda },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const demanda = consultaDemanda.rows?.[0];
+
+        if (!demanda) {
+            response.status(404).json({
+                valido: false,
+                mensagem: "Demanda não encontrada."
+            });
+            return;
+        }
+        
+                const acesso = await verificarAcessoProjeto(
+            conexao,
+            idUsuario,
+            Number(demanda.idProjeto)
+        );
+
+        if (!acesso) {
+            response.status(401).json({
+                valido: false,
+                mensagem: "Usuário não encontrado ou inativo."
+            });
+            return;
+        }
+
+        if (!acesso.permitido) {
+            response.status(403).json({
+                valido: false,
+                mensagem: "Você não faz parte do projeto desta demanda."
+            });
+            return;
+        }
+
+        if (acesso.idPerfil !== 1 && acesso.idPerfil !== 2) {
+            response.status(403).json({
+                valido: false,
+                mensagem: "Apenas Administrador ou Líder de Projeto podem excluir demandas."
+            });
+            return;
+        }
+
+               await conexao.execute(
+            `DELETE FROM comentario WHERE id_demanda = :idDemanda`,
+            { idDemanda }
+        );
+
+        await conexao.execute(
+            `DELETE FROM historico_alteracao WHERE id_demanda = :idDemanda`,
+            { idDemanda }
+        );
+
+        await conexao.execute(
+            `DELETE FROM demanda WHERE id_demanda = :idDemanda`,
+            { idDemanda }
+        );
+
+        await conexao.commit();
+
+        response.status(200).json({
+            valido: true,
+            mensagem: "Demanda excluída com sucesso."
+        });
+
+            } catch (erro) {
+        if (conexao) {
+            try { await conexao.rollback(); } catch { }
+        }
+
+        console.error("Erro ao excluir demanda:", erro);
+
+        response.status(500).json({
+            valido: false,
+            mensagem: "Erro interno ao excluir a demanda."
         });
 
     } finally {
