@@ -188,11 +188,6 @@ body {
     color: #FFFFFF;
 }
 
-/* ============================================================
-   CARDS DO KANBAN
-   ============================================================ */
-
-/* A área de cards ocupa o resto da coluna (assim dá para soltar em coluna vazia) */
 .kanban-cards {
     flex: 1;
     min-height: 80px;
@@ -225,7 +220,6 @@ body {
     transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
-/* Faixa colorida na lateral = prioridade */
 .kanban-card::before {
     content: "";
     position: absolute;
@@ -339,7 +333,6 @@ body {
     font-weight: 700;
 }
 
-
 .card-mover {
     display: flex;
     gap: 4px;
@@ -365,13 +358,11 @@ body {
     background: rgba(255, 255, 255, 0.25);
 }
 
-
 .kanban-coluna.alvo {
     background: rgba(23, 26, 33, 0.75);
     border-color: rgba(255, 255, 255, 0.55);
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
 }
-
 
 .kanban-aviso {
     position: fixed;
@@ -393,7 +384,6 @@ body {
 .kanban-aviso.erro {
     border-color: #EF4444;
 }
-
 
 @media (max-width: 900px) {
     .kanban-board {

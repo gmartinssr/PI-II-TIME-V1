@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { iniciarPool, testarPool } from "./bd.js"; 
 import oracledb from "oracledb";
+import { mensagemSeFeriado } from "./feriados.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 3333;
@@ -354,7 +355,6 @@ app.patch("/api/usuarios/:id/senha", async (request, response) => {
     }
 });
 
-
 if (serveFrontend) {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
   const frontendRoot = express.static(projectRoot);
@@ -456,7 +456,6 @@ function validarSenha(senha: string): string | undefined {
   return erros.length > 0 ? erros.join(" ") : undefined;
 }
 
-// Dashboard
 app.get("/api/dashboard", async (_request, response) => {
     let conexao: oracledb.Connection | undefined;
 
@@ -464,7 +463,6 @@ app.get("/api/dashboard", async (_request, response) => {
         const pool = await iniciarPool();
         conexao = await pool.getConnection();
 
-        // Total de demandas
         const resultadoTotal = await conexao.execute(
             `SELECT COUNT(*) AS TOTAL FROM demanda`,
             [],
@@ -475,7 +473,6 @@ app.get("/api/dashboard", async (_request, response) => {
             (resultadoTotal.rows?.[0] as { TOTAL: number })?.TOTAL ?? 0
         );
 
-        // Quantidade por status
         const resultadoStatus = await conexao.execute(
             `SELECT LOWER(s.nome) AS NOME, COUNT(*) AS QUANTIDADE
              FROM demanda d
@@ -518,7 +515,6 @@ app.get("/api/dashboard", async (_request, response) => {
             }
         }
 
-        // Quantidade por prioridade
         const resultadoPrioridades = await conexao.execute(
             `SELECT LOWER(p.nome) AS NOME, COUNT(*) AS QUANTIDADE
              FROM demanda d
@@ -557,7 +553,6 @@ app.get("/api/dashboard", async (_request, response) => {
             }
         }
 
-        // Quantidade por tipo
         const resultadoTipos = await conexao.execute(
             `SELECT LOWER(t.nome) AS NOME, COUNT(*) AS QUANTIDADE
              FROM demanda d
@@ -596,7 +591,6 @@ app.get("/api/dashboard", async (_request, response) => {
             }
         }
 
-        // Demandas críticas ainda abertas
         const resultadoCriticas = await conexao.execute(
             `SELECT
                 d.id_demanda AS "id",
@@ -618,7 +612,6 @@ app.get("/api/dashboard", async (_request, response) => {
             prazo: string | null;
         }[];
 
-        // Demandas com prazo entre hoje e os próximos 7 dias
         const resultadoPrazos = await conexao.execute(
             `SELECT
                 d.id_demanda AS "id",
@@ -638,7 +631,6 @@ app.get("/api/dashboard", async (_request, response) => {
             prazo: string | null;
         }[];
 
-        // Resposta compatível com o scriptDashboard.js
         response.status(200).json({
             total,
             status: statusBanco,
@@ -661,8 +653,6 @@ app.get("/api/dashboard", async (_request, response) => {
         }
     }
 });
-
-// Lista Demandas
 
 interface DemandaBanco {
     id: number;
@@ -698,7 +688,6 @@ app.get("/api/demandas", async (_request, response) => {
 
         condicoes.push("pr.ativo = 1");  
 
-        // Filtro por status
         const statusBanco: Record<string, string> = {
             aberta: "Aberta",
             andamento: "Em andamento",
@@ -722,7 +711,6 @@ app.get("/api/demandas", async (_request, response) => {
             binds.status = valor;
         }
 
-        // Filtro por prioridade
         const prioridadeBanco: Record<string, string> = {
             baixa: "Baixa",
             media: "Média",
@@ -745,7 +733,6 @@ app.get("/api/demandas", async (_request, response) => {
             binds.prioridade = valor;
         }
 
-        // Filtro por tipo
         const tipoBanco: Record<string, string> = {
             tarefa: "Tarefa",
             defeito: "Defeito",
@@ -768,7 +755,6 @@ app.get("/api/demandas", async (_request, response) => {
             binds.tipo = valor;
         }
 
-        // Busca por título ou descrição
         if (typeof busca === "string" && busca.trim() !== "") {
             condicoes.push(
                 "(LOWER(d.titulo) LIKE :busca OR LOWER(d.descricao) LIKE :busca)"
@@ -777,7 +763,6 @@ app.get("/api/demandas", async (_request, response) => {
             binds.busca = `%${busca.trim().toLowerCase()}%`;
         }
 
-        // Colunas permitidas para ordenação
         const colunasOrdenacao: Record<string, string> = {
             id: "d.id_demanda",
             titulo: "d.titulo",
@@ -893,8 +878,6 @@ app.get("/api/demandas", async (_request, response) => {
     }
 });
 
-// Cadastro Demandas
-
  
 type StatusDemanda = "aberta" | "andamento" | "revisao" | "concluida" | "cancelada";
 type Prioridade = "baixa" | "media" | "alta" | "critica";
@@ -947,7 +930,6 @@ const REGRAS = {
 const PRIORIDADES: Prioridade[] = ["baixa", "media", "alta", "critica"];
 const TIPOS: Tipo[] = ["tarefa", "defeito", "melhoria", "documentação"];
  
-
 
 function texto(valor: unknown): string {
   return typeof valor === "string" ? valor.trim() : "";
@@ -1193,6 +1175,12 @@ app.post("/api/demandas", async (request, response) => {
     return;
   }
 
+  const erroFeriado = await mensagemSeFeriado(resultado.dados.prazo);
+  if (erroFeriado) {
+    response.status(400).json({ valido: false, erros: { prazo: erroFeriado } });
+    return;
+  }
+
   const corpo = request.body as Record<string, unknown>;
   const idCriador = Number(corpo.idCriador);
   const dados = resultado.dados;
@@ -1372,7 +1360,6 @@ app.post("/api/demandas", async (request, response) => {
 
 const STATUS_VALIDOS: StatusDemanda[] = ["aberta", "andamento", "revisao", "concluida", "cancelada"];
  
-//Visualizar demanda
 app.get("/api/demandas/:id", async (request, response) => {
     const id = Number(request.params.id);
 
@@ -1551,8 +1538,6 @@ app.get("/api/demandas/:id/comentarios", async (request, response) => {
         }
     }
 });
-
-
 
 app.post("/api/demandas/:id/comentarios", async (request, response) => {
     const idDemanda = Number(request.params.id);
@@ -1869,6 +1854,12 @@ app.put("/api/demandas/:id", async (request, response) => {
   const validacao = validarDemanda(request.body);
   if (!validacao.ok) {
     response.status(400).json({ valido: false, erros: validacao.erros });
+    return;
+  }
+
+  const erroFeriado = await mensagemSeFeriado(validacao.dados.prazo);
+  if (erroFeriado) {
+    response.status(400).json({ valido: false, erros: { prazo: erroFeriado } });
     return;
   }
 
@@ -2446,7 +2437,6 @@ server.on("error", (error) => {
   process.exitCode = 1;
 });
 
-//Banco 
 async function iniciarServidor() {
     try {
         await iniciarPool();

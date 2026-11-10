@@ -7,7 +7,6 @@ const REGRAS = {
     anexoExtensoes: ["png", "jpg", "jpeg", "pdf", "doc", "docx", "xls", "xlsx", "csv"],
 };
 
-// Obtém o ID da demanda a partir dos parâmetros de busca da URL (ex: ?id=2)
 const urlParams = new URLSearchParams(window.location.search);
 const demandaId = urlParams.get("id");
 
@@ -49,13 +48,11 @@ function preencherFormulario(demanda) {
     obter("abertura").value = demanda.abertura || demanda.dataCriacao || hoje();
     obter("prazo").value = demanda.prazo || "";
 
-    // Seleciona a opção de rádio correspondente à prioridade
     if (demanda.prioridade) {
         const radio = document.querySelector(`input[name="prioridade"][value="${demanda.prioridade}"]`);
         if (radio) radio.checked = true;
     }
 
-    // Atualiza o contador de caracteres da descrição após preencher
     const textarea = obter("descricao");
     const contador = document.querySelector(".char-count");
     if (contador && textarea) {
@@ -172,7 +169,6 @@ const API_BASE_URL =
         ? "http://localhost:3333/api/demandas"
         : "http://localhost:3000/api/demandas";
 
-// Busca os dados da demanda quando estiver no modo de edição
 async function carregarDadosDemanda(id) {
     try {
         const resposta = await fetch(`${API_BASE_URL}/${id}`);
@@ -189,7 +185,6 @@ async function carregarDadosDemanda(id) {
 }
 
 async function salvarDemanda(dados) {
-    // Recupera o usuário que realizou o login
     const usuarioSalvo = sessionStorage.getItem("usuario");
 
     if (!usuarioSalvo) {
@@ -211,7 +206,6 @@ async function salvarDemanda(dados) {
         return;
     }
 
-    // Prepara os dados para enviar ao backend
     const { anexo, ...resto } = dados;
 
     const corpo = {
@@ -225,7 +219,6 @@ async function salvarDemanda(dados) {
             : null,
     };
 
-    // POST para cadastrar e PUT para editar
     const url = demandaId
         ? `${API_BASE_URL}/${demandaId}`
         : API_BASE_URL;
@@ -342,7 +335,6 @@ async function iniciar() {
     await carregarResponsaveis();
     await carregarProjetos();
 
-    // Se houver um ID na URL, altera o título da tela e carrega os dados
     if (demandaId) {
         const tituloPagina = document.querySelector("h1");
         if (tituloPagina) tituloPagina.textContent = "Editar Demanda";
