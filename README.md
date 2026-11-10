@@ -26,4 +26,20 @@ Os comandos devem ser executados dentro da pasta `backend`:
 - `npm run back`: inicia somente o backend na porta 3333.
 - `npm run front`: inicia somente o frontend em `http://localhost:3030`.
 - `npm start`: inicia backend e frontend juntos no mesmo servidor, em `http://localhost:3000`.
+- `npm run feriados`: atualiza os feriados nacionais salvos no projeto (veja abaixo).
+
+## Configuração
+
+Crie o arquivo `backend/.env` com as variáveis:
+
+```
+DB_USER=
+DB_PASSWORD=
+DB_CONNECT_STRING=
+FERIADO_API_KEY=
+```
+
+`FERIADO_API_KEY` é a chave da [FeriadosAPI](https://feriadosapi.com). Não envie o `.env` para o repositório.
+
+
 

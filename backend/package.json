@@ -9,6 +9,7 @@
     "front": "node scripts/frontend-server.mjs",
     "start": "node scripts/start.mjs",
     "dev": "tsx watch src/server.ts",
+    "feriados": "node scripts/atualizar-feriados.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
