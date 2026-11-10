@@ -36,11 +36,6 @@ app.use((_request, response, next) => {
     next();
 });
 
-app.options("/api/login", (_request, response) => {
-  response.sendStatus(204);
-});
-
-
 app.post("/api/login", async (request, response) => {
     const { email, senha } = request.body as {
         email?: unknown;
@@ -461,20 +456,6 @@ function validarSenha(senha: string): string | undefined {
   return erros.length > 0 ? erros.join(" ") : undefined;
 }
 
-const server = app.listen(port, () => {
-  const endereco = `http://localhost:${port}`;
-  console.log(
-    serveFrontend
-      ? `Servidor completo executando em: ${endereco}`
-      : `Servidor backend executando em: ${endereco}`,
-  );
-});
-
-server.on("error", (error) => {
-  console.error("Não foi possível iniciar o servidor backend:", error);
-  process.exitCode = 1;
-});
-
 // Dashboard
 app.get("/api/dashboard", async (_request, response) => {
     let conexao: oracledb.Connection | undefined;
@@ -680,64 +661,6 @@ app.get("/api/dashboard", async (_request, response) => {
         }
     }
 });
-
-const demandas = [
-  {
-    id: 1,
-    titulo: "Corrigir erro de Login",
-    status: "aberta",
-    prioridade: "critica",
-    tipo: "defeito",
-    prazo: "2026-10-10",
-    projeto: "Sistema de Gestão",
-    responsavel: "joaoSM",
-    dataCriacao: "2026-05-10"
-  },
-  {
-    id: 2,
-    titulo: "Criar Dashboard",
-    status: "andamento",
-    prioridade: "alta",
-    tipo: "tarefa",
-    prazo: "2026-10-08",
-    projeto: "Construção de Site",
-    responsavel: "vitorZGB",
-    dataCriacao: "2026-05-08"
-  },
-  {
-    id: 3,
-    titulo: "Documentar API",
-    status: "aberta",
-    prioridade: "media",
-    tipo: "documentação",
-    prazo: "2026-10-09",
-    projeto: "Manutenção de Sistema",
-    responsavel: "guilhermeBM",
-    dataCriacao: "2026-05-09"
-  },
-  {
-    id: 4,
-    titulo: "Ajustar formulário",
-    status: "revisao",
-    prioridade: "alta",
-    tipo: "melhoria",
-    prazo: "2026-10-11",
-    projeto: "Criação de Aplicativo",
-    responsavel: "mariaOS",
-    dataCriacao: "2026-05-10"
-  },
-  {
-    id: 5,
-    titulo: "Falha no servidor",
-    status: "aberta",
-    prioridade: "critica",
-    tipo: "defeito",
-    prazo: "2026-10-07",
-    projeto: "Portal Web",
-    responsavel: "lucasMF",
-    dataCriacao: "2026-09-07"
-  }
-];
 
 // Lista Demandas
 
@@ -1040,11 +963,6 @@ function dataValida(valor: string): boolean {
   const data = new Date(`${valor}T00:00:00Z`);
   return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor;
 }
- 
-function proximoId(): number {
-  return demandas.reduce((maior, d) => Math.max(maior, d.id), 0) + 1;
-}
-
 
 function validarDemanda(corpo: unknown): ResultadoValidacao {
   const body = (typeof corpo === "object" && corpo !== null ? corpo : {}) as Record<string, unknown>;
@@ -1157,11 +1075,6 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
     },
   };
 }
- 
-
-app.options("/api/demandas", (_request, response) => {
-  response.sendStatus(204);
-});
  
 const nomesProjetos: Record<string, string> = {
   workflow: "Sistema de Gestão"
@@ -1456,13 +1369,8 @@ app.post("/api/demandas", async (request, response) => {
     }
   }
 });
- 
 
 const STATUS_VALIDOS: StatusDemanda[] = ["aberta", "andamento", "revisao", "concluida", "cancelada"];
- 
-app.options("/api/demandas/:id/status", (_request, response) => {
-  response.sendStatus(204);
-});
  
 //Visualizar demanda
 app.get("/api/demandas/:id", async (request, response) => {
@@ -1591,43 +1499,6 @@ app.get("/api/demandas/:id", async (request, response) => {
         }
     }
 });
-
-interface Comentario {
-  id: number;
-  demandaId: number;
-  autor: string;
-  texto: string;
-  criadoEm: string;
-}
-
-const comentarios: Comentario[] = [
-  {
-    id: 1,
-    demandaId: 1,
-    autor: "joaoSM",
-    texto: "O erro acontece somente quando a senha está incorreta.",
-    criadoEm: "2026-10-08"
-  },
-  {
-    id: 2,
-    demandaId: 1,
-    autor: "guilhermeBM",
-    texto: "Vou verificar a validação do formulário.",
-    criadoEm: "2026-10-08"
-  },
-  {
-    id: 3,
-    demandaId: 2,
-    autor: "vitorZGB",
-    texto: "Dashboard em desenvolvimento.",
-    criadoEm: "2026-10-07"
-  }
-];
-
-function proximoIdComentario(): number {
-  return comentarios.reduce((maior, comentario) => Math.max(maior, comentario.id), 0) + 1;
-}
-
 
 app.get("/api/demandas/:id/comentarios", async (request, response) => {
     const idDemanda = Number(request.params.id);
@@ -2559,6 +2430,20 @@ app.delete("/api/demandas/:id", async (request, response) => {
             await conexao.close();
         }
     }
+});
+
+const server = app.listen(port, () => {
+  const endereco = `http://localhost:${port}`;
+  console.log(
+    serveFrontend
+      ? `Servidor completo executando em: ${endereco}`
+      : `Servidor backend executando em: ${endereco}`,
+  );
+});
+
+server.on("error", (error) => {
+  console.error("Não foi possível iniciar o servidor backend:", error);
+  process.exitCode = 1;
 });
 
 //Banco 
