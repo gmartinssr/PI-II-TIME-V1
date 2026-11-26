@@ -1,4 +1,6 @@
 
+/* Fundo da página: imagem fixa que cobre a tela toda.
+O background-color é um plano B caso a imagem bgColor.png não carregue. */
 body {
     background-image: url("bgColor.png");
     background-color: #ffffff;
@@ -9,6 +11,8 @@ body {
     color: rgb(75, 71, 71);
 }
 
+/* Faixa do topo com efeito de vidro fosco (fundo escuro translúcido + blur).
+   O -webkit- é pra funcionar no Safari. */
 header {
     background: rgba(23, 26, 33, 0.55);
     backdrop-filter: blur(12px);
@@ -16,12 +20,16 @@ header {
     border-bottom: 1px solid rgba(23, 26, 33, 0.3);
 }
 
+/* Nome "Workflow" em branco pra destacar em cima do vidro escuro */
 header span {
     color: #FFFFFF;
     font-weight: 600;
     letter-spacing: 0.5px;
 }
 
+/* Centraliza o card no meio da tela.
+   O calc tira um pedaço da altura pra compensar o cabeçalho,
+   senão a página ganha barra de rolagem. */
 .corpo {
     display: flex;
     justify-content: center;
@@ -29,6 +37,9 @@ header span {
     min-height: calc(90vh - 60px);
 }
 
+/* Card de login, mesmo efeito de vidro do cabeçalho.
+Largura e altura são fixas, então em tela bem pequena pode apertar.
+TODO: testar no celular e talvez trocar por max-width. */
 .card_login {
     width: 380px;
     height: 450px;
@@ -41,6 +52,7 @@ header span {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
+/* Título "Login" e a frase embaixo, os dois centralizados */
 .login_header h2 {
     text-align: center;
     margin-bottom: 10px;
@@ -55,6 +67,7 @@ header span {
     font-size: 15px;
 }
 
+/* Cada campo (label em cima, input embaixo) com espaço entre eles */
 .Email,
 .Senha {
     display: flex;
@@ -62,11 +75,14 @@ header span {
     margin-bottom: 20px;
 }
 
+/* Placeholder em branco, senão o Bootstrap deixa cinza e some no fundo escuro */
 .Email input::placeholder,
 .Senha input::placeholder {
     color: #FFFFFF;
 }
 
+/* Sobrescreve o visual padrão do form-control do Bootstrap
+   pra combinar com o card translúcido */
 .Email label,
 .Senha label {
     color: rgba(255, 255, 255, 0.85);
@@ -82,6 +98,8 @@ header span {
     border-radius: 8px;
 }
 
+/* Botão Entrar. O text-decoration e o text-align sobraram de quando
+   ele provavelmente era um link (<a>); num <button> não fazem diferença. */
 .btn-entrar {
     display: block;
     width: 100%;
@@ -105,6 +123,7 @@ header span {
     transition: 0.2s;
 }
 
+/* Ao passar o mouse: fica um pouco mais claro e cresce 2% */
 .btn-entrar:hover {
     background: rgba(255, 255, 255, 0.25);
     color: #FFFFFF;
@@ -112,6 +131,10 @@ header span {
     transform: scale(1.02);
 }
 
+/* Confirmar se o JS usa mesmo "campo-erro" e "mensagem-erro".
+   No formulário de demandas o JS usa "has-error" e "error-message",
+   e lá os nomes não batiam com o CSS. Se for o mesmo caso aqui,
+   o erro vai aparecer sem estilo. */
 .campo-erro {
     border-color: #B3432B !important;
 }
