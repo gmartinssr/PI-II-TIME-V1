@@ -16,9 +16,6 @@ body {
     width: 100%;
 }
 
-
-
-
 .sidebar {
     width: 220px;
     min-height: 100vh;
@@ -70,9 +67,6 @@ body {
     background-color: rgba(10, 65, 115, 0.85);
 }
 
-
-
-
 main {
     flex: 1;
     min-width: 0;
@@ -92,18 +86,12 @@ main {
     font-weight: 600;
 }
 
-
-
-
 .conteudo {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     align-items: stretch;
 }
-
-
-
 
 .card {
     background: linear-gradient(
@@ -145,9 +133,6 @@ main {
     border-bottom: 1px solid #E2E8F0;
 }
 
-
-
-
 #nome,
 #email,
 #usuario,
@@ -172,9 +157,6 @@ main {
     color: #174E87;
 }
 
-
-
-
 .botao-senha,
 .botao-usuarios {
     display: inline-block;
@@ -198,7 +180,6 @@ main {
     align-items: center;
     gap: 12px;
 }
-
 
 .botao-senha {
     background: linear-gradient(
@@ -320,9 +301,6 @@ main {
     background-color: #123E6B;
 }
 
-
-
-
 .botao-usuarios {
     background: linear-gradient(
         135deg,
@@ -341,9 +319,6 @@ main {
     transform: translateY(-3px);
 }
 
-
-
-
 @media (max-width: 1000px) {
 
     .sidebar {
@@ -355,7 +330,6 @@ main {
     }
 
 }
-
 
 @media (max-width: 768px) {
 
@@ -403,7 +377,6 @@ main {
         grid-template-columns: 1fr;
     }
 }
-
 
 @media (max-width: 480px) {
 

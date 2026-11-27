@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const pastaTelas = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const port = Number(process.env.FRONT_PORT) || 3030;
 
 const contentTypes = {
@@ -16,11 +16,12 @@ const contentTypes = {
   ".png": "image/png",
 };
 
-function getFilePath(requestUrl) {
+// Converte a URL em um arquivo do projeto. Retorna null se tentar sair da pasta.
+function acharArquivo(requestUrl) {
   const pathname = decodeURIComponent(new URL(requestUrl, "http://localhost").pathname);
-  const requestedPath = pathname === "/" ? "Login/indexLogin.html" : pathname.slice(1);
-  const filePath = path.resolve(frontendRoot, requestedPath);
-  const relativePath = path.relative(frontendRoot, filePath);
+  const caminhoPedido = pathname === "/" ? "Login/indexLogin.html" : pathname.slice(1);
+  const filePath = path.resolve(pastaTelas, caminhoPedido);
+  const relativePath = path.relative(pastaTelas, filePath);
 
   if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
     return null;
@@ -29,6 +30,7 @@ function getFilePath(requestUrl) {
   return filePath;
 }
 
+// Servidor simples que só entrega os arquivos das telas (porta 3030).
 const server = http.createServer(async (request, response) => {
   if (request.method !== "GET" && request.method !== "HEAD") {
     response.writeHead(405, { Allow: "GET, HEAD" });
@@ -36,7 +38,7 @@ const server = http.createServer(async (request, response) => {
     return;
   }
 
-  const filePath = getFilePath(request.url || "/");
+  const filePath = acharArquivo(request.url || "/");
   if (!filePath) {
     response.writeHead(403);
     response.end("Acesso negado");

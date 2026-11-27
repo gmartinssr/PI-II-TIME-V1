@@ -21,6 +21,7 @@ const barraDocumentacao = document.getElementById("barra-documentacao");
 const criticasAbertas = document.getElementById("criticas-abertas");
 const proximasDoPrazo = document.getElementById("proximas-ao-prazo");
 
+// Porcentagem usada na largura das barras.
 function calcularPorcentagem(valor, total) {
     if (total === 0) {
         return 0;
@@ -29,13 +30,13 @@ function calcularPorcentagem(valor, total) {
     return (valor / total) * 100;
 }
 
+// GET /api/dashboard: preenche os totais, as barras e as listas de alerta.
 fetch("http://localhost:3000/api/dashboard")
     .then(response => response.json())
     .then(dados => {
         console.log("Dados recebidos do backend:", dados);
 
         total.textContent = dados.total;
-        
 
         abertas.textContent = dados.status.abertas;
         andamento.textContent = dados.status.andamento;
@@ -93,12 +94,12 @@ fetch("http://localhost:3000/api/dashboard")
         dados.proximasDoPrazo.forEach(demanda => {
             const data = new Date(demanda.prazo);
 
-            const dataFormatada = data.toLocaleDateString("pt-BR");
+            const prazo = data.toLocaleDateString("pt-BR");
 
             proximasDoPrazo.innerHTML += `
                 <div class="demanda-alerta">
                     <p>#${String(demanda.id).padStart(3, "0")} - ${demanda.titulo}</p>
-                    <p>${dataFormatada}</p>
+                    <p>${prazo}</p>
                 </div>
             `;
         });

@@ -1,12 +1,10 @@
-import "dotenv/config";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+const URL_BASE = "https://brasilapi.com.br/api/feriados/v1";
+// A BrasilAPI também lista datas que não são feriados nacionais.
+const DATAS_IGNORADAS = ["Carnaval", "Páscoa", "Corpus Christi"];
+const feriadosPorAno = new Map<number, Set<string>>();
 
-const URL_BASE = "https://feriadosapi.com/api/v1/feriados/nacionais";
-const ARQUIVO = fileURLToPath(new URL("./dados/feriados.json", import.meta.url));
-const cachePorAno = new Map<number, Set<string>>();
-
-function normalizarData(valor: unknown): string | null {
+// Converte AAAA-MM-DD ou DD/MM/AAAA para AAAA-MM-DD.
+function paraDataIso(valor: unknown): string | null {
     if (typeof valor !== "string") return null;
     const iso = valor.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
@@ -15,58 +13,50 @@ function normalizarData(valor: unknown): string | null {
     return null;
 }
 
-function extrairData(item: unknown): string | null {
-    if (typeof item === "string") return normalizarData(item);
+// Pega a data de um item da lista, seja texto ou objeto.
+function dataDoItem(item: unknown): string | null {
+    if (typeof item === "string") return paraDataIso(item);
     if (typeof item === "object" && item !== null) {
         const registro = item as Record<string, unknown>;
-        return normalizarData(registro.data ?? registro.date);
+        return paraDataIso(registro.data ?? registro.date);
     }
     return null;
 }
 
-function listaParaSet(lista: unknown): Set<string> {
+// Monta o conjunto de datas a partir da lista recebida.
+function juntarDatas(lista: unknown): Set<string> {
     const datas = new Set<string>();
     for (const item of Array.isArray(lista) ? lista : []) {
-        const data = extrairData(item);
+        const data = dataDoItem(item);
         if (data) datas.add(data);
     }
     return datas;
 }
 
-function lerArquivo(ano: number): Set<string> | null {
-    try {
-        const salvo = JSON.parse(readFileSync(ARQUIVO, "utf8")) as Record<string, unknown>;
-        const datas = listaParaSet(salvo[String(ano)]);
-        return datas.size > 0 ? datas : null;
-    } catch {
-        return null;
-    }
-}
-
+// Chamada à BrasilAPI: GET /api/feriados/v1/{ano}.
 async function buscarNaApi(ano: number): Promise<Set<string>> {
-    const chave = process.env.FERIADO_API_KEY;
-    if (!chave) throw new Error("FERIADO_API_KEY não configurada.");
-
-    const resposta = await fetch(`${URL_BASE}?ano=${ano}`, {
-        headers: { Authorization: `Bearer ${chave}` },
+    const resposta = await fetch(`${URL_BASE}/${ano}`, {
         signal: AbortSignal.timeout(5000)
     });
-    if (!resposta.ok) throw new Error(`FeriadosAPI respondeu ${resposta.status}.`);
+    if (!resposta.ok) throw new Error(`BrasilAPI respondeu ${resposta.status}.`);
 
-    const json = (await resposta.json()) as { feriados?: unknown; data?: unknown };
-    return listaParaSet(json.feriados ?? json.data);
+    const lista = (await resposta.json()) as { date: string; name: string }[];
+    return juntarDatas(lista.filter((f) => !DATAS_IGNORADAS.includes(f.name)));
 }
 
+// Consulta cada ano uma vez e guarda na memória enquanto o servidor roda.
 async function buscarFeriados(ano: number): Promise<Set<string>> {
-    const emCache = cachePorAno.get(ano);
+    const emCache = feriadosPorAno.get(ano);
     if (emCache) return emCache;
 
-    const datas = lerArquivo(ano) ?? (await buscarNaApi(ano));
-    cachePorAno.set(ano, datas);
+    const datas = await buscarNaApi(ano);
+    feriadosPorAno.set(ano, datas);
     return datas;
 }
 
-export async function mensagemSeFeriado(data: string): Promise<string | null> {
+// Retorna a mensagem de erro se a data for feriado.
+// Se a API falhar, a data é aceita e o erro vai para o terminal.
+export async function validarFeriado(data: string): Promise<string | null> {
     try {
         const feriados = await buscarFeriados(Number(data.slice(0, 4)));
         return feriados.has(data) ? "O prazo não pode cair em um feriado nacional." : null;

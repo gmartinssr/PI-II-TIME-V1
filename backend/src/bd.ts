@@ -3,6 +3,7 @@ import oracledb from "oracledb";
 
 let pool: oracledb.Pool | undefined;
 
+// Cria o pool de conexões do Oracle uma única vez e o reaproveita.
 export async function iniciarPool() {
     if (pool) {
         return pool;
@@ -23,6 +24,7 @@ export async function iniciarPool() {
     return pool;
 }
 
+// Faz uma consulta simples para confirmar que o banco responde.
 export async function testarPool() {
     if (!pool) {
         throw new Error("O pool ainda não foi iniciado.");

@@ -80,8 +80,6 @@ main {
     margin-bottom: 10px;
 }
 
-
-
 .topo h1 {
     color: #174E87;
     font-size: 32px;
@@ -284,7 +282,6 @@ main {
     border-bottom: 1px solid #E2E8F0;
 }
 
-
 .prioridade,
 .tipo {
     margin-bottom: 18px;
@@ -431,7 +428,6 @@ main {
     font-weight: 600;
 }
 
-
 .alertas .col-md-6:first-child .demanda-alerta p:last-child {
     color: #EF4444;
     font-size: 12px;
@@ -441,7 +437,6 @@ main {
     padding: 5px 10px;
     border-radius: 20px;
 }
-
 
 .alertas .col-md-6:last-child .demanda-alerta p:last-child {
     color: #174E87;
@@ -454,9 +449,6 @@ main {
     padding: 5px 10px;
     border-radius: 20px;
 }
-
-
-
 
 @media (max-width: 1000px) {
 

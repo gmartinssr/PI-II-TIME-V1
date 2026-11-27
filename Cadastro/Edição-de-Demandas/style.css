@@ -1,14 +1,9 @@
-/* Remove as margens e os espaçamentos que o navegador coloca automaticamente.
-   Também ajusta o tamanho dos elementos para que o padding e as bordas
-   sejam considerados dentro da largura e altura definidas. */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Cores principais do projeto. Nem tudo no CSS usa essas variáveis ainda,
-   tem muita cor escrita direto em hex. */
 :root {
     --bg: #E7E8ED;
     --panel: #FFFFFF;
@@ -31,9 +26,6 @@ body {
     line-height: 1.5;
 }
 
-/* Organiza o conteúdo principal no centro da página.
-   Limita a largura a 1100px para evitar que o formulário fique muito
-   espalhado em telas maiores. */
 .page {
     width: 100%;
     max-width: 1100px;
@@ -41,10 +33,6 @@ body {
     padding: 30px 35px 60px;
 }
 
-/* Estilização do cabeçalho da página.
-   O degradê azul fica sobre a imagem de fundo para manter o texto
-   branco fácil de ler. Caso a imagem não carregue, o degradê
-   continua aparecendo normalmente. */
 .app-header {
     display: flex;
     align-items: center;
@@ -94,8 +82,6 @@ body {
     font-size: 16px;
 }
 
-/* Identificação da página, exibida no canto direito do cabeçalho.
-   Utiliza um fundo translúcido para combinar com o restante do visual. */
 .record-id {
     padding: 9px 16px;
 
@@ -110,8 +96,6 @@ body {
     backdrop-filter: blur(8px);
 }
 
-/* Ajusta o tamanho do cabeçalho e das fontes para deixar a página
-   mais confortável de usar em celulares. */
 @media (max-width: 640px) {
     .app-header {
         min-height: 120px;
@@ -128,9 +112,6 @@ body {
     }
 }
 
-/* ATENÇÃO: .record-id já foi definida lá em cima, com fundo translúcido.
-   Como esta vem depois, ela vence e o efeito translúcido não aparece.
-   O ideal é manter só uma. */
 .record-id {
     font-size: 13px;
     color: #174E87;
@@ -144,8 +125,6 @@ form {
     position: relative;
 }
 
-/* Organiza o formulário em duas colunas:
-   uma para a numeração das etapas e outra para o conteúdo de cada seção. */
 .flow {
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
@@ -161,8 +140,6 @@ form {
     min-width: 0;
 }
 
-/* Área responsável por mostrar o número de cada etapa
-   e a linha vertical que conecta uma seção à outra. */
 .flow-spine {
     grid-column: 1;
     display: flex;
@@ -187,16 +164,12 @@ form {
     transition: 0.2s ease;
 }
 
-/* Só a seção 1 tem a classe "active" (fixa no HTML), ela não muda
-   conforme o usuário avança no formulário. */
 .section.active .spine-node {
     background: #DBEAFE;
     border-color: #174E87;
     color: #174E87;
 }
 
-/* Faz a linha vertical ocupar o espaço disponível,
-   conectando visualmente as etapas do formulário. */
 .spine-line {
     width: 2px;
     flex: 1;
@@ -204,9 +177,6 @@ form {
     background: #CBD5E1;
 }
 
-/* Na prática essa regra não pega nada: o último div dentro de .flow é o
-   .actions, não a seção 4. A linha some na etapa 4 porque o HTML dela
-   simplesmente não tem .spine-line. */
 .section:last-of-type .spine-line {
     display: none;
 }
@@ -233,8 +203,6 @@ form {
     font-size: 13px;
 }
 
-/* Cria o cartão branco que agrupa os campos de cada etapa,
-   deixando o formulário mais organizado e fácil de visualizar. */
 .panel {
     width: 100%;
     background: linear-gradient(
@@ -251,16 +219,12 @@ form {
     transition: 0.25s ease;
 }
 
-/* Adiciona um pequeno efeito visual quando o usuário passa
-   o mouse sobre o cartão. */
 .panel:hover {
     box-shadow:
         0 14px 35px rgba(15, 23, 42, 0.12),
         0 3px 8px rgba(15, 23, 42, 0.05);
 }
 
-/* Organiza os campos em duas colunas, deixando um ao lado do outro.
-   Em telas menores, os campos passam a aparecer um abaixo do outro. */
 .field-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -275,14 +239,10 @@ form {
     min-width: 0;
 }
 
-/* Remove o espaço extra depois do último campo,
-   evitando que fique uma distância desnecessária no final do cartão. */
 .field:last-child {
     margin-bottom: 0;
 }
 
-/* Faz o campo ocupar toda a largura disponível,
-   em vez de dividir espaço com outro campo. */
 .field.full {
     grid-column: 1 / -1;
 }
@@ -293,15 +253,11 @@ form {
     font-weight: 600;
 }
 
-/* Estilo utilizado para pequenas informações ou orientações abaixo dos campos.
-   Ainda não está sendo utilizado no formulário. */
 .field .hint {
     color: #64748B;
     font-size: 12px;
 }
 
-/* Define o mesmo visual para os campos de texto, data, seleção
-   e descrição, mantendo um padrão em todo o formulário. */
 input[type="text"],
 input[type="date"],
 select,
@@ -323,9 +279,6 @@ textarea {
     resize: vertical;
 }
 
-/* Adiciona um efeito visual quando o usuário passa o mouse sobre os campos.
-   Ao selecionar um campo, aparece um contorno azul claro para indicar
-   onde o usuário está digitando, facilitando também a navegação pelo teclado. */
 input:hover,
 select:hover,
 textarea:hover {
@@ -344,8 +297,6 @@ select {
     cursor: pointer;
 }
 
-/* Mostra a quantidade de caracteres digitados na descrição,
-   ajudando o usuário a acompanhar o limite permitido. */
 .char-count {
     color: #64748B;
     font-size: 11px;
@@ -358,10 +309,6 @@ select {
     gap: 10px;
 }
 
-/* Esconde os campos radio originais, mas mantém seu funcionamento.
-   Assim, o usuário continua podendo selecionar as opções normalmente,
-   inclusive utilizando o teclado ou leitores de tela.
-   Os botões visíveis são os labels com a classe .pill. */
 .pill-group input {
     position: absolute;
     opacity: 0;
@@ -382,15 +329,11 @@ select {
     transition: 0.2s ease;
 }
 
-/* Adiciona um efeito visual quando o usuário passa o mouse
-   sobre uma das opções de prioridade. */
 .pill:hover {
     background: #EFF6FF;
     border-color: #93C5FD;
 }
 
-/* Define a aparência da pequena bolinha que aparece ao lado
-   do texto de cada opção, utilizando a mesma cor do texto. */
 .pill .dot {
     width: 8px;
     height: 8px;
@@ -398,8 +341,6 @@ select {
     background: currentColor;
 }
 
-/* Define uma cor diferente para cada nível de prioridade
-   enquanto a opção ainda não foi selecionada. */
 .pill[data-level="baixa"] {
     color: #22C55E;
 }
@@ -416,9 +357,6 @@ select {
     color: #EF4444;
 }
 
-/* Altera o fundo da opção para destacar a prioridade selecionada.
-   Essa configuração depende da ordem dos elementos no HTML:
-   o label precisa estar logo depois do input para que o seletor "+" funcione. */
 input:checked + .pill[data-level="baixa"] {
     background: #DCFCE7;
     border-color: #86EFAC;
@@ -443,8 +381,6 @@ input:checked + .pill[data-level="critica"] {
     color: #B91C1C;
 }
 
-/* Área que mostra o status atual da demanda.
-   Serve apenas para informar o usuário, sem permitir alterações por aqui. */
 .status-row {
     display: flex;
     align-items: center;
@@ -464,8 +400,6 @@ input:checked + .pill[data-level="critica"] {
     font-weight: 600;
 }
 
-/* Área destinada ao envio de arquivos anexados à demanda.
-   Permite selecionar um arquivo ou arrastá-lo até essa região. */
 .dropzone {
     padding: 25px;
     text-align: center;
@@ -477,8 +411,6 @@ input:checked + .pill[data-level="critica"] {
     transition: 0.2s ease;
 }
 
-/* Adiciona um efeito visual quando o usuário passa o mouse
-   sobre a área de anexos. */
 .dropzone:hover {
     background: #EFF6FF;
     border-color: #174E87;
@@ -490,18 +422,12 @@ input:checked + .pill[data-level="critica"] {
     cursor: pointer;
 }
 
-/* Personaliza a aparência do campo de seleção de arquivos. */
 .dropzone input[type="file"] {
     display: block;
     margin: 12px auto 0;
     max-width: 100%;
 }
 
-/* ATENÇÃO: O JavaScript utiliza as classes "has-error" e "error-message"
-   para indicar os campos com problemas, mas aqui o CSS está utilizando
-   "campo-erro" e "mensagem-erro".
-   Como os nomes são diferentes, a formatação dos erros não será aplicada.
-   É necessário deixar os nomes iguais nos dois arquivos. */
 .campo-erro {
     border-color: #EF4444 !important;
 }
@@ -511,13 +437,7 @@ input:checked + .pill[data-level="critica"] {
     font-size: 12px;
     margin-top: 4px;
 }
-/* TODO: Criar um estilo para a classe "dragover".
-   Ela é adicionada pelo JavaScript quando o usuário arrasta um arquivo
-   até a área de anexos. Assim, será possível destacar visualmente
-   a área enquanto o arquivo estiver sendo arrastado. */
 
-/* Organiza os botões que ficam no final do formulário,
-   mantendo as ações alinhadas e bem distribuídas. */
 .actions {
     grid-column: 2;
     display: flex;
@@ -533,7 +453,6 @@ input:checked + .pill[data-level="critica"] {
     gap: 10px;
 }
 
-/* Define o estilo padrão dos botões utilizados na página. */
 button {
     padding: 11px 20px;
     font-family: var(--font-body);
@@ -544,7 +463,6 @@ button {
     transition: 0.2s ease;
 }
 
-/* Botão principal utilizado para salvar a demanda. */
 .btn-primary {
     background: #174E87;
     color: #FFFFFF;
@@ -552,18 +470,12 @@ button {
     box-shadow: 0 4px 10px rgba(23, 78, 135, 0.15);
 }
 
-/* Adiciona um efeito visual quando o usuário passa o mouse
-   sobre o botão de salvar. */
 .btn-primary:hover {
     background: #123E6B;
     border-color: #123E6B;
     transform: translateY(-1px);
 }
 
-/* Estilização do botão "Voltar".
-   Como ele é um link (<a>) e não um botão (<button>),
-   precisa de algumas propriedades extras para ter a mesma aparência
-   dos demais botões. */
 .btn-secondary {
     display: inline-block;
     padding: 10px 18px;
@@ -581,9 +493,6 @@ button {
     border-color: #174E87;
 }
 
-/* Botão utilizado para excluir uma demanda.
-   Possui destaque em vermelho e só aparece quando o usuário
-   está editando uma demanda já cadastrada. */
 .btn-danger-text {
     display: inline-block;
     padding: 11px 18px;
@@ -604,8 +513,6 @@ button {
     border-color: #B91C1C;
 }
 
-/* Ajusta o espaçamento e a disposição dos elementos
-   para telas de tablets. */
 @media (max-width: 768px) {
     .page {
         padding: 25px 20px 45px;
@@ -622,10 +529,6 @@ button {
     }
 }
 
-/* Ajustes para celulares:
-   Os campos passam a ocupar toda a largura disponível,
-   os botões ficam um abaixo do outro e ocupam a largura da tela.
-   A ordem também é invertida para deixar o botão "Salvar" acima do "Voltar". */
 @media (max-width: 640px) {
     .page {
         padding: 20px 15px 40px;
@@ -675,15 +578,6 @@ button {
     }
 }
 
-
-/* ATENÇÃO: Os estilos abaixo já foram definidos anteriormente no CSS.
-   Como aparecem novamente aqui, acabam substituindo as configurações anteriores.
-
-    - O botão de excluir passa a utilizar o vermelho padrão ("red")
-     no lugar da cor definida anteriormente (#EF4444).
-    - O botão "Voltar" muda de borda, fundo e cantos arredondados.
-
-   O ideal é juntar tudo com as definições originais e apagar as repetidas. */
 button.btn-danger-text {
   background: red;
   border: none;

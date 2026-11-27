@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,54 +6,41 @@
 
     <title>Login</title>
 
-    <!-- Bootstrap só via CDN. Aqui ele ajuda no cabeçalho (d-flex, py-4...)
-     e nos inputs (form-control). O resto do visual está no styleLogin.css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="styleLogin.css" rel="stylesheet">
 </head>
 
 <body>
   
-    <!-- Topo com o nome do sistema. O link leva pra própria tela de login,
-    então na prática só recarrega a página. -->
     <header class="d-flex flex-wrap justify-content-center py-4 mb-4">
         <a href="indexLogin.html" class="d-flex align-items-center mb-3 mb-md-0 text-decoration-none">
             <span class="fs-2">Workflow</span>
         </a>
     </header>
 
-    <!-- Caixa central da tela. O posicionamento fica no styleLogin.css -->
     <div class = "corpo"> 
         <div class = "card_login">
             
-            <!-- Título e frase de apoio -->
             <div class = "login_header">
                 <h2>Login</h2>
                 <p>Entre na sua conta para continuar</p>
             </div>
 
-            <!-- novalidate: o navegador não valida o email/senha sozinho,
-            quem faz isso é o scriptLogin.js no envio do formulário -->
             <form class="login_form" id="formLogin" novalidate>
                 <div class = "Email">
                     <label>Email</label>
-                    <!-- O id "email" é o que o JS usa pra ler o valor -->
                     <input type="email" id="email" class="form-control" placeholder="Digite seu Email...">
                 </div>
                 <div class = "Senha">
                     <label>Senha</label>
-                    <!-- type="password" esconde o que a pessoa digita -->
                     <input type="password" id = "senha" class = "form-control" placeholder="Digite Sua Senha...">
                 </div>
-                <!-- Botão de enviar. Como está dentro do form com type="submit",
-                o clique (ou o Enter) dispara o evento submit tratado no JS -->
                 <button type="submit" class="btn-entrar">Entrar</button>
             </form>
 
         </div>
     </div>
 
-    <!-- Script no final pra o HTML já estar carregado quando ele rodar -->
     <script src="scriptLogin.js"></script>
 </body>
 </html>

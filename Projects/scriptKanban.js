@@ -31,6 +31,7 @@ let idArrastado = null;
 const seletorProjeto = document.querySelector(".seletor-projeto");
 const colunas = document.querySelectorAll(".kanban-coluna");
 
+// Lê o usuário logado salvo na sessão.
 function obterUsuario() {
   try {
     const salvo = sessionStorage.getItem("usuario");
@@ -43,25 +44,30 @@ function obterUsuario() {
 
 const usuarioLogado = obterUsuario();
 
+// Limpa a sessão e volta para o login.
 function irParaLogin() {
   sessionStorage.removeItem("usuario");
   window.location.href = PAGINA_LOGIN;
 }
 
+// Data de hoje no formato AAAA-MM-DD.
 function hoje() {
   return new Date().toLocaleDateString("sv-SE");
 }
 
+// Converte AAAA-MM-DD para DD/MM/AAAA.
 function formatarData(data) {
   if (!data) return "Sem prazo";
   const [ano, mes, dia] = data.split("-");
   return `${dia}/${mes}/${ano}`;
 }
 
+// Coloca a primeira letra em maiúscula.
 function primeiraMaiuscula(texto) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
+// Mostra um aviso que some depois de 5 segundos.
 function mostrarAviso(mensagem, erro = false) {
   const aviso = document.createElement("div");
   aviso.className = erro ? "kanban-aviso erro" : "kanban-aviso";
@@ -71,6 +77,7 @@ function mostrarAviso(mensagem, erro = false) {
   setTimeout(() => aviso.remove(), 5000);
 }
 
+// Cria um elemento com classe e texto.
 function criar(tag, classe, texto) {
   const el = document.createElement(tag);
   if (classe) el.className = classe;
@@ -78,6 +85,7 @@ function criar(tag, classe, texto) {
   return el;
 }
 
+// GET /api/projetos/:id/kanban: demandas do projeto.
 async function carregarKanban() {
   let resposta;
 
@@ -124,6 +132,7 @@ async function carregarKanban() {
   demandas = resultado.demandas;
 }
 
+// GET /api/projetos/listagem: preenche a troca de projeto.
 async function carregarSeletor() {
   try {
     const resposta = await fetch(
@@ -144,6 +153,7 @@ async function carregarSeletor() {
   }
 }
 
+// PATCH /api/demandas/:id/status: grava a mudança de coluna.
 async function salvarStatus(id, status) {
   let resposta;
 
@@ -163,6 +173,7 @@ async function salvarStatus(id, status) {
   }
 }
 
+// Monta o card de uma demanda.
 function criarCard(demanda) {
   const card = criar("article", "kanban-card");
   card.dataset.id = demanda.id;
@@ -213,6 +224,7 @@ function criarCard(demanda) {
   return card;
 }
 
+// Botão que leva o card para a coluna vizinha.
 function criarBotaoMover(demanda, novaPosicao, simbolo) {
   const botao = criar("button", "", simbolo);
   botao.type = "button";
@@ -229,6 +241,7 @@ function criarBotaoMover(demanda, novaPosicao, simbolo) {
   return botao;
 }
 
+// Distribui os cards nas colunas e atualiza os contadores.
 function render() {
   colunas.forEach((coluna) => {
     const status = coluna.dataset.status;
@@ -242,12 +255,13 @@ function render() {
   });
 }
 
+// Move o card na tela e salva. Se der erro, devolve para a coluna anterior.
 async function moverDemanda(id, novoStatus, idAntes = null) {
   const demanda = demandas.find((d) => d.id === id);
   if (!demanda) return;
 
   const mudouDeColuna = demanda.status !== novoStatus;
-  const backup = { lista: [...demandas], status: demanda.status };
+  const anterior = { lista: [...demandas], status: demanda.status };
 
   demandas = demandas.filter((d) => d.id !== id);
   demanda.status = novoStatus;
@@ -267,13 +281,14 @@ async function moverDemanda(id, novoStatus, idAntes = null) {
     await salvarStatus(id, novoStatus);
   } catch (erro) {
     console.error("Erro ao salvar o status:", erro);
-    demandas = backup.lista;
-    demanda.status = backup.status;
+    demandas = anterior.lista;
+    demanda.status = anterior.status;
     render();
     mostrarAviso(`${erro.message} O card voltou para a coluna anterior.`, true);
   }
 }
 
+// Acha o card que fica logo abaixo do ponto onde o mouse soltou.
 function cardSeguinte(area, mouseY) {
   const cards = [...area.querySelectorAll(".kanban-card:not(.arrastando)")];
 
@@ -285,12 +300,14 @@ function cardSeguinte(area, mouseY) {
   );
 }
 
+// Limpa o destaque usado durante o arrasto.
 function finalizarArrasto() {
   idArrastado = null;
   document.querySelectorAll(".arrastando").forEach((el) => el.classList.remove("arrastando"));
   colunas.forEach((coluna) => coluna.classList.remove("alvo"));
 }
 
+// Liga o arrastar e soltar nas colunas.
 function configurarColunas() {
   colunas.forEach((coluna) => {
     const status = coluna.dataset.status;
@@ -323,6 +340,7 @@ function configurarColunas() {
   });
 }
 
+// Confere a sessão e o projeto da URL e monta o quadro.
 async function iniciar() {
   if (!usuarioLogado) {
     irParaLogin();
