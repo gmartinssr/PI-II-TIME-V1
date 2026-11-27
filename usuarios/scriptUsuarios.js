@@ -16,6 +16,7 @@ const apiUrl = window.location.port === "3030"
 
 let idPerfilLogado = null;
 
+// Abre e fecha o formulário de troca de senha.
 botaoSenha.addEventListener("click", function() {
 
     if (formularioSenha.style.display === "none") {
@@ -26,6 +27,7 @@ botaoSenha.addEventListener("click", function() {
 
 });
 
+// Apaga os erros do formulário.
 function limparMensagens() {
     [senhaAtual, novaSenha, confirmarSenha].forEach((campo) => {
         campo.classList.remove("campo-invalido");
@@ -38,24 +40,27 @@ function limparMensagens() {
     mensagemFormulario.className = "mensagem-formulario";
 }
 
+// Mostra o erro no campo indicado.
 function mostrarErro(campo, mensagem) {
     campo.classList.add("campo-invalido");
     document.getElementById(`mensagem${campo.id[0].toUpperCase()}${campo.id.slice(1)}`).textContent = mensagem;
 }
 
-function mostrarMensagemFormulario(mensagem, tipo) {
+// Mensagem geral do formulário, de sucesso ou erro.
+function avisarFormulario(mensagem, tipo) {
     mensagemFormulario.textContent = mensagem;
     mensagemFormulario.className = `mensagem-formulario ${tipo}`;
 }
 
+// PATCH /api/usuarios/:id/senha: troca a senha do usuário logado.
 formularioSenha.addEventListener("submit", async function(event) {
     event.preventDefault();
     limparMensagens();
 
-    const usuarioSalvo = sessionStorage.getItem("usuario");
+    const sessao = sessionStorage.getItem("usuario");
 
-    if (!usuarioSalvo) {
-        mostrarMensagemFormulario("Sua sessão não foi encontrada. Faça login novamente.", "erro");
+    if (!sessao) {
+        avisarFormulario("Sua sessão não foi encontrada. Faça login novamente.", "erro");
         window.location.href = "../Login/indexLogin.html";
         return;
     }
@@ -63,10 +68,10 @@ formularioSenha.addEventListener("submit", async function(event) {
     let usuarioLogado;
 
     try {
-        usuarioLogado = JSON.parse(usuarioSalvo);
+        usuarioLogado = JSON.parse(sessao);
     } catch (erro) {
         console.error("Os dados da sessão são inválidos:", erro);
-        mostrarMensagemFormulario("Sua sessão é inválida. Faça login novamente.", "erro");
+        avisarFormulario("Sua sessão é inválida. Faça login novamente.", "erro");
         return;
     }
 
@@ -93,19 +98,20 @@ formularioSenha.addEventListener("submit", async function(event) {
             } else if (resultado.mensagem?.includes("senha")) {
                 mostrarErro(novaSenha, resultado.mensagem);
             } else {
-                mostrarMensagemFormulario(resultado.mensagem || "Não foi possível alterar a senha.", "erro");
+                avisarFormulario(resultado.mensagem || "Não foi possível alterar a senha.", "erro");
             }
             return;
         }
 
         formularioSenha.reset();
-        mostrarMensagemFormulario("Senha alterada com sucesso.", "sucesso");
+        avisarFormulario("Senha alterada com sucesso.", "sucesso");
     } catch (erro) {
         console.error("Não foi possível alterar a senha:", erro);
-        mostrarMensagemFormulario("Não foi possível conectar ao servidor.", "erro");
+        avisarFormulario("Não foi possível conectar ao servidor.", "erro");
     }
 });
 
+// Só o administrador pode abrir a lista de usuários.
 linkUsuarios.addEventListener("click", function(evento) {
     if (idPerfilLogado === 1) {
         avisoUsuarios.textContent = "";
@@ -115,16 +121,17 @@ linkUsuarios.addEventListener("click", function(evento) {
     }
 });
 
+// GET /api/usuarios/:id: preenche os dados do perfil.
 async function carregarPerfil() {
-    const usuarioSalvo = sessionStorage.getItem("usuario");
+    const sessao = sessionStorage.getItem("usuario");
 
-    if (!usuarioSalvo) {
+    if (!sessao) {
         window.location.href = "../Login/indexLogin.html";
         return;
     }
 
     try {
-        const usuarioLogado = JSON.parse(usuarioSalvo);
+        const usuarioLogado = JSON.parse(sessao);
         const resposta = await fetch(`${apiUrl}/api/usuarios/${usuarioLogado.idUsuario}`);
         const resultado = await resposta.json();
 

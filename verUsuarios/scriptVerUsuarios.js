@@ -7,6 +7,7 @@ const apiUrl = window.location.port === "3030"
 
 let usuarios = [];
 
+// Classe CSS de acordo com o perfil.
 function classeCargo(idPerfil) {
     if (idPerfil === 1) {
         return "administrador";
@@ -19,6 +20,7 @@ function classeCargo(idPerfil) {
     return "usuario";
 }
 
+// Monta a tabela, aplicando o texto da busca.
 function renderizarUsuarios() {
     const termo = campoBusca.value.trim().toLowerCase();
     listaUsuarios.replaceChildren();
@@ -31,32 +33,33 @@ function renderizarUsuarios() {
         .forEach((usuario) => {
             const linha = document.createElement("tr");
             const nome = document.createElement("td");
-            const identificador = document.createElement("td");
+            const login = document.createElement("td");
             const email = document.createElement("td");
             const cargo = document.createElement("td");
-            const cargoEtiqueta = document.createElement("span");
+            const etiqueta = document.createElement("span");
 
             nome.textContent = usuario.nome;
-            identificador.textContent = usuario.usuario;
+            login.textContent = usuario.usuario;
             email.textContent = usuario.email;
-            cargoEtiqueta.className = `cargo ${classeCargo(Number(usuario.idPerfil))}`;
-            cargoEtiqueta.textContent = usuario.perfil;
-            cargo.appendChild(cargoEtiqueta);
-            linha.append(nome, identificador, email, cargo);
+            etiqueta.className = `cargo ${classeCargo(Number(usuario.idPerfil))}`;
+            etiqueta.textContent = usuario.perfil;
+            cargo.appendChild(etiqueta);
+            linha.append(nome, login, email, cargo);
             listaUsuarios.appendChild(linha);
         });
 }
 
+// GET /api/usuarios: carrega todos os usuários.
 async function carregarUsuarios() {
-    const usuarioSalvo = sessionStorage.getItem("usuario");
+    const sessao = sessionStorage.getItem("usuario");
 
-    if (!usuarioSalvo) {
+    if (!sessao) {
         window.location.href = "../Login/indexLogin.html";
         return;
     }
 
     try {
-        const usuarioLogado = JSON.parse(usuarioSalvo);
+        const usuarioLogado = JSON.parse(sessao);
         perfilLogado.textContent = usuarioLogado.perfil || "";
 
         const resposta = await fetch(`${apiUrl}/api/usuarios`);

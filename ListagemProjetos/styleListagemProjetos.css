@@ -24,8 +24,6 @@ body {
     padding: 30px 40px;
 }
 
-
-
 .botao-voltar {
     display: inline-block;
 
@@ -55,8 +53,6 @@ body {
     transform: translateY(-3px);
 }
 
-
-
 .barra-topo {
     display: flex;
     align-items: center;
@@ -80,8 +76,6 @@ body {
     font-size: 32px;
     font-weight: 600;
 }
-
-
 
 .barra-busca {
     margin-left: auto;
@@ -136,8 +130,6 @@ body {
     border-color: rgba(255, 255, 255, 0.40);
 }
 
-
-
 .lista-projetos {
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 16px;
@@ -149,8 +141,6 @@ body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
-
-
 
 .linha {
     display: grid;
@@ -170,8 +160,6 @@ body {
     border-bottom: none;
 }
 
-
-
 .linha--cabecalho {
     background: rgba(255, 255, 255, 0.05);
 
@@ -185,8 +173,6 @@ body {
     text-align: center;
 }
 
-
-
 .linha__nome {
     font-weight: 600;
 
@@ -197,8 +183,6 @@ body {
     color: rgba(255, 255, 255, 0.75);
 }
 
-
-
 .linha__acoes {
     display: flex;
 
@@ -206,8 +190,6 @@ body {
 
     justify-content: center;
 }
-
-
 
 .btn {
     padding: 8px 12px;
@@ -243,8 +225,6 @@ body {
 .btn--secundario:hover {
     background: rgba(255, 255, 255, 0.18);
 }
-
-
 
 .status {
     justify-self: start;

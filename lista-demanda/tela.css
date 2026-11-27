@@ -1,5 +1,3 @@
-
-
 * {
     margin: 0;
     padding: 0;
@@ -108,7 +106,6 @@ main {
     background: linear-gradient(135deg, #163e93, #2563EB);
     transform: translateY(-2px);
 }
-
 
 .botao-nova {
     background: linear-gradient(135deg, #2E8B57, #4ecc89);
@@ -246,8 +243,6 @@ main {
     box-shadow: 0 0 0 3px rgba(23, 78, 135, 0.12);
 }
 
-
-
 .botao-filtrar {
     height: 40px;
     padding: 0 18px;
@@ -266,7 +261,6 @@ main {
     background-color: #123D69;
     transform: translateY(-1px);
 }
-
 
 .lista-demandas {
     width: 100%;
@@ -355,13 +349,10 @@ tbody tr:hover {
     color: white;
 }
 
-
 .cancelada {
     background-color: #DC2626;
     color: white;
 }
-
-
 
 .critica {
     background-color: #FEE2E2;
@@ -470,8 +461,6 @@ tbody tr:hover {
     }
 }
 
-
-
 @media (max-width: 768px) {
 
     .container {
@@ -543,8 +532,6 @@ tbody tr:hover {
         width: 100%;
     }
 }
-
-
 
 @media (max-width: 480px) {
 

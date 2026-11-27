@@ -192,7 +192,6 @@ body {
     color: var(--ink-soft);
 }
 
-
 .detail-sidebar {
     background: var(--panel);
     border: 1px solid var(--line);
@@ -225,7 +224,6 @@ body {
     background: var(--line-soft);
     margin: 2px 0;
 }
-
 
 .status-badge {
     display: inline-flex;
@@ -266,7 +264,6 @@ body {
 .priority-tag.priority-media  { background: var(--warn-soft); border-color: #E3C766; color: #7A5F0F; }
 .priority-tag.priority-alta   { background: var(--danger-soft); border-color: #DDA893; color: var(--danger); }
 .priority-tag.priority-critica{ background: #F6DAD2; border-color: #E2A491; color: #96311A; }
-
 
 .btn-primary {
     display: inline-flex;
