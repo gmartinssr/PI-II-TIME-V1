@@ -1,6 +1,3 @@
-// Abrir o login (inclusive pelo "Sair") encerra a sessão anterior.
-sessionStorage.removeItem("usuario");
-
 const email = document.getElementById("email");
 
 const senha = document.getElementById("senha");
