@@ -3,24 +3,25 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { iniciarPool, testarPool } from "./bd.js"; 
 import oracledb from "oracledb";
-import { mensagemSeFeriado } from "./feriados.js";
+import { validarFeriado } from "./feriados.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 3333;
-const serveFrontend = process.env.SERVE_FRONTEND === "true";
+const servirTelas = process.env.SERVE_FRONTEND === "true";
 
 app.use(express.json());
-app.use((_request, response, next) => {
-    const origem = _request.headers.origin;
+// Libera o acesso das telas à API (CORS).
+app.use((request, response, next) => {
+    const origem = request.headers.origin;
 
-    const origensPermitidas = [
+    const origensLiberadas = [
         "http://localhost:3030",
         "http://localhost:5500",
         "http://127.0.0.1:5500",
         "http://localhost:3000"
     ];
 
-    if (origem && origensPermitidas.includes(origem)) {
+    if (origem && origensLiberadas.includes(origem)) {
         response.setHeader("Access-Control-Allow-Origin", origem);
     }
 
@@ -30,13 +31,14 @@ app.use((_request, response, next) => {
         "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     );
 
-    if (_request.method === "OPTIONS") {
+    if (request.method === "OPTIONS") {
         return response.sendStatus(204);
     }
 
     next();
 });
 
+// Login: valida os campos, busca o usuário pelo e-mail e confere a senha.
 app.post("/api/login", async (request, response) => {
     const { email, senha } = request.body as {
         email?: unknown;
@@ -173,7 +175,8 @@ interface UsuarioPublico {
     perfil: string;
 }
 
-const consultaUsuarios = `
+// Consulta base usada na lista de usuários e no perfil.
+const sqlUsuarios = `
     SELECT
         u.id_usuario AS "idUsuario",
         u.nome AS "nome",
@@ -186,6 +189,7 @@ const consultaUsuarios = `
         ON p.id_perfil = u.id_perfil
 `;
 
+// Lista todos os usuários.
 app.get("/api/usuarios", async (_request, response) => {
     let conexao: oracledb.Connection | undefined;
 
@@ -194,7 +198,7 @@ app.get("/api/usuarios", async (_request, response) => {
         conexao = await pool.getConnection();
 
         const resultado = await conexao.execute(
-            `${consultaUsuarios} ORDER BY u.nome`,
+            `${sqlUsuarios} ORDER BY u.nome`,
             [],
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -214,6 +218,7 @@ app.get("/api/usuarios", async (_request, response) => {
     }
 });
 
+// Retorna o perfil de um usuário.
 app.get("/api/usuarios/:id", async (request, response) => {
     const idUsuario = Number(request.params.id);
 
@@ -231,7 +236,7 @@ app.get("/api/usuarios/:id", async (request, response) => {
         conexao = await pool.getConnection();
 
         const resultado = await conexao.execute(
-            `${consultaUsuarios} WHERE u.id_usuario = :idUsuario`,
+            `${sqlUsuarios} WHERE u.id_usuario = :idUsuario`,
             { idUsuario },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -258,6 +263,7 @@ app.get("/api/usuarios/:id", async (request, response) => {
     }
 });
 
+// Troca a senha, conferindo antes a senha atual.
 app.patch("/api/usuarios/:id/senha", async (request, response) => {
     const idUsuario = Number(request.params.id);
     const { senhaAtual, novaSenha, confirmarSenha } = request.body as {
@@ -355,11 +361,12 @@ app.patch("/api/usuarios/:id/senha", async (request, response) => {
     }
 });
 
-if (serveFrontend) {
-  const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-  const frontendRoot = express.static(projectRoot);
+// No "npm start" o próprio backend também entrega as telas.
+if (servirTelas) {
+  const pastaProjeto = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+  const arquivosDasTelas = express.static(pastaProjeto);
 
-  app.use(frontendRoot);
+  app.use(arquivosDasTelas);
   app.get("/", (_request, response) => {
     response.redirect("/Login/indexLogin.html");
   });
@@ -371,22 +378,23 @@ if (serveFrontend) {
   });
 }
 
+// Retorna a mensagem de erro do e-mail, ou undefined se estiver certo.
 function validarEmail(email: string): string | undefined {
-  const emailNormalizado = email.trim().toLowerCase();
-  if (emailNormalizado === "") {
+  const emailLimpo = email.trim().toLowerCase();
+  if (emailLimpo === "") {
     return "O email é obrigatório.";
   }
-  if (emailNormalizado.length < 6) {
+  if (emailLimpo.length < 6) {
     return "O email deve ter no mínimo 6 caracteres.";
   }
-  if (emailNormalizado.length > 254) {
+  if (emailLimpo.length > 254) {
     return "O email não pode ter mais de 254 caracteres.";
   }
-  if (/\s/.test(emailNormalizado)) {
+  if (/\s/.test(emailLimpo)) {
     return "O email não pode conter espaços.";
   }
 
-  const partes = emailNormalizado.split("@");
+  const partes = emailLimpo.split("@");
   if (partes.length !== 2) {
     return "O email deve conter um único caractere @.";
   }
@@ -408,7 +416,7 @@ function validarEmail(email: string): string | undefined {
     return "O domínio deve estar no formato exemplo.com.";
   }
 
-  const extensoesReconhecidas = [
+  const finaisAceitos = [
     "com",
     "com.br",
     "net",
@@ -424,13 +432,14 @@ function validarEmail(email: string): string | undefined {
     "app",
   ];
 
-  if (!extensoesReconhecidas.some((extensao) => dominio.endsWith(`.${extensao}`))) {
+  if (!finaisAceitos.some((extensao) => dominio.endsWith(`.${extensao}`))) {
     return "O domínio informado não é reconhecido. Use .com, .com.br, .org, .net, .edu, .gov, .io, .dev ou .app.";
   }
 
   return undefined;
 }
 
+// Junta em uma mensagem todas as regras de senha que não foram cumpridas.
 function validarSenha(senha: string): string | undefined {
   const erros: string[] = [];
 
@@ -456,6 +465,7 @@ function validarSenha(senha: string): string | undefined {
   return erros.length > 0 ? erros.join(" ") : undefined;
 }
 
+// Dashboard: totais por status, prioridade e tipo, críticas abertas e prazos dos próximos 7 dias.
 app.get("/api/dashboard", async (_request, response) => {
     let conexao: oracledb.Connection | undefined;
 
@@ -463,17 +473,17 @@ app.get("/api/dashboard", async (_request, response) => {
         const pool = await iniciarPool();
         conexao = await pool.getConnection();
 
-        const resultadoTotal = await conexao.execute(
+        const buscaTotal = await conexao.execute(
             `SELECT COUNT(*) AS TOTAL FROM demanda`,
             [],
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 
         const total = Number(
-            (resultadoTotal.rows?.[0] as { TOTAL: number })?.TOTAL ?? 0
+            (buscaTotal.rows?.[0] as { TOTAL: number })?.TOTAL ?? 0
         );
 
-        const resultadoStatus = await conexao.execute(
+        const buscaStatus = await conexao.execute(
             `SELECT LOWER(s.nome) AS NOME, COUNT(*) AS QUANTIDADE
              FROM demanda d
              JOIN status s ON s.id_status = d.id_status
@@ -482,7 +492,7 @@ app.get("/api/dashboard", async (_request, response) => {
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 
-        const statusBanco = {
+        const contagemStatus = {
             abertas: 0,
             andamento: 0,
             revisao: 0,
@@ -490,7 +500,7 @@ app.get("/api/dashboard", async (_request, response) => {
             canceladas: 0
         };
 
-        for (const linha of (resultadoStatus.rows ?? []) as {
+        for (const linha of (buscaStatus.rows ?? []) as {
             NOME: string;
             QUANTIDADE: number;
         }[]) {
@@ -498,24 +508,24 @@ app.get("/api/dashboard", async (_request, response) => {
 
             switch (linha.NOME) {
                 case "aberta":
-                    statusBanco.abertas = quantidade;
+                    contagemStatus.abertas = quantidade;
                     break;
                 case "em andamento":
-                    statusBanco.andamento = quantidade;
+                    contagemStatus.andamento = quantidade;
                     break;
                 case "em revisão":
-                    statusBanco.revisao = quantidade;
+                    contagemStatus.revisao = quantidade;
                     break;
                 case "concluída":
-                    statusBanco.concluidas = quantidade;
+                    contagemStatus.concluidas = quantidade;
                     break;
                 case "cancelada":
-                    statusBanco.canceladas = quantidade;
+                    contagemStatus.canceladas = quantidade;
                     break;
             }
         }
 
-        const resultadoPrioridades = await conexao.execute(
+        const buscaPrioridades = await conexao.execute(
             `SELECT LOWER(p.nome) AS NOME, COUNT(*) AS QUANTIDADE
              FROM demanda d
              JOIN prioridade p ON p.id_prioridade = d.id_prioridade
@@ -531,7 +541,7 @@ app.get("/api/dashboard", async (_request, response) => {
             baixa: 0
         };
 
-        for (const linha of (resultadoPrioridades.rows ?? []) as {
+        for (const linha of (buscaPrioridades.rows ?? []) as {
             NOME: string;
             QUANTIDADE: number;
         }[]) {
@@ -553,7 +563,7 @@ app.get("/api/dashboard", async (_request, response) => {
             }
         }
 
-        const resultadoTipos = await conexao.execute(
+        const buscaTipos = await conexao.execute(
             `SELECT LOWER(t.nome) AS NOME, COUNT(*) AS QUANTIDADE
              FROM demanda d
              JOIN tipo_demanda t ON t.id_tipo = d.id_tipo
@@ -569,7 +579,7 @@ app.get("/api/dashboard", async (_request, response) => {
             documentacao: 0
         };
 
-        for (const linha of (resultadoTipos.rows ?? []) as {
+        for (const linha of (buscaTipos.rows ?? []) as {
             NOME: string;
             QUANTIDADE: number;
         }[]) {
@@ -591,7 +601,7 @@ app.get("/api/dashboard", async (_request, response) => {
             }
         }
 
-        const resultadoCriticas = await conexao.execute(
+        const buscaCriticas = await conexao.execute(
             `SELECT
                 d.id_demanda AS "id",
                 d.titulo AS "titulo",
@@ -606,13 +616,13 @@ app.get("/api/dashboard", async (_request, response) => {
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 
-        const criticasAbertas = (resultadoCriticas.rows ?? []) as {
+        const criticasAbertas = (buscaCriticas.rows ?? []) as {
             id: number;
             titulo: string;
             prazo: string | null;
         }[];
 
-        const resultadoPrazos = await conexao.execute(
+        const buscaPrazos = await conexao.execute(
             `SELECT
                 d.id_demanda AS "id",
                 d.titulo AS "titulo",
@@ -625,7 +635,7 @@ app.get("/api/dashboard", async (_request, response) => {
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 
-        const proximasDoPrazo = (resultadoPrazos.rows ?? []) as {
+        const proximasDoPrazo = (buscaPrazos.rows ?? []) as {
             id: number;
             titulo: string;
             prazo: string | null;
@@ -633,7 +643,7 @@ app.get("/api/dashboard", async (_request, response) => {
 
         response.status(200).json({
             total,
-            status: statusBanco,
+            status: contagemStatus,
             prioridades,
             tipos,
             criticasAbertas,
@@ -667,7 +677,8 @@ interface DemandaBanco {
     dataCriacao: string;
 }
 
-app.get("/api/demandas", async (_request, response) => {
+// Lista as demandas de projetos ativos, com filtros, busca e ordenação opcionais.
+app.get("/api/demandas", async (request, response) => {
     let conexao: oracledb.Connection | undefined;
 
     try {
@@ -681,14 +692,14 @@ app.get("/api/demandas", async (_request, response) => {
             busca,
             ordenar,
             ordem
-        } = _request.query;
+        } = request.query;
 
-        const condicoes: string[] = [];
+        const filtros: string[] = [];
         const binds: Record<string, string> = {};
 
-        condicoes.push("pr.ativo = 1");  
+        filtros.push("pr.ativo = 1");  
 
-        const statusBanco: Record<string, string> = {
+        const opcoesStatus: Record<string, string> = {
             aberta: "Aberta",
             andamento: "Em andamento",
             revisao: "Em revisão",
@@ -697,7 +708,7 @@ app.get("/api/demandas", async (_request, response) => {
         };
 
         if (typeof status === "string") {
-            const valor = statusBanco[status.toLowerCase()];
+            const valor = opcoesStatus[status.toLowerCase()];
 
             if (!valor) {
                 response.status(400).json({
@@ -707,11 +718,11 @@ app.get("/api/demandas", async (_request, response) => {
                 return;
             }
 
-            condicoes.push("LOWER(s.nome) = LOWER(:status)");
+            filtros.push("LOWER(s.nome) = LOWER(:status)");
             binds.status = valor;
         }
 
-        const prioridadeBanco: Record<string, string> = {
+        const opcoesPrioridade: Record<string, string> = {
             baixa: "Baixa",
             media: "Média",
             alta: "Alta",
@@ -719,7 +730,7 @@ app.get("/api/demandas", async (_request, response) => {
         };
 
         if (typeof prioridade === "string") {
-            const valor = prioridadeBanco[prioridade.toLowerCase()];
+            const valor = opcoesPrioridade[prioridade.toLowerCase()];
 
             if (!valor) {
                 response.status(400).json({
@@ -729,11 +740,11 @@ app.get("/api/demandas", async (_request, response) => {
                 return;
             }
 
-            condicoes.push("LOWER(p.nome) = LOWER(:prioridade)");
+            filtros.push("LOWER(p.nome) = LOWER(:prioridade)");
             binds.prioridade = valor;
         }
 
-        const tipoBanco: Record<string, string> = {
+        const opcoesTipo: Record<string, string> = {
             tarefa: "Tarefa",
             defeito: "Defeito",
             melhoria: "Melhoria",
@@ -741,7 +752,7 @@ app.get("/api/demandas", async (_request, response) => {
         };
 
         if (typeof tipo === "string") {
-            const valor = tipoBanco[tipo.toLowerCase()];
+            const valor = opcoesTipo[tipo.toLowerCase()];
 
             if (!valor) {
                 response.status(400).json({
@@ -751,19 +762,19 @@ app.get("/api/demandas", async (_request, response) => {
                 return;
             }
 
-            condicoes.push("LOWER(td.nome) = LOWER(:tipo)");
+            filtros.push("LOWER(td.nome) = LOWER(:tipo)");
             binds.tipo = valor;
         }
 
         if (typeof busca === "string" && busca.trim() !== "") {
-            condicoes.push(
+            filtros.push(
                 "(LOWER(d.titulo) LIKE :busca OR LOWER(d.descricao) LIKE :busca)"
             );
 
             binds.busca = `%${busca.trim().toLowerCase()}%`;
         }
 
-        const colunasOrdenacao: Record<string, string> = {
+        const colunasOrdem: Record<string, string> = {
             id: "d.id_demanda",
             titulo: "d.titulo",
             prazo: "d.prazo",
@@ -778,7 +789,7 @@ app.get("/api/demandas", async (_request, response) => {
         };
 
         const coluna = typeof ordenar === "string"
-            ? colunasOrdenacao[ordenar]
+            ? colunasOrdem[ordenar]
             : undefined;
 
         if (typeof ordenar === "string" && !coluna) {
@@ -795,8 +806,8 @@ app.get("/api/demandas", async (_request, response) => {
             ? `ORDER BY ${coluna} ${direcao}`
             : "ORDER BY d.id_demanda ASC";
 
-        const where = condicoes.length > 0
-            ? `WHERE ${condicoes.join(" AND ")}`
+        const where = filtros.length > 0
+            ? `WHERE ${filtros.join(" AND ")}`
             : "";
 
         const sql = `
@@ -878,7 +889,6 @@ app.get("/api/demandas", async (_request, response) => {
     }
 });
 
- 
 type StatusDemanda = "aberta" | "andamento" | "revisao" | "concluida" | "cancelada";
 type Prioridade = "baixa" | "media" | "alta" | "critica";
 type Tipo = "tarefa" | "defeito" | "melhoria" | "documentação";
@@ -887,7 +897,6 @@ interface Anexo {
   nome: string;
   tamanho: number; 
 }
- 
 
 interface Demanda {
     id: number;
@@ -904,19 +913,18 @@ interface Demanda {
     abertura?: string;
     anexo?: Anexo | null;
 }
- 
 
 type NovaDemanda = Omit<Demanda, "id" | "status" | "dataCriacao">;
  
-type CampoCadastro =
+type Campo =
   | "titulo" | "descricao" | "categoria" | "projeto" | "prioridade"
   | "responsavel" | "solicitante" | "abertura" | "prazo" | "anexo"
   | "idCriador";
-type ErrosCadastro = Partial<Record<CampoCadastro, string>>;
+type Erros = Partial<Record<Campo, string>>;
  
-type ResultadoValidacao =
+type Validacao =
   | { ok: true; dados: NovaDemanda }
-  | { ok: false; erros: ErrosCadastro };
+  | { ok: false; erros: Erros };
  
 const REGRAS = {
   titulo: { min: 5, max: 80 },
@@ -929,26 +937,28 @@ const REGRAS = {
  
 const PRIORIDADES: Prioridade[] = ["baixa", "media", "alta", "critica"];
 const TIPOS: Tipo[] = ["tarefa", "defeito", "melhoria", "documentação"];
- 
 
+// Devolve o texto sem espaços nas pontas, ou vazio se não for texto.
 function texto(valor: unknown): string {
   return typeof valor === "string" ? valor.trim() : "";
 }
  
+// Data de hoje no formato AAAA-MM-DD.
 function dataDeHoje(): string {
   return new Date().toLocaleDateString("sv-SE"); 
 }
- 
 
+// Confere se a data está em AAAA-MM-DD e se existe no calendário.
 function dataValida(valor: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
   const data = new Date(`${valor}T00:00:00Z`);
   return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor;
 }
 
-function validarDemanda(corpo: unknown): ResultadoValidacao {
+// Valida os dados enviados no cadastro e na edição de uma demanda.
+function validarDemanda(corpo: unknown): Validacao {
   const body = (typeof corpo === "object" && corpo !== null ? corpo : {}) as Record<string, unknown>;
-  const erros: ErrosCadastro = {};
+  const erros: Erros = {};
  
   const titulo = texto(body.titulo);
   const descricao = texto(body.descricao);
@@ -959,7 +969,6 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
   const solicitante = texto(body.solicitante);
   const abertura = texto(body.abertura) || dataDeHoje();
   const prazo = texto(body.prazo);
- 
 
   if (!titulo) {
     erros.titulo = "Informe o título da demanda.";
@@ -968,7 +977,6 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
   } else if (titulo.length > REGRAS.titulo.max) {
     erros.titulo = `O título não pode ter mais de ${REGRAS.titulo.max} caracteres.`;
   }
- 
 
   if (!descricao) {
     erros.descricao = "Descreva a demanda.";
@@ -977,7 +985,6 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
   } else if (descricao.length > REGRAS.descricao.max) {
     erros.descricao = `A descrição não pode ter mais de ${REGRAS.descricao.max} caracteres.`;
   }
- 
 
   if (!categoria) {
     erros.categoria = "Selecione uma categoria.";
@@ -990,19 +997,16 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
   } else if (projeto.length > REGRAS.projeto.max) {
     erros.projeto = `O projeto não pode ter mais de ${REGRAS.projeto.max} caracteres.`;
   }
- 
 
   if (!PRIORIDADES.includes(prioridade as Prioridade)) {
     erros.prioridade = "Prioridade inválida.";
   }
- 
 
   if (solicitante && solicitante.length < REGRAS.solicitante.min) {
     erros.solicitante = `O nome precisa ter pelo menos ${REGRAS.solicitante.min} caracteres.`;
   } else if (solicitante.length > REGRAS.solicitante.max) {
     erros.solicitante = `O nome não pode ter mais de ${REGRAS.solicitante.max} caracteres.`;
   }
- 
 
   if (!dataValida(abertura)) {
     erros.abertura = "Data de abertura inválida.";
@@ -1017,7 +1021,6 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
   } else if (!erros.abertura && prazo < abertura) {
     erros.prazo = "O prazo não pode ser anterior à data de abertura.";
   }
- 
 
   let anexo: Anexo | null = null;
   if (body.anexo !== null && body.anexo !== undefined) {
@@ -1058,10 +1061,12 @@ function validarDemanda(corpo: unknown): ResultadoValidacao {
   };
 }
  
-const nomesProjetos: Record<string, string> = {
+// Nomes alternativos que apontam para um projeto do banco.
+const apelidosProjetos: Record<string, string> = {
   workflow: "Sistema de Gestão"
 };
 
+// Lista os projetos ativos.
 app.get("/api/projetos", async (_request, response) => {
     let conexao: oracledb.Connection | undefined;
 
@@ -1098,6 +1103,7 @@ app.get("/api/projetos", async (_request, response) => {
     }
 });
 
+// Lista os usuários ativos que podem ser responsáveis.
 app.get("/api/responsaveis", async (_request, response) => {
     let conexao: oracledb.Connection | undefined;
 
@@ -1148,7 +1154,8 @@ const nomesTipos: Record<Tipo, string> = {
   documentação: "Documentação"
 };
 
-async function buscarIdPorNome(
+// Busca o ID de um registro pelo valor de uma coluna. Retorna null se não achar.
+async function buscarId(
   conexao: oracledb.Connection,
   tabela: "projeto" | "prioridade" | "tipo_demanda" | "usuario",
   colunaId: string,
@@ -1167,15 +1174,16 @@ async function buscarIdPorNome(
   return registro ? Number(registro.id) : null;
 }
 
+// Cadastra uma demanda, depois de validar os campos e consultar os feriados.
 app.post("/api/demandas", async (request, response) => {
-  const resultado = validarDemanda(request.body);
+  const validacao = validarDemanda(request.body);
  
-  if (!resultado.ok) {
-    response.status(400).json({ valido: false, erros: resultado.erros });
+  if (!validacao.ok) {
+    response.status(400).json({ valido: false, erros: validacao.erros });
     return;
   }
 
-  const erroFeriado = await mensagemSeFeriado(resultado.dados.prazo);
+  const erroFeriado = await validarFeriado(validacao.dados.prazo);
   if (erroFeriado) {
     response.status(400).json({ valido: false, erros: { prazo: erroFeriado } });
     return;
@@ -1183,8 +1191,8 @@ app.post("/api/demandas", async (request, response) => {
 
   const corpo = request.body as Record<string, unknown>;
   const idCriador = Number(corpo.idCriador);
-  const dados = resultado.dados;
-  const erros: ErrosCadastro = {};
+  const dados = validacao.dados;
+  const erros: Erros = {};
 
   if (!Number.isInteger(idCriador) || idCriador <= 0) {
     erros.idCriador = "Não foi possível identificar o usuário criador.";
@@ -1201,22 +1209,22 @@ app.post("/api/demandas", async (request, response) => {
     const pool = await iniciarPool();
     conexao = await pool.getConnection();
 
-    const projetoBusca = nomesProjetos[dados.projeto.toLowerCase()] ?? dados.projeto;
-    const idProjeto = await buscarIdPorNome(
+    const nomeProjeto = apelidosProjetos[dados.projeto.toLowerCase()] ?? dados.projeto;
+    const idProjeto = await buscarId(
       conexao,
       "projeto",
       "id_projeto",
       "nome",
-      projetoBusca
+      nomeProjeto
     );
-    const idPrioridade = await buscarIdPorNome(
+    const idPrioridade = await buscarId(
       conexao,
       "prioridade",
       "id_prioridade",
       "nome",
       nomesPrioridades[dados.prioridade]
     );
-    const idTipo = await buscarIdPorNome(
+    const idTipo = await buscarId(
       conexao,
       "tipo_demanda",
       "id_tipo",
@@ -1227,7 +1235,7 @@ app.post("/api/demandas", async (request, response) => {
     let idResponsavel: number | null = null;
 
     if (dados.responsavel) {
-        const resultadoResponsavel = await conexao.execute(
+        const buscaResponsavel = await conexao.execute(
             `SELECT id_usuario AS "id"
             FROM usuario
             WHERE id_usuario = :idResponsavel
@@ -1236,13 +1244,13 @@ app.post("/api/demandas", async (request, response) => {
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 
-        const registro = resultadoResponsavel.rows?.[0] as
+        const registro = buscaResponsavel.rows?.[0] as
             { id: number } | undefined;
 
         idResponsavel = registro ? Number(registro.id) : null;
     }
 
-    const idCriadorExiste = await buscarIdPorNome(
+    const criadorEncontrado = await buscarId(
       conexao,
       "usuario",
       "id_usuario",
@@ -1251,7 +1259,7 @@ app.post("/api/demandas", async (request, response) => {
     );
 
     if (idProjeto !== null) {
-    const consultaAtivo = await conexao.execute<{ ativo: number }>(
+    const buscaAtivo = await conexao.execute<{ ativo: number }>(
         `SELECT ativo AS "ativo"
          FROM projeto
          WHERE id_projeto = :idProjeto`,
@@ -1259,7 +1267,7 @@ app.post("/api/demandas", async (request, response) => {
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    if (Number(consultaAtivo.rows?.[0]?.ativo) !== 1) {
+    if (Number(buscaAtivo.rows?.[0]?.ativo) !== 1) {
         erros.projeto = "Este projeto está inativo.";
     }
     }
@@ -1276,7 +1284,7 @@ app.post("/api/demandas", async (request, response) => {
     if (dados.responsavel && idResponsavel === null) {
         erros.responsavel = "Responsável não encontrado ou usuário inativo.";
     }
-    if (idCriadorExiste === null) {
+    if (criadorEncontrado === null) {
       erros.idCriador = "Usuário criador não encontrado no banco de dados.";
     }
 
@@ -1332,7 +1340,7 @@ app.post("/api/demandas", async (request, response) => {
         id: idDemanda,
         titulo: dados.titulo,
         descricao: dados.descricao,
-        projeto: projetoBusca,
+        projeto: nomeProjeto,
         prioridade: dados.prioridade,
         tipo: dados.tipo,
         prazo: dados.prazo,
@@ -1360,6 +1368,7 @@ app.post("/api/demandas", async (request, response) => {
 
 const STATUS_VALIDOS: StatusDemanda[] = ["aberta", "andamento", "revisao", "concluida", "cancelada"];
  
+// Retorna os detalhes de uma demanda.
 app.get("/api/demandas/:id", async (request, response) => {
     const id = Number(request.params.id);
 
@@ -1487,6 +1496,7 @@ app.get("/api/demandas/:id", async (request, response) => {
     }
 });
 
+// Lista os comentários de uma demanda.
 app.get("/api/demandas/:id/comentarios", async (request, response) => {
     const idDemanda = Number(request.params.id);
 
@@ -1539,6 +1549,7 @@ app.get("/api/demandas/:id/comentarios", async (request, response) => {
     }
 });
 
+// Adiciona um comentário a uma demanda.
 app.post("/api/demandas/:id/comentarios", async (request, response) => {
     const idDemanda = Number(request.params.id);
     const { texto, idUsuario } = request.body;
@@ -1629,7 +1640,8 @@ interface DemandaAtual {
   status: string;
 }
 
-async function verificarAcessoProjeto(
+// Diz se o usuário pode mexer no projeto: administrador ou membro dele.
+async function checarAcesso(
     conexao: oracledb.Connection,
     idUsuario: number,
     idProjeto: number
@@ -1686,6 +1698,7 @@ const NOME_STATUS: Record<StatusDemanda, string> = {
     cancelada: "Cancelada"
 };
 
+// Mudanças de status previstas no fluxo (a rota de status não consulta esta tabela).
 const TRANSICOES: Record<StatusDemanda, StatusDemanda[]> = {
     aberta: ["andamento", "cancelada"],
     andamento: ["revisao", "cancelada"],
@@ -1694,6 +1707,7 @@ const TRANSICOES: Record<StatusDemanda, StatusDemanda[]> = {
     cancelada: []
 };
 
+// Muda o status de uma demanda (usado no Kanban) e grava no histórico.
 app.patch("/api/demandas/:id/status", async (request, response) => {
     const id = Number(request.params.id);
     const corpo = (request.body ?? {}) as { status?: unknown; idUsuario?: unknown };
@@ -1742,7 +1756,7 @@ app.patch("/api/demandas/:id/status", async (request, response) => {
             return;
         }
 
-        const acesso = await verificarAcessoProjeto(
+        const acesso = await checarAcesso(
             conexao,
             idUsuario,
             Number(demanda.idProjeto)
@@ -1843,6 +1857,7 @@ app.patch("/api/demandas/:id/status", async (request, response) => {
     }
 });
 
+// Edita uma demanda e registra no histórico mudanças de prioridade, prazo e responsável.
 app.put("/api/demandas/:id", async (request, response) => {
   const id = Number(request.params.id);
 
@@ -1857,7 +1872,7 @@ app.put("/api/demandas/:id", async (request, response) => {
     return;
   }
 
-  const erroFeriado = await mensagemSeFeriado(validacao.dados.prazo);
+  const erroFeriado = await validarFeriado(validacao.dados.prazo);
   if (erroFeriado) {
     response.status(400).json({ valido: false, erros: { prazo: erroFeriado } });
     return;
@@ -1912,15 +1927,15 @@ app.put("/api/demandas/:id", async (request, response) => {
       return;
     }
 
-    const erros: ErrosCadastro = {};
+    const erros: Erros = {};
 
-    const idProjeto = await buscarIdPorNome(
+    const idProjeto = await buscarId(
       conexao, "projeto", "id_projeto", "nome", dados.projeto
     );
-    const idPrioridade = await buscarIdPorNome(
+    const idPrioridade = await buscarId(
       conexao, "prioridade", "id_prioridade", "nome", nomesPrioridades[dados.prioridade]
     );
-    const idTipo = await buscarIdPorNome(
+    const idTipo = await buscarId(
       conexao, "tipo_demanda", "id_tipo", "nome", nomesTipos[dados.tipo]
     );
 
@@ -1933,14 +1948,14 @@ app.put("/api/demandas/:id", async (request, response) => {
       if (!Number.isInteger(idInformado) || idInformado <= 0) {
         erros.responsavel = "Responsável inválido.";
       } else {
-        const consultaResp = await conexao.execute<{ id: number; nome: string }>(
+        const consultaResponsavel = await conexao.execute<{ id: number; nome: string }>(
           `SELECT id_usuario AS "id", nome AS "nome"
            FROM usuario
            WHERE id_usuario = :idInformado AND ativo = 1`,
           { idInformado },
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
-        const registro = consultaResp.rows?.[0];
+        const registro = consultaResponsavel.rows?.[0];
 
         if (registro) {
           idResponsavel = Number(registro.id);
@@ -2014,8 +2029,8 @@ app.put("/api/demandas/:id", async (request, response) => {
       await registrarHistorico("PRAZO", atual.prazo, dados.prazo);
     }
 
-    const idRespAtual = atual.idResponsavel === null ? null : Number(atual.idResponsavel);
-    if (idRespAtual !== idResponsavel) {
+    const responsavelAnterior = atual.idResponsavel === null ? null : Number(atual.idResponsavel);
+    if (responsavelAnterior !== idResponsavel) {
       await registrarHistorico("RESPONSAVEL", atual.responsavel, nomeResponsavel);
     }
 
@@ -2067,6 +2082,7 @@ interface DemandaKanban {
     responsavel: string | null;
 }
 
+// Lista os projetos que o usuário pode ver, com a situação de cada um.
 app.get("/api/projetos/listagem", async (request, response) => {
     const idUsuario = Number(request.query.idUsuario);
 
@@ -2183,6 +2199,7 @@ app.get("/api/projetos/listagem", async (request, response) => {
     }
 });
 
+// Retorna as demandas de um projeto para o Kanban, sem as canceladas.
 app.get("/api/projetos/:id/kanban", async (request, response) => {
     const idProjeto = Number(request.params.id);
     const idUsuario = Number(request.query.idUsuario);
@@ -2209,7 +2226,7 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
         const pool = await iniciarPool();
         conexao = await pool.getConnection();
 
-        const acesso = await verificarAcessoProjeto(conexao, idUsuario, idProjeto);
+        const acesso = await checarAcesso(conexao, idUsuario, idProjeto);
 
         if (!acesso) {
             response.status(401).json({
@@ -2282,7 +2299,7 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 
-        const demandasProjeto = (resultado.rows ?? []).map((linha) => ({
+        const cartoes = (resultado.rows ?? []).map((linha) => ({
             ...linha,
             responsavel: linha.responsavel ?? "Não atribuído"
         }));
@@ -2290,7 +2307,7 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
         response.status(200).json({
             valido: true,
             projeto: { id: Number(projeto.id), nome: projeto.nome },
-            demandas: demandasProjeto
+            demandas: cartoes
         });
 
     } catch (erro) {
@@ -2308,6 +2325,7 @@ app.get("/api/projetos/:id/kanban", async (request, response) => {
     }
 });
 
+// Exclui uma demanda com seus comentários e histórico (só administrador ou líder).
 app.delete("/api/demandas/:id", async (request, response) => {
     const idDemanda = Number(request.params.id);
     const idUsuario = Number(request.query.idUsuario);
@@ -2352,7 +2370,7 @@ app.delete("/api/demandas/:id", async (request, response) => {
             return;
         }
         
-                const acesso = await verificarAcessoProjeto(
+                const acesso = await checarAcesso(
             conexao,
             idUsuario,
             Number(demanda.idProjeto)
@@ -2426,7 +2444,7 @@ app.delete("/api/demandas/:id", async (request, response) => {
 const server = app.listen(port, () => {
   const endereco = `http://localhost:${port}`;
   console.log(
-    serveFrontend
+    servirTelas
       ? `Servidor completo executando em: ${endereco}`
       : `Servidor backend executando em: ${endereco}`,
   );
@@ -2437,6 +2455,7 @@ server.on("error", (error) => {
   process.exitCode = 1;
 });
 
+// Abre o pool do Oracle e testa a conexão ao subir o servidor.
 async function iniciarServidor() {
     try {
         await iniciarPool();
