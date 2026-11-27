@@ -1,3 +1,7 @@
+// Chegar na tela de login (inclusive pelo "Sair") encerra a sessão anterior.
+// Sem isso, os links diretos continuariam abrindo depois de sair.
+sessionStorage.removeItem("usuario");
+
 // Elementos que o script usa. Os ids vêm do indexLogin.html
 const email = document.getElementById("email");
 
