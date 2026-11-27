@@ -1,22 +1,24 @@
 "use strict";
 
-const API_BASE_URL =
+const API_DEMANDAS =
     window.location.port === "3030"
         ? "http://localhost:3333/api/demandas"
         : "http://localhost:3000/api/demandas";
 
-const urlParams = new URLSearchParams(window.location.search);
-const demandaId = urlParams.get("id");
+const parametros = new URLSearchParams(window.location.search);
+const demandaId = parametros.get("id");
 
-function formatarData(dataString) {
-    if (!dataString) return "-";
-    const partes = dataString.split("T")[0].split("-");
+// Converte a data para DD/MM/AAAA.
+function formatarData(data) {
+    if (!data) return "-";
+    const partes = data.split("T")[0].split("-");
     if (partes.length === 3) {
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
-    return dataString;
+    return data;
 }
 
+// Tamanho do anexo em KB ou MB.
 function formatarTamanho(bytes) {
     if (!bytes || isNaN(bytes)) return "";
     if (bytes >= 1024 * 1024) {
@@ -25,7 +27,8 @@ function formatarTamanho(bytes) {
     return `${Math.round(bytes / 1024)} KB`;
 }
 
-function obterClasseStatus(status) {
+// Classe CSS do selo de status.
+function classeDoStatus(status) {
     const mapa = {
         aberta: "status-aberto",
         andamento: "status-andamento",
@@ -36,43 +39,45 @@ function obterClasseStatus(status) {
     return mapa[status?.toLowerCase()] || "status-aberto";
 }
 
-function obterInfoPrioridade(prioridade) {
-    const p = prioridade?.toLowerCase();
+// Classe e nome exibido de cada prioridade.
+function dadosPrioridade(prioridade) {
+    const chave = prioridade?.toLowerCase();
     const mapa = {
         baixa: { classe: "priority-baixa", label: "Baixa" },
         media: { classe: "priority-media", label: "Média" },
         alta: { classe: "priority-alta", label: "Alta" },
         critica: { classe: "priority-critica", label: "Crítica" }
     };
-    return mapa[p] || { classe: "priority-baixa", label: prioridade || "Baixa" };
+    return mapa[chave] || { classe: "priority-baixa", label: prioridade || "Baixa" };
 }
 
-function renderizarDemanda(demanda) {
-    const elRecordId = document.querySelector(".record-id");
-    const elTitulo = document.querySelector(".title-bar-main h2");
+// Preenche a tela com os dados da demanda.
+function mostrarDemanda(demanda) {
+    const codigo = document.querySelector(".record-id");
+    const titulo = document.querySelector(".title-bar-main h2");
     
-    if (elRecordId) {
-        elRecordId.textContent = `DEM-${String(demanda.id).padStart(4, "0")}`;
+    if (codigo) {
+        codigo.textContent = `DEM-${String(demanda.id).padStart(4, "0")}`;
     }
-    if (elTitulo) {
-        elTitulo.textContent = demanda.titulo || "Sem título";
-    }
-
-    const btnEditar = document.querySelector(".title-bar-actions .btn-primary");
-    if (btnEditar) {
-        btnEditar.href = `../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html?id=${demanda.id}`;
+    if (titulo) {
+        titulo.textContent = demanda.titulo || "Sem título";
     }
 
-    const statusHeader = document.querySelector(".title-bar-actions .status-badge");
-    if (statusHeader) {
-        const classeStatus = obterClasseStatus(demanda.status);
-        statusHeader.className = `status-badge ${classeStatus}`;
-        statusHeader.textContent = demanda.status ? demanda.status.toUpperCase() : "ABERTA";
+    const botaoEditar = document.querySelector(".title-bar-actions .btn-primary");
+    if (botaoEditar) {
+        botaoEditar.href = `../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html?id=${demanda.id}`;
     }
 
-    const elDescricao = document.querySelector(".description-text");
-    if (elDescricao) {
-        elDescricao.textContent = demanda.descricao || "Nenhuma descrição informada.";
+    const seloTopo = document.querySelector(".title-bar-actions .status-badge");
+    if (seloTopo) {
+        const classeStatus = classeDoStatus(demanda.status);
+        seloTopo.className = `status-badge ${classeStatus}`;
+        seloTopo.textContent = demanda.status ? demanda.status.toUpperCase() : "ABERTA";
+    }
+
+    const descricao = document.querySelector(".description-text");
+    if (descricao) {
+        descricao.textContent = demanda.descricao || "Nenhuma descrição informada.";
     }
 
     const listaAnexos = document.querySelector(".attachment-list");
@@ -94,41 +99,42 @@ function renderizarDemanda(demanda) {
         }
     }
 
-    const infoRows = document.querySelectorAll(".detail-sidebar .info-row");
-    if (infoRows.length >= 8) {
-        const statusBadgeSide = infoRows[0].querySelector(".status-badge");
-        if (statusBadgeSide) {
-            statusBadgeSide.className = `status-badge ${obterClasseStatus(demanda.status)}`;
-            statusBadgeSide.textContent = demanda.status || "Aberta";
+    const linhas = document.querySelectorAll(".detail-sidebar .info-row");
+    if (linhas.length >= 8) {
+        const seloLateral = linhas[0].querySelector(".status-badge");
+        if (seloLateral) {
+            seloLateral.className = `status-badge ${classeDoStatus(demanda.status)}`;
+            seloLateral.textContent = demanda.status || "Aberta";
         }
 
-        const priorityTag = infoRows[1].querySelector(".priority-tag");
-        if (priorityTag) {
-            const infoP = obterInfoPrioridade(demanda.prioridade);
-            priorityTag.className = `priority-tag ${infoP.classe}`;
-            priorityTag.innerHTML = `<span class="dot"></span>${infoP.label}`;
+        const etiqueta = linhas[1].querySelector(".priority-tag");
+        if (etiqueta) {
+            const info = dadosPrioridade(demanda.prioridade);
+            etiqueta.className = `priority-tag ${info.classe}`;
+            etiqueta.innerHTML = `<span class="dot"></span>${info.label}`;
         }
 
-        const elCategoria = infoRows[2].querySelector(".info-value");
-        if (elCategoria) elCategoria.textContent = demanda.tipo || "-";
+        const categoria = linhas[2].querySelector(".info-value");
+        if (categoria) categoria.textContent = demanda.tipo || "-";
 
-        const elProjeto = infoRows[3].querySelector(".info-value");
-        if (elProjeto) elProjeto.textContent = demanda.projeto || "-";
+        const projeto = linhas[3].querySelector(".info-value");
+        if (projeto) projeto.textContent = demanda.projeto || "-";
 
-        const elResponsavel = infoRows[4].querySelector(".info-value");
-        if (elResponsavel) elResponsavel.textContent = demanda.responsavel || "Não atribuído";
+        const responsavel = linhas[4].querySelector(".info-value");
+        if (responsavel) responsavel.textContent = demanda.responsavel || "Não atribuído";
 
-        const elSolicitante = infoRows[5].querySelector(".info-value");
-        if (elSolicitante) elSolicitante.textContent = demanda.solicitante || "-";
+        const solicitante = linhas[5].querySelector(".info-value");
+        if (solicitante) solicitante.textContent = demanda.solicitante || "-";
 
-        const elAbertura = infoRows[6].querySelector(".info-value");
-        if (elAbertura) elAbertura.textContent = formatarData(demanda.abertura || demanda.dataCriacao);
+        const abertura = linhas[6].querySelector(".info-value");
+        if (abertura) abertura.textContent = formatarData(demanda.abertura || demanda.dataCriacao);
 
-        const elPrazo = infoRows[7].querySelector(".info-value");
-        if (elPrazo) elPrazo.textContent = formatarData(demanda.prazo);
+        const prazo = linhas[7].querySelector(".info-value");
+        if (prazo) prazo.textContent = formatarData(demanda.prazo);
     }
 }
 
+// GET /api/demandas/:id
 async function carregarDemanda() {
     if (!demandaId) {
         alert("ID da demanda não foi informado na URL.");
@@ -137,11 +143,11 @@ async function carregarDemanda() {
     }
 
     try {
-        const resposta = await fetch(`${API_BASE_URL}/${demandaId}`);
+        const resposta = await fetch(`${API_DEMANDAS}/${demandaId}`);
         const resultado = await resposta.json();
 
         if (resposta.ok && resultado.valido) {
-            renderizarDemanda(resultado.demanda);
+            mostrarDemanda(resultado.demanda);
         } else {
             alert(resultado.erro || "Não foi possível carregar as informações da demanda.");
         }
@@ -151,6 +157,7 @@ async function carregarDemanda() {
     }
 }
 
+// Monta a lista de comentários.
 function renderizarComentarios(comentarios) {
     const container = document.getElementById("lista-comentarios");
     if (!container) return;
@@ -161,27 +168,28 @@ function renderizarComentarios(comentarios) {
     }
 
     container.innerHTML = comentarios
-        .map((c) => {
-            const dataFormatada = c.data;
+        .map((comentario) => {
+            const dataFormatada = comentario.data;
 
             return `
             <div class="attachment-item" style="flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px; margin-bottom: 8px;">
                 <div style="display: flex; justify-content: space-between; width: 100%; font-size: 12px; color: var(--ink-soft);">
-                    <strong>${c.usuario}</strong>
+                    <strong>${comentario.usuario}</strong>
                     <span>${dataFormatada}</span>
                 </div>
-                <p style="margin: 4px 0 0; font-size: 13px; color: var(--ink); white-space: pre-wrap;">${c.texto}</p>
+                <p style="margin: 4px 0 0; font-size: 13px; color: var(--ink); white-space: pre-wrap;">${comentario.texto}</p>
             </div>
         `;
         })
         .join("");
 }
 
+// GET /api/demandas/:id/comentarios
 async function carregarComentarios() {
     if (!demandaId) return;
 
     try {
-        const resposta = await fetch(`${API_BASE_URL}/${demandaId}/comentarios`);
+        const resposta = await fetch(`${API_DEMANDAS}/${demandaId}/comentarios`);
         const resultado = await resposta.json();
 
         if (resposta.ok) {
@@ -192,7 +200,8 @@ async function carregarComentarios() {
     }
 }
 
-function iniciarFormularioComentario() {
+// POST /api/demandas/:id/comentarios: envia um novo comentário.
+function ligarComentarios() {
     const form = document.getElementById("form-comentario");
     const textarea = document.getElementById("texto-comentario");
 
@@ -212,7 +221,7 @@ function iniciarFormularioComentario() {
         }
 
         try {
-            const resposta = await fetch(`${API_BASE_URL}/${demandaId}/comentarios`, {
+            const resposta = await fetch(`${API_DEMANDAS}/${demandaId}/comentarios`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -240,5 +249,5 @@ function iniciarFormularioComentario() {
 document.addEventListener("DOMContentLoaded", () => {
     carregarDemanda();
     carregarComentarios();
-    iniciarFormularioComentario();
+    ligarComentarios();
 });

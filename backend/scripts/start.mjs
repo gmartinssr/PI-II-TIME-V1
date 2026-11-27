@@ -1,41 +1,43 @@
 import { spawn } from "node:child_process";
 
+// "npm start": sobe o backend na porta 3000 servindo também as telas.
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-const processes = [spawn(npmCommand, ["run", "back"], {
+const servidores = [spawn(npmCommand, ["run", "back"], {
   env: { ...process.env, PORT: "3000", SERVE_FRONTEND: "true" },
   shell: process.platform === "win32",
   stdio: "inherit",
 })];
 
-let shuttingDown = false;
+let encerrando = false;
 
-function stopProcesses() {
-  if (shuttingDown) {
+// Encerra os servidores uma única vez.
+function encerrar() {
+  if (encerrando) {
     return;
   }
 
-  shuttingDown = true;
-  for (const child of processes) {
-    if (!child.killed) {
-      child.kill("SIGINT");
+  encerrando = true;
+  for (const servidor of servidores) {
+    if (!servidor.killed) {
+      servidor.kill("SIGINT");
     }
   }
 }
 
-for (const child of processes) {
-  child.on("error", (error) => {
+for (const servidor of servidores) {
+  servidor.on("error", (error) => {
     console.error("Não foi possível iniciar um dos servidores:", error);
-    stopProcesses();
+    encerrar();
     process.exitCode = 1;
   });
 
-  child.on("exit", (code) => {
-    if (!shuttingDown && code !== 0) {
+  servidor.on("exit", (code) => {
+    if (!encerrando && code !== 0) {
       process.exitCode = code ?? 1;
-      stopProcesses();
+      encerrar();
     }
   });
 }
 
-process.on("SIGINT", stopProcesses);
-process.on("SIGTERM", stopProcesses);
+process.on("SIGINT", encerrar);
+process.on("SIGTERM", encerrar);

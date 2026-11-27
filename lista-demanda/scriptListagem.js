@@ -10,12 +10,12 @@ const semResultados = document.getElementById("sem-resultados");
 const tabela = document.querySelector("tbody");
 let demandas = [];
 
-
 const API_URL =
     window.location.port === "3030"
         ? "http://localhost:3333/api/demandas"
         : "http://localhost:3000/api/demandas";
 
+// Monta a tabela de demandas.
 function renderizarDemandas() {
     tabela.innerHTML = "";
 
@@ -92,7 +92,7 @@ function renderizarDemandas() {
         demandas.length === 0 ? "block" : "none";
 }
 
-
+// GET /api/demandas
 async function carregarDemandas() {
     try {
         const resposta = await fetch(API_URL);
@@ -126,6 +126,7 @@ const concluidasCard = cards[2].querySelector("p");
 const criticasCard = cards[3].querySelector("p");
 const botaoLimpar = document.querySelector(".botao-limpar");
 
+// Recalcula os cards de resumo com as linhas visíveis.
 function atualizarCards() {
     const linhas = tabela.querySelectorAll("tr");
 
@@ -163,6 +164,7 @@ function atualizarCards() {
     criticasCard.textContent = criticas;
 }
 
+// Limpa os filtros.
 botaoLimpar.addEventListener("click", function() {
     busca.value = "";
     filtroStatus.value = "";
@@ -173,6 +175,7 @@ botaoLimpar.addEventListener("click", function() {
     atualizarCards();
 });
 
+// Esconde as linhas que não batem com os filtros.
 botaoFiltrar.addEventListener("click", function() {
     const textoBusca = busca.value.trim().toLowerCase();
     const valorStatus = filtroStatus.value;
@@ -192,19 +195,19 @@ botaoFiltrar.addEventListener("click", function() {
         const prioridadeLinha = linha.cells[3].textContent.trim();
         const statusLinha = linha.cells[4].textContent.trim();
 
-        const encontrouTitulo = titulo.includes(textoBusca);
-        const encontrouStatus =
+        const bateTitulo = titulo.includes(textoBusca);
+        const bateStatus =
             valorStatus === "" || statusLinha === valorStatus;
-        const encontrouPrioridade =
+        const batePrioridade =
             valorPrioridade === "" || prioridadeLinha === valorPrioridade;
-        const encontrouTipo =
+        const bateTipo =
             valorTipo === "" || tipoLinha === valorTipo;
 
         if (
-            encontrouTitulo &&
-            encontrouStatus &&
-            encontrouPrioridade &&
-            encontrouTipo
+            bateTitulo &&
+            bateStatus &&
+            batePrioridade &&
+            bateTipo
         ) {
             linha.style.display = "";
 

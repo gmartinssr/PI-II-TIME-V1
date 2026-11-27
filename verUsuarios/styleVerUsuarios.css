@@ -16,18 +16,12 @@ body {
     color: #FFFFFF;
 }
 
-
-
-
 .usuarios-container {
     width: 100%;
     min-height: 100vh;
 
     padding: 30px 40px;
 }
-
-
-
 
 .botao-voltar {
     display: inline-block;
@@ -58,9 +52,6 @@ body {
     transform: translateY(-3px);
 }
 
-
-
-
 .usuarios-topo {
     display: flex;
 
@@ -81,9 +72,6 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
-
-
-
 .subtitulo-topo {
     margin-bottom: 5px;
 
@@ -95,18 +83,12 @@ body {
     letter-spacing: 1px;
 }
 
-
-
-
 .usuarios-topo h1 {
     color: #FFFFFF;
 
     font-size: 32px;
     font-weight: 600;
 }
-
-
-
 
 .descricao-topo {
     margin-top: 5px;
@@ -115,9 +97,6 @@ body {
 
     font-size: 15px;
 }
-
-
-
 
 .campo-busca input {
     width: 300px;
@@ -151,9 +130,6 @@ body {
     background: rgba(255, 255, 255, 0.15);
 }
 
-
-
-
 .tabela-container {
     width: 100%;
 
@@ -168,9 +144,6 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
-
-
-
 table {
     width: 100%;
 
@@ -178,9 +151,6 @@ table {
 
     min-width: 850px;
 }
-
-
-
 
 thead {
     background: rgba(255, 255, 255, 0.08);
@@ -202,9 +172,6 @@ th {
     border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-
-
-
 td {
     padding: 18px 22px;
 
@@ -215,9 +182,6 @@ td {
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-
-
-
 tbody tr {
     transition: 0.2s;
 }
@@ -226,15 +190,9 @@ tbody tr:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
-
-
-
 tbody tr:last-child td {
     border-bottom: none;
 }
-
-
-
 
 .cargo {
     display: inline-block;
@@ -247,9 +205,6 @@ tbody tr:last-child td {
     font-weight: 600;
 }
 
-
-
-
 .cargo.administrador {
     background: rgba(255, 220, 100, 0.20);
 
@@ -257,9 +212,6 @@ tbody tr:last-child td {
 
     color: #FFE58A;
 }
-
-
-
 
 .cargo.usuario {
     background: rgba(100, 180, 255, 0.18);
@@ -269,9 +221,6 @@ tbody tr:last-child td {
     color: #9DD5FF;
 }
 
-
-
-
 .cargo.gestor {
     background: rgba(100, 255, 170, 0.18);
 
@@ -280,15 +229,9 @@ tbody tr:last-child td {
     color: #9CFFBE;
 }
 
-
-
-
 .acoes {
     white-space: nowrap;
 }
-
-
-
 
 .acoes button {
     padding: 8px 13px;
@@ -304,9 +247,6 @@ tbody tr:last-child td {
 
     transition: 0.2s;
 }
-
-
-
 
 .botao-editar {
     margin-right: 6px;
@@ -324,9 +264,6 @@ tbody tr:last-child td {
     transform: translateY(-2px);
 }
 
-
-
-
 .botao-excluir {
     background: rgba(220, 70, 70, 0.20);
 
@@ -340,9 +277,6 @@ tbody tr:last-child td {
 
     transform: translateY(-2px);
 }
-
-
-
 
 @media (max-width: 900px) {
 
@@ -364,7 +298,6 @@ tbody tr:last-child td {
         width: 100%;
     }
 }
-
 
 @media (max-width: 600px) {
 

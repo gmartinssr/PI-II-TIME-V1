@@ -18,6 +18,7 @@ const SITUACOES = {
 
 let projetos = [];
 
+// Lê o usuário logado salvo na sessão.
 function obterUsuario() {
     try {
         const salvo = sessionStorage.getItem("usuario");
@@ -28,11 +29,13 @@ function obterUsuario() {
     }
 }
 
+// Limpa a sessão e volta para o login.
 function irParaLogin() {
     sessionStorage.removeItem("usuario");
     window.location.href = PAGINA_LOGIN;
 }
 
+// Deixa o texto sem acento e em minúsculas para a busca.
 function normalizar(valor) {
     return valor
         .toLowerCase()
@@ -41,6 +44,7 @@ function normalizar(valor) {
         .trim();
 }
 
+// Cria um elemento com classe e texto.
 function criarElemento(tag, classe, texto) {
     const elemento = document.createElement(tag);
     elemento.className = classe;
@@ -50,15 +54,16 @@ function criarElemento(tag, classe, texto) {
     return elemento;
 }
 
+// Monta a linha de um projeto.
 function criarLinha(projeto) {
     const situacao = SITUACOES[projeto.situacao] || SITUACOES.andamento;
-    const rotuloDemandas = projeto.demandas === 1 ? "demanda" : "demandas";
+    const palavra = projeto.demandas === 1 ? "demanda" : "demandas";
 
     const linha = criarElemento("article", "linha");
 
     linha.appendChild(criarElemento("span", "linha__nome", projeto.nome));
     linha.appendChild(
-        criarElemento("span", "linha__demandas", `${projeto.demandas} ${rotuloDemandas}`)
+        criarElemento("span", "linha__demandas", `${projeto.demandas} ${palavra}`)
     );
     linha.appendChild(
         criarElemento("span", `status ${situacao.classe}`, situacao.texto)
@@ -75,18 +80,21 @@ function criarLinha(projeto) {
     return linha;
 }
 
+// Desenha a lista de projetos na tela.
 function renderizar(lista) {
     listaLinhas.replaceChildren(...lista.map(criarLinha));
     mensagemVazia.textContent = "Nenhum projeto encontrado.";
     mensagemVazia.hidden = lista.length > 0;
 }
 
+// Mostra uma mensagem no lugar da lista.
 function mostrarErro(mensagem) {
     listaLinhas.replaceChildren();
     mensagemVazia.textContent = mensagem;
     mensagemVazia.hidden = false;
 }
 
+// GET /api/projetos/listagem: projetos que o usuário pode ver.
 async function carregarProjetos() {
     const usuario = obterUsuario();
 
@@ -121,6 +129,7 @@ async function carregarProjetos() {
     }
 }
 
+// Filtra os projetos pelo nome.
 campoBusca.addEventListener("input", function () {
     const texto = normalizar(campoBusca.value);
 

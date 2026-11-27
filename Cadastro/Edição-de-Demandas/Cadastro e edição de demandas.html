@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Workflow — Nova demanda</title>
-<!-- Carrega as fontes do Google utilizadas no projeto.
-O CSS também possui fontes alternativas, como Segoe UI e Arial.
-Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser removido. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -14,9 +11,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
 <body>
 
 <div class="page">
-  <!-- Cabeçalho principal da página.
-  Quando o usuário acessa uma demanda para editar, o JavaScript
-  altera automaticamente o título para "Editar Demanda". -->
   <header class="app-header">
     <div class="brand">
       <h1>Workflow</h1>
@@ -26,15 +20,9 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
     <span class="record-id">Nova Demanda</span>
   </header>
 
-    <!-- Formulário utilizado para cadastrar ou editar uma demanda.
-    O atributo novalidate impede que o navegador faça suas próprias validações,
-    deixando essa responsabilidade para o JavaScript.
-    Assim, as mensagens de erro seguem o padrão definido no projeto. -->
   <form novalidate> 
     <div class="flow">
 
-      <!-- 1. Primeira etapa do formulário: informações básicas da demanda. -->
-      <!-- A classe "active" deixa a numeração da etapa destacada em azul. -->
       <div class="section active">
         <div class="flow-spine">
           <div class="spine-node">1</div>
@@ -48,8 +36,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
           <div class="panel">
             <div class="field full">
               <label for="titulo">Título da demanda</label>
-              <!-- Limite de 80 caracteres no título. No JS esse máximo existe em REGRAS,
-              mas só o mínimo é validado, então quem segura o máximo é este maxlength. -->
               <input 
                 type="text"
                 id="titulo"
@@ -61,8 +47,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
             </div>
             <div class="field full">
               <label for="descricao">Descrição</label>
-              <!-- Campo onde o usuário descreve os detalhes da demanda.
-              Permite digitar até 1000 caracteres. -->
               <textarea 
                 id="descricao"
                 name="descricao"
@@ -70,15 +54,12 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
                 maxlength="1000"
                 required
               ></textarea>
-              <!-- Mostra quantos caracteres já foram digitados.
-              A contagem é atualizada automaticamente pelo JavaScript. -->
               <span class="char-count">0 / 1000</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 2. Segunda etapa do formulário: classificação da demanda. -->
       <div class="section">
         <div class="flow-spine">
           <div class="spine-node">2</div>
@@ -93,10 +74,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
             <div class="field-row">
               <div class="field">
                 <label for="categoria">Categoria</label>
-                <!-- Apresenta as categorias disponíveis para o usuário selecionar.
-                As opções são definidas diretamente no HTML.
-                Caso uma nova categoria seja adicionada, também será necessário
-                atualizar as opções aceitas pelo backend. -->
                 <select id="categoria" name="categoria" required>
                   <option value="">Selecione</option>
                   <option value="tarefa">Tarefa</option>
@@ -107,9 +84,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
               </div>
               <div class="field">
                 <label for="projeto">Projeto relacionado</label>
-                <!-- Lista os projetos disponíveis para seleção.
-                Enquanto as informações não chegam da API, exibe a mensagem
-                "Carregando projetos...". Depois, o JavaScript adiciona as opções. -->
                 <select id="projeto" name="projeto" required>
                   <option value="">Carregando projetos...</option>
                 </select>
@@ -117,14 +91,8 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
             </div>
             <div class="field full">
               <label>Prioridade</label>
-                <!-- Apresenta as opções de prioridade como botões de seleção.
-                Os campos radio ficam escondidos pelo CSS, enquanto os labels
-                são exibidos visualmente como botões.
-                A ordem entre input e label deve ser mantida, pois o CSS utiliza
-                essa estrutura para destacar a opção selecionada. -->
               <div class="pill-group" role="radiogroup" aria-label="Prioridade">
 
-                <!-- A prioridade baixa já vem selecionada como opção padrão. -->
                 <input type="radio" id="p-baixa" name="prioridade" value="baixa" checked>
                 <label class="pill" data-level="baixa" for="p-baixa">
                   <span class="dot"></span>Baixa
@@ -151,7 +119,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
         </div>
       </div>
 
-      <!-- 3. Terceira etapa do formulário: responsável, solicitante e prazos. -->
       <div class="section">
         <div class="flow-spine">
           <div class="spine-node">3</div>
@@ -166,18 +133,12 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
             <div class="field-row">
               <div class="field">
                 <label for="responsavel">Responsável</label>
-                <!-- Permite escolher quem ficará responsável pela demanda.
-                Inicialmente, aparece apenas a opção "Não atribuído".
-                As demais opções são carregadas automaticamente pela API.
-                Cada responsável é identificado pelo seu idUsuario. -->
               <select id="responsavel" name="responsavel">
                   <option value="">Não atribuído</option>
               </select>
               </div>
               <div class="field">
                 <label for="solicitante">Solicitante</label>
-                <!-- Campo para informar o nome de quem está solicitando a demanda.
-                O preenchimento é feito manualmente pelo usuário. -->
                 <input 
                   type="text"
                   id="solicitante"
@@ -191,22 +152,16 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
             <div class="field-row">
               <div class="field">
                 <label for="abertura">Data de abertura</label>
-                <!-- Informa quando a demanda foi criada.
-                Caso nenhuma data seja selecionada, o JavaScript utiliza a data atual. -->
                 <input type="date" id="abertura" name="abertura">
               </div>
               <div class="field">
                 <label for="prazo">Prazo</label>
-                <!-- Define a data limite para a conclusão da demanda. -->
                 <input type="date" id="prazo" name="prazo" required>
               </div>
             </div>
             <div class="field full">
               <label>Status atual</label>
               <div class="status-row">
-                <!-- Exibe visualmente o status atual da demanda.
-                Esse campo não é enviado ao backend pelo formulário.
-                O status é atualizado conforme o andamento da demanda. -->
                 <span class="status-badge">Aberta</span>
                 <span>alterado automaticamente conforme o andamento</span>
               </div>
@@ -215,8 +170,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
         </div>
       </div>
 
-      <!-- 4. Última etapa do formulário: envio de arquivos anexados à demanda. -->
-<!-- Como essa é a última seção, não precisa continuar a linha que conecta as etapas anteriores. -->
       <div class="section">
         <div class="flow-spine">
           <div class="spine-node">4</div>
@@ -227,11 +180,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
             <p>Opcional — prints, planilhas ou documentos de apoio.</p>
           </div>
           <div class="panel">
-            <!-- Área onde o usuário pode adicionar um arquivo à demanda.
-            É possível selecionar o arquivo pelo botão ou arrastá-lo diretamente
-            para essa área.
-            O tamanho máximo permitido é de 5 MB e os formatos aceitos são
-            definidos nas regras de validação do JavaScript. -->
             <div class="dropzone">
               <label for="anexo">
                 Arraste um arquivo aqui ou <strong>escolha no computador</strong>
@@ -243,17 +191,12 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
         </div>
       </div>
 
-      <!-- Botão utilizado para excluir uma demanda já cadastrada.
-       Fica escondido inicialmente e só aparece quando o usuário
-       acessa o formulário no modo de edição. -->
       <div class="actions">
         <button type="button" id="btn-excluir" class="btn-danger-text" style="display:none">
           Excluir demanda
         </button>
         <div class="actions-right">
-          <!-- Retorna para a lista de demandas sem salvar as alterações. -->
           <a href="../../lista-demanda/tela.html" class="btn-secondary">Voltar</a>
-          <!-- Envia as informações preenchidas para serem salvas. -->
           <button type="submit" class="btn-primary">Salvar demanda</button>
         </div>
       </div>
@@ -263,10 +206,6 @@ Caso as fontes do Google não estejam sendo utilizadas, esse trecho pode ser rem
 
 </div>
 
-<!-- Carrega o JavaScript responsável pelas validações,
-preenchimento dos campos e envio das informações.
-O script fica no final da página para garantir que os elementos
-do HTML já estejam carregados quando o código for executado. -->
 <script src="scriptCadastroDemandas.js"></script>
 
 </body>
