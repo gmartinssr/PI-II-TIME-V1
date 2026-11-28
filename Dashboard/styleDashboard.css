@@ -12,12 +12,15 @@ body {
     color: #1F2937;
 }
 
+/* Layout em duas colunas: menu de largura fixa na esquerda, conteúdo ocupando o resto */
 .layout {
     display: flex;
     min-height: 100vh;
     width: 100%;
 }
 
+/* Menu lateral com imagem de fundo. O background-color azul é reserva
+caso o fundoTela.jpeg não carregue */
 .sidebar {
     width: 220px;
     min-height: 100vh;
@@ -63,10 +66,12 @@ body {
     transform: translateX(3px);
 }
 
+/* Página atual no menu */
 .sidebar a.ativo {
     background-color: rgba(10, 65, 115, 0.85);
 }
 
+/* min-width: 0 evita o conteúdo estourar a largura dentro do flex */
 main {
     flex: 1;
     min-width: 0;
@@ -92,10 +97,13 @@ main {
     margin-top: 5px;
 }
 
+/* !important porque a regra ".topo p" de cima também mexe na margem
+e ganharia dela */
 .subtitulo-topo {
     margin-top: 12px !important;
 }
 
+/* Cartão azul de resumo. Sobe 2px no hover */
 .resumo-dashboard {
     display: flex;
     align-items: center;
@@ -179,6 +187,8 @@ main {
     padding: 15px 16px;
 }
 
+/* Cada status tem uma linha fina na esquerda separando do anterior
+   (só do segundo em diante, por causa do "+") */
 .status-item + .status-item {
     border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -206,6 +216,7 @@ main {
     font-size: 14px;
 }
 
+/* Bolinha colorida de cada status */
 .ponto {
     width: 9px;
     height: 9px;
@@ -240,6 +251,8 @@ main {
     margin-bottom: 28px;
 }
 
+/* Sobrescrevo o .row e o .col-md-6 do Bootstrap com flex + gap pra ter
+o espaço de 24px entre os cartões */
 .distribuicao .row {
     display: flex;
     gap: 24px;
@@ -249,6 +262,7 @@ main {
     flex: 1;
 }
 
+/* O .card também existe no Bootstrap, aqui o meu visual sobrescreve */
 .card {
     background: linear-gradient(
         145deg,
@@ -328,6 +342,8 @@ main {
     border-radius: 20px;
 }
 
+/* Barra de fundo cinza + barra preenchida por cima.
+O JS muda a largura e o transition faz ela crescer animada */
 .barra {
     width: 100%;
     height: 10px;
@@ -352,6 +368,9 @@ main {
         0 1px 4px rgba(15, 23, 42, 0.18);
 }
 
+/* Essas larguras (40%, 70%, 100%...) são só valores de teste de quando
+foi montado o visual. O JS sobrescreve com a porcentagem real,
+mas se a API demorar elas aparecem por um instante */
 .critica {
     width: 40%;
     background: #EF4444;
@@ -405,6 +424,7 @@ main {
     flex: 1;
 }
 
+/* Item das listas de alerta. Anda 4px pra direita no hover */
 .demanda-alerta {
     display: flex;
     justify-content: space-between;
@@ -434,11 +454,15 @@ main {
     font-size: 14px;
 }
 
+/* O primeiro <p> é o título da demanda */
 .demanda-alerta p:first-child { 
     color: #1F2937;
     font-weight: 600;
 }
 
+/* O último <p> vira uma etiqueta: vermelha na coluna da esquerda (críticas)
+e azul na da direita (prazo). Depende da ordem das colunas no HTML,
+se trocar de lugar as cores trocam junto */
 .alertas .col-md-6:first-child .demanda-alerta p:last-child {
     color: #EF4444;
     font-size: 12px;
@@ -461,6 +485,7 @@ main {
     border-radius: 20px;
 }
 
+/* Até 1000px: menu mais estreito */
 @media (max-width: 1000px) {
 
     .sidebar {
@@ -480,6 +505,8 @@ main {
     }
 }
 
+/* Tablet/celular: o menu vira uma faixa no topo com os links rolando
+na horizontal, e os blocos empilham */
 @media (max-width: 768px) {
 
     .layout {
@@ -551,6 +578,7 @@ main {
     }
 }
 
+/* Celular pequeno: status em coluna única e fontes menores */
 @media (max-width: 480px) {
 
     main {

@@ -2,6 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- Carrega antes de tudo. Pelo nome, deve barrar quem não está logado
+    (conferir no controleAcesso.js se é isso mesmo) -->
     <script src="../comum/controleAcesso.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
@@ -10,6 +12,10 @@
 </head>
 <body>
         <div class = "layout">
+
+            <!-- Menu lateral. A classe "ativo" marca a página atual,
+            nas outras telas ela muda de lugar.
+            "Sair" volta pro login, que limpa a sessão sozinho -->
             <aside class = "sidebar">
                 <h2>Workflow</h2>
 
@@ -22,6 +28,7 @@
                         <a href="../lista-demanda/tela.html">Demandas</a>
                     </li>
 
+                    <!-- TODO: esse caminho tem espaço e acento, melhor renomear o arquivo -->
                     <li>
                         <a href="../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html">Nova Demanda</a>
                     </li>
@@ -52,6 +59,8 @@
                     </div>
                 </section>
 
+                <!-- Cartão azul do topo: total geral + quantidade por status.
+                Os "-" são só enquanto o JS não preenche -->
                 <section class="resumo-dashboard">
 
                     <div class="total-demandas">
@@ -60,6 +69,9 @@
                         <p class="texto-resumo">Total de demandas registradas</p>
                     </div>
 
+                    <!-- Cada item tem a bolinha colorida (.ponto) e o número.
+                    Os ids (abertas, andamento, revisao...) são os mesmos do JS.
+                    Os 5 itens seguem o mesmo molde -->
                     <div class="status-demandas">
 
                         <div class="status-item">
@@ -106,6 +118,8 @@
 
                 </section>
 
+                <!-- Dois cartões lado a lado: prioridade e tipo.
+                O row/col-md-6 vem do Bootstrap, mas o CSS também mexe neles -->
                 <section class = "distribuicao">
                     <div class = "row">
                         <div class = "col-md-6">
@@ -123,6 +137,8 @@
                                     </div>
                                 </div>
 
+                                <!-- Cada prioridade tem o número (id prioridade-x) e a barra (id barra-x).
+                                A largura da barra é o JS que define -->
                                 <div class="prioridade">
                                     <div class="linha-prioridade">
                                         <p>Alta</p>
@@ -209,6 +225,8 @@
                     </div>
                 </section>
 
+                <!-- Listas de alerta, vazias aqui. O JS monta as demandas dentro
+                dos divs com id "criticas-abertas" e "proximas-ao-prazo" -->
                 <section class="alertas">
                 <div class="row">
 
