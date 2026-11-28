@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- Controle de acesso, carregado antes do resto da página -->
     <script src="../comum/controleAcesso.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -15,21 +16,25 @@
 
     <div class="container">
 
+        <!-- Volta para a lista de demandas -->
         <a href="../lista-demanda/tela.html" class="botao-voltar">
             ← Voltar para Demandas
         </a>
 
+        <!-- Faixa do topo com o título e o campo de busca -->
         <div class="barra-topo">
 
             <h1>Meus projetos</h1>
 
             <div class="barra-busca">
 
+                <!-- Ícone da lupa feito em SVG, fica por cima do input (posição no CSS) -->
                 <svg class="barra-busca__icone" viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="11" cy="11" r="7"></circle>
                     <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
                 </svg>
 
+                <!-- O JS filtra a lista a cada letra digitada, pelo id "campo-busca" -->
                 <input
                     type="search"
                     id="campo-busca"
@@ -42,6 +47,7 @@
 
         <section class="lista-projetos" id="lista-projetos">
 
+            <!-- Cabeçalho da lista, usa a mesma grade das linhas de projeto -->
             <div class="linha linha--cabecalho">
                 <span>PROJETO</span>
                 <span>DEMANDAS</span>
@@ -49,8 +55,11 @@
                 <span>AÇÕES</span>
             </div>
 
+            <!-- Aqui o JS coloca uma linha para cada projeto -->
             <div id="linhas-projetos"></div>
 
+            <!-- Aviso de lista vazia ou de erro. Começa escondido (hidden)
+            e o JS troca o texto conforme o caso -->
             <p class="sem-resultado" id="sem-resultado" hidden>
                 Nenhum projeto encontrado.
             </p>

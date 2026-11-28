@@ -4,6 +4,7 @@
     box-sizing: border-box;
 }
 
+/* Imagem de fundo fixa. O cinza é reserva caso o fundo.jpeg não carregue */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
 
@@ -24,6 +25,8 @@ body {
     padding: 30px 40px;
 }
 
+/* Botão de voltar com efeito de vidro fosco (fundo escuro translúcido + blur).
+O -webkit- é pro Safari */
 .botao-voltar {
     display: inline-block;
 
@@ -53,6 +56,7 @@ body {
     transform: translateY(-3px);
 }
 
+/* Faixa do topo com título à esquerda e busca à direita */
 .barra-topo {
     display: flex;
     align-items: center;
@@ -77,12 +81,16 @@ body {
     font-weight: 600;
 }
 
+/* margin-left: auto empurra a busca pro canto direito.
+O position: relative serve pra lupa ficar posicionada dentro dela */
 .barra-busca {
     margin-left: auto;
 
     position: relative;
 }
 
+/* Lupa em cima do input, no lado esquerdo.
+pointer-events: none deixa o clique passar pro campo */
 .barra-busca__icone {
     position: absolute;
 
@@ -102,6 +110,7 @@ body {
     pointer-events: none;
 }
 
+/* O padding da esquerda (38px) abre espaço pra lupa não ficar em cima do texto */
 .barra-busca input {
     width: 280px;
 
@@ -126,10 +135,12 @@ body {
     color: rgba(255, 255, 255, 0.65);
 }
 
+/* Como tirei o outline, o foco aparece pela borda mais clara */
 .barra-busca input:focus {
     border-color: rgba(255, 255, 255, 0.40);
 }
 
+/* Caixa da lista. O overflow: hidden mantém as pontas arredondadas */
 .lista-projetos {
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 16px;
@@ -142,6 +153,8 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
+/* Cada linha é uma grade de 4 colunas: nome, demandas, situação e ações.
+O cabeçalho usa a mesma grade, por isso as colunas alinham */
 .linha {
     display: grid;
 
@@ -156,6 +169,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
+/* A última linha não precisa da linha de baixo */
 .linha:last-child {
     border-bottom: none;
 }
@@ -169,6 +183,7 @@ body {
     color: rgba(255, 255, 255, 0.65);
 }
 
+/* "AÇÕES" centralizado pra ficar em cima dos botões */
 .linha--cabecalho span:last-child {
     text-align: center;
 }
@@ -191,6 +206,7 @@ body {
     justify-content: center;
 }
 
+/* Botão base. As cores ficam nas variações .btn--principal e .btn--secundario */
 .btn {
     padding: 8px 12px;
 
@@ -226,6 +242,9 @@ body {
     background: rgba(255, 255, 255, 0.18);
 }
 
+/* Etiqueta de situação. A cor vem da segunda classe (.status--andamento...),
+que o JS escolhe conforme a situação do projeto.
+justify-self: start evita ela esticar a coluna toda */
 .status {
     justify-self: start;
 
@@ -263,6 +282,7 @@ body {
     border: 1px solid rgba(220, 38, 38, 0.40);
 }
 
+/* Mensagem de lista vazia ou erro (o atributo hidden do HTML esconde ela) */
 .sem-resultado {
     padding: 24px 20px;
     text-align: center;
