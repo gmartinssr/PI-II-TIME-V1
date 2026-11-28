@@ -10,11 +10,14 @@ body {
     color: #1F2937;
 }
 
+/* Menu de largura fixa na esquerda, conteúdo ocupando o resto */
 .container {
     display: flex;
     min-height: 100vh;
 }
 
+/* Mesmo menu do dashboard, só muda o nome da imagem de fundo.
+O azul é reserva caso a imagem não carregue */
 .sidebar {
     width: 220px;
     min-height: 100vh;
@@ -60,10 +63,12 @@ body {
     transform: translateX(3px);
 }
 
+/* Página atual no menu */
 .sidebar a.ativo {
     background-color: rgba(10, 65, 115, 0.85);
 }
 
+/* min-width: 0 evita a tabela larga estourar o conteúdo dentro do flex */
 main {
     flex: 1;
     min-width: 0;
@@ -77,6 +82,7 @@ main {
     margin-bottom: 28px;
 }
 
+/* Começa escondida, o JS mostra com display: block */
 .sem-resultados {
     display: none;
     padding: 30px;
@@ -128,6 +134,7 @@ main {
     gap: 10px;
 }
 
+/* Botão "Limpar" dos filtros (cinza, pra não competir com o Filtrar) */
 .botao-limpar {
     height: 40px;
     padding: 0 18px;
@@ -147,6 +154,7 @@ main {
     transform: translateY(-1px);
 }
 
+/* Cards de resumo. flex-wrap deixa quebrar linha em tela menor */
 .cards {
     display: flex;
     gap: 20px;
@@ -237,6 +245,8 @@ main {
     width: 180px;
 }
 
+/* Tirei o outline padrão (outline: none lá em cima), então o foco
+é mostrado pela borda azul + sombra */
 .filtros input:focus,
 .filtros select:focus {
     border-color: #174E87;
@@ -262,6 +272,7 @@ main {
     transform: translateY(-1px);
 }
 
+/* Caixa branca da tabela. O min-height segura o tamanho mesmo com poucas linhas */
 .lista-demandas {
     width: 100%;
     min-height: 360px;
@@ -278,6 +289,8 @@ main {
     overflow: hidden;
 }
 
+/* A tabela tem min-width de 1100px, então em tela pequena
+rola na horizontal só aqui dentro, sem esticar a página */
 .tabela-container {
     width: 100%;
     overflow-x: auto;
@@ -320,6 +333,8 @@ tbody tr:hover {
     background-color: #EEF4FA;
 }
 
+/* Etiqueta usada em prioridade e status. A cor vem da segunda classe
+(.critica, .aberta...), que o JS escolhe conforme o valor */
 .badge {
     display: inline-block;
     padding: 5px 10px;
@@ -329,6 +344,7 @@ tbody tr:hover {
     white-space: nowrap;
 }
 
+/* Cores de status (fundo forte, texto branco) */
 .aberta {
     background-color: #2563EB;
     color: white;
@@ -354,6 +370,7 @@ tbody tr:hover {
     color: white;
 }
 
+/* Cores de prioridade (fundo claro, texto escuro) */
 .critica {
     background-color: #FEE2E2;
     color: #B91C1C;
@@ -374,6 +391,7 @@ tbody tr:hover {
     color: #15803D;
 }
 
+/* Deixa os botões Ver e Editar lado a lado, centralizados na coluna de ações */
 .acoes {
     display: flex;
     justify-content: center;
@@ -409,6 +427,8 @@ tbody tr:hover {
     transform: translateY(-1px);
 }
 
+/* Botões de paginação, centralizados embaixo da tabela.
+Por enquanto só visual */
 .paginacao {
     display: flex;
     justify-content: center;
@@ -438,6 +458,7 @@ tbody tr:hover {
     color: #FFFFFF;
 }
 
+/* Até 1000px: menu mais estreito e cards mais juntos */
 @media (max-width: 1000px) {
 
     .sidebar {
@@ -461,6 +482,8 @@ tbody tr:hover {
     }
 }
 
+/* Tablet/celular: o menu vira uma faixa no topo com os links rolando
+na horizontal, e cards e filtros empilham */
 @media (max-width: 768px) {
 
     .container {
@@ -533,6 +556,7 @@ tbody tr:hover {
     }
 }
 
+/* Celular pequeno */
 @media (max-width: 480px) {
 
     main {

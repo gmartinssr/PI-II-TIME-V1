@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- Controle de acesso, carregado antes do resto da página -->
     <script src="../comum/controleAcesso.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listagem de Demandas</title>
@@ -12,6 +13,7 @@
 
 <div class="container">
 
+    <!-- Menu lateral, igual ao do dashboard. Aqui o "ativo" fica em Demandas -->
     <aside class="sidebar">
 
        <h2>Workflow</h2>
@@ -25,6 +27,7 @@
             <a href="tela.html" class="ativo">Demandas</a>
         </li>
 
+        <!-- Link para a tela de cadastro de nova demanda -->
         <li>
             <a href="../Cadastro/Edição-de-Demandas/Cadastro e edição de demandas.html">Nova Demanda</a>
         </li>
@@ -62,6 +65,8 @@
             </div>
         </section>
 
+        <!-- Os 4 cards começam com 0 e o JS preenche. Ele pega pela ordem
+        (cards[0] = Total, [1] = Em andamento...), então não trocar de lugar -->
         <section class="cards">
 
             <div class="card">
@@ -86,6 +91,9 @@
 
         </section>
 
+        <!-- Esses campos não têm id, o JS acha pela ordem (primeiro select = status,
+        segundo = prioridade, terceiro = tipo). O value de cada option tem que
+        ser igual ao texto que aparece na tabela, com acento e tudo -->
         <section class="filtros">
 
             <input type="text" placeholder="Buscar por título...">
@@ -141,6 +149,8 @@
 
                     </thead>
 
+                    <!-- As 5 linhas abaixo são só de exemplo (dados fixos).
+                    O JS apaga tudo e monta de novo com o que vem da API -->
                     <tbody>
 
                         <tr>
@@ -226,6 +236,7 @@
                     </tbody>
 
                 </table>
+                <!-- Aparece (via JS) quando não tem nenhuma demanda ou quando a API falha -->
                 <p id="sem-resultados" class="sem-resultados">
                     Nenhuma demanda encontrada.
                 </p>
@@ -233,6 +244,8 @@
 
         </section>
 
+        <!-- Botões de paginação. Por enquanto só aparecem na tela,
+        a lista mostra todas as demandas de uma vez -->
         <section class="paginacao">
 
             <a href="#">Anterior</a>

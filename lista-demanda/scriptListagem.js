@@ -1,5 +1,8 @@
+// Só pra confirmar no console que o script foi carregado
 console.log("JavaScript da Listagem conectado!");
 
+// Os filtros não têm id, então pego pela posição:
+// 1º select = status, 2º = prioridade, 3º = tipo
 const busca = document.querySelector(".filtros input");
 const filtroStatus = document.querySelectorAll(".filtros select")[0];
 const prioridade = document.querySelectorAll(".filtros select")[1];
@@ -10,12 +13,15 @@ const semResultados = document.getElementById("sem-resultados");
 const tabela = document.querySelector("tbody");
 let demandas = [];
 
+// Mesma regra das outras telas: porta 3030 usa o backend de teste (3333)
 const API_URL =
     window.location.port === "3030"
         ? "http://localhost:3333/api/demandas"
         : "http://localhost:3000/api/demandas";
 
-// Monta a tabela de demandas.
+// Apaga as linhas de exemplo do HTML e monta uma linha por demanda.
+// O backend manda os valores em minúsculo (critica, andamento...),
+// aqui eu converto pro texto bonito e pra classe de cor do badge.
 function renderizarDemandas() {
     tabela.innerHTML = "";
 
@@ -37,6 +43,7 @@ function renderizarDemandas() {
             baixa: "Baixa"
         };
 
+        // Classe CSS de cada status e de cada prioridade, é ela que define a cor do badge
         const statusClasse = {
             aberta: "aberta",
             andamento: "andamento",
@@ -52,6 +59,7 @@ function renderizarDemandas() {
             baixa: "baixa"
         };
 
+        // "documentação" tem acento porque é assim que o formulário envia
         const tipoTexto = {
             tarefa: "Tarefa",
             defeito: "Defeito",
@@ -59,6 +67,8 @@ function renderizarDemandas() {
             "documentação": "Documentação"
         };
 
+        // Monta o conteúdo da linha com os dados da demanda.
+        // O ?id= nos links de Ver e Editar é o que abre a tela já com essa demanda
         linha.innerHTML = `
             <td>#${String(demanda.id).padStart(3, "0")}</td>
             <td>${demanda.titulo}</td>
@@ -92,7 +102,8 @@ function renderizarDemandas() {
         demandas.length === 0 ? "block" : "none";
 }
 
-// GET /api/demandas
+// GET /api/demandas: guarda a lista, monta a tabela e atualiza os cards.
+// Se a API falhar, mostra o aviso no lugar da tabela
 async function carregarDemandas() {
     try {
         const resposta = await fetch(API_URL);
@@ -116,8 +127,10 @@ async function carregarDemandas() {
     }
 }
 
+// Carrega as demandas assim que o script roda
 carregarDemandas();
 
+// Cards de resumo, pegos pela ordem do HTML (Total, Em andamento, Concluídas, Críticas)
 const cards = document.querySelectorAll(".card");
 
 const totalCard = cards[0].querySelector("p");
@@ -126,7 +139,9 @@ const concluidasCard = cards[2].querySelector("p");
 const criticasCard = cards[3].querySelector("p");
 const botaoLimpar = document.querySelector(".botao-limpar");
 
-// Recalcula os cards de resumo com as linhas visíveis.
+// Conta pelo texto das células (cells[3] = prioridade, cells[4] = status)
+// só as linhas que estão visíveis, então os cards acompanham o filtro.
+// Por isso o texto do filtro precisa ser igual ao do badge
 function atualizarCards() {
     const linhas = tabela.querySelectorAll("tr");
 
@@ -164,7 +179,7 @@ function atualizarCards() {
     criticasCard.textContent = criticas;
 }
 
-// Limpa os filtros.
+// Zera os campos e monta a tabela de novo, o que também mostra as linhas escondidas
 botaoLimpar.addEventListener("click", function() {
     busca.value = "";
     filtroStatus.value = "";
@@ -175,7 +190,8 @@ botaoLimpar.addEventListener("click", function() {
     atualizarCards();
 });
 
-// Esconde as linhas que não batem com os filtros.
+// Filtra a tabela no próprio navegador: esconde as linhas que não batem
+// com os filtros escolhidos e recalcula os números dos cards
 botaoFiltrar.addEventListener("click", function() {
     const textoBusca = busca.value.trim().toLowerCase();
     const valorStatus = filtroStatus.value;
