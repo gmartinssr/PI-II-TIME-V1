@@ -162,8 +162,9 @@ main {
 .status-demandas {
     display: flex;
     flex: 1;
+    flex-wrap: wrap;
     justify-content: space-around;
-    gap: 25px;
+    gap: 15px;
 }
 
 .status-item {
@@ -171,14 +172,24 @@ main {
     flex-direction: column;
     justify-content: center;
 
-    min-width: 120px;
+    flex: 1 1 100px;
+    min-width: 100px;
     min-height: 100px;
 
-    padding: 15px 20px;
+    padding: 15px 16px;
 }
 
 .status-item + .status-item {
     border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.resumo-dashboard {
+    gap: 24px;   /* era 40px */
+}
+
+.total-demandas {
+    min-width: 180px;   /* era 220px */
+    padding-right: 24px;   /* era 30px */
 }
 
 .status-item p {
