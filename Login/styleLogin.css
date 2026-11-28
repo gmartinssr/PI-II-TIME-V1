@@ -1,3 +1,5 @@
+/* Imagem de fundo fixa cobrindo a tela toda.
+O background-color é só reserva caso o bgColor.png não carregue */
 body {
     background-image: url("bgColor.png");
     background-color: #ffffff;
@@ -8,6 +10,8 @@ body {
     color: rgb(75, 71, 71);
 }
 
+/* Efeito de vidro fosco (fundo escuro meio transparente + blur).
+O -webkit- é pro Safari */
 header {
     background: rgba(23, 26, 33, 0.55);
     backdrop-filter: blur(12px);
@@ -21,6 +25,8 @@ header span {
     letter-spacing: 0.5px;
 }
 
+/* Centraliza o card na tela.
+Tirei 60px da altura pra compensar o header, senão aparecia barra de rolagem */
 .corpo {
     display: flex;
     justify-content: center;
@@ -28,6 +34,9 @@ header span {
     min-height: calc(90vh - 60px);
 }
 
+/* Mesmo efeito de vidro do header.
+TODO: width e height fixos, testar no celular. Talvez trocar por max-width
+e min-height, porque se aparecer mensagem de erro o conteúdo pode estourar o card */
 .card_login {
     width: 380px;
     height: 450px;
@@ -54,6 +63,7 @@ header span {
     font-size: 15px;
 }
 
+/* Label em cima, input embaixo */
 .Email,
 .Senha {
     display: flex;
@@ -61,6 +71,7 @@ header span {
     margin-bottom: 20px;
 }
 
+/* Sem isso o Bootstrap deixa o placeholder cinza e ele some no fundo escuro */
 .Email input::placeholder,
 .Senha input::placeholder {
     color: #FFFFFF;
@@ -72,6 +83,7 @@ header span {
     margin-bottom: 6px;
 }
 
+/* Sobrescreve o form-control do Bootstrap pra combinar com o card */
 .Email input,
 .Senha input {
     width: 100%;
@@ -81,6 +93,8 @@ header span {
     border-radius: 8px;
 }
 
+/* text-decoration e text-align sobraram de quando ele era um link <a>,
+num <button> não fazem diferença. Dá pra apagar depois */
 .btn-entrar {
     display: block;
     width: 100%;
@@ -104,6 +118,7 @@ header span {
     transition: 0.2s;
 }
 
+/* Clareia um pouco e cresce 2% */
 .btn-entrar:hover {
     background: rgba(255, 255, 255, 0.25);
     color: #FFFFFF;
@@ -111,6 +126,9 @@ header span {
     transform: scale(1.02);
 }
 
+/* Essas duas classes são as mesmas que o scriptLogin.js usa:
+campo-erro vai no input e mensagem-erro no span embaixo dele.
+Se mudar o nome aqui, tem que mudar lá também */
 .campo-erro {
     border-color: #B3432B !important;
 }
