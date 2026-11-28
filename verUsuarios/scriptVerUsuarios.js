@@ -1,6 +1,7 @@
 const listaUsuarios = document.getElementById("listaUsuarios");
 const campoBusca = document.getElementById("buscarUsuario");
 const perfilLogado = document.getElementById("perfilLogado");
+const listaHistorico = document.getElementById("listaHistorico");
 const apiUrl = window.location.port === "3030"
     ? "http://localhost:3333"
     : "http://localhost:3000";
@@ -77,5 +78,56 @@ async function carregarUsuarios() {
     }
 }
 
+// Monta a tabela do histórico de alterações.
+function renderizarHistorico(historico) {
+    listaHistorico.replaceChildren();
+
+    if (!historico || historico.length === 0) {
+        listaHistorico.innerHTML = "<tr><td colspan=\"4\">Nenhuma alteração registrada até o momento.</td></tr>";
+        return;
+    }
+
+    historico.forEach((item) => {
+        const linha = document.createElement("tr");
+        const data = document.createElement("td");
+        const quem = document.createElement("td");
+        const demanda = document.createElement("td");
+        const mudanca = document.createElement("td");
+
+        data.textContent = new Date(item.dataHora).toLocaleString("pt-BR");
+        quem.textContent = item.usuario;
+        demanda.textContent = `DEM-${String(item.idDemanda).padStart(4, "0")} - ${item.tituloDemanda}`;
+        mudanca.textContent = item.descricao;
+
+        linha.append(data, quem, demanda, mudanca);
+        listaHistorico.appendChild(linha);
+    });
+}
+
+// GET /api/historico: carrega as alterações (só o admin).
+async function carregarHistorico() {
+    const sessao = sessionStorage.getItem("usuario");
+    if (!sessao) return;
+
+    try {
+        const usuarioLogado = JSON.parse(sessao);
+
+        const resposta = await fetch(
+            `${apiUrl}/api/historico?idSolicitante=${usuarioLogado.idUsuario}`
+        );
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(resultado.mensagem || "Não foi possível carregar o histórico.");
+        }
+
+        renderizarHistorico(resultado.historico);
+    } catch (erro) {
+        console.error("Não foi possível carregar o histórico:", erro);
+        listaHistorico.innerHTML = "<tr><td colspan=\"4\">Não foi possível carregar o histórico.</td></tr>";
+    }
+}
+
 campoBusca.addEventListener("input", renderizarUsuarios);
 carregarUsuarios();
+carregarHistorico();

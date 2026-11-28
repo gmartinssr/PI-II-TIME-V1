@@ -2070,6 +2070,89 @@ app.put("/api/demandas/:id", async (request, response) => {
   }
 });
 
+// Lista o histórico de alterações das demandas (somente Administrador).
+app.get("/api/historico", async (request, response) => {
+    const idSolicitante = Number(request.query.idSolicitante);
+
+    if (!Number.isInteger(idSolicitante) || idSolicitante <= 0) {
+        response.status(400).json({ valido: false, mensagem: "Usuário inválido." });
+        return;
+    }
+
+    let conexao: oracledb.Connection | undefined;
+
+    try {
+        const pool = await iniciarPool();
+        conexao = await pool.getConnection();
+
+        const consultaPerfil = await conexao.execute<{ idPerfil: number }>(
+            `SELECT id_perfil AS "idPerfil"
+               FROM usuario
+              WHERE id_usuario = :idSolicitante AND ativo = 1`,
+            { idSolicitante },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const solicitante = consultaPerfil.rows?.[0];
+
+        if (!solicitante || Number(solicitante.idPerfil) !== 1) {
+            response.status(403).json({
+                valido: false,
+                mensagem: "Apenas o Administrador pode ver o histórico."
+            });
+            return;
+        }
+
+        const resultado = await conexao.execute(
+            `SELECT
+                h.data_hora - INTERVAL '3' HOUR AS "dataHora",
+                h.data_hora        AS "dataHora",
+                u.nome             AS "usuario",
+                h.id_demanda       AS "idDemanda",
+                d.titulo           AS "tituloDemanda",
+                h.tipo_alteracao   AS "tipo",
+                h.valor_anterior   AS "anterior",
+                h.valor_novo       AS "novo"
+             FROM historico_alteracao h
+             INNER JOIN usuario u ON u.id_usuario = h.id_usuario
+             INNER JOIN demanda d ON d.id_demanda = h.id_demanda
+             ORDER BY h.data_hora DESC`,
+            {},
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const nomesTipo: Record<string, string> = {
+            STATUS: "Status",
+            CANCELAMENTO: "Cancelamento",
+            PRIORIDADE: "Prioridade",
+            PRAZO: "Prazo",
+            RESPONSAVEL: "Responsável"
+        };
+
+        const historico = (resultado.rows ?? []).map((linha: any) => ({
+            dataHora: linha.dataHora,
+            usuario: linha.usuario,
+            idDemanda: linha.idDemanda,
+            tituloDemanda: linha.tituloDemanda,
+            descricao: `${nomesTipo[linha.tipo] ?? linha.tipo}: ${linha.anterior ?? "(vazio)"} → ${linha.novo ?? "(vazio)"}`
+        }));
+
+        response.status(200).json({ valido: true, historico });
+
+    } catch (erro) {
+        console.error("Erro ao listar histórico:", erro);
+        response.status(500).json({
+            valido: false,
+            mensagem: "Erro interno ao carregar o histórico."
+        });
+
+    } finally {
+        if (conexao) {
+            await conexao.close();
+        }
+    }
+});
+
 interface DemandaKanban {
     id: number;
     titulo: string;
